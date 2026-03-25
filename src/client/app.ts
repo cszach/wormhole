@@ -22,9 +22,13 @@ import { getDefaultTheme, getTheme, themes } from "@/themes/index.js";
 
 import { initShader } from "./shader.js";
 
-type ServerMessage = { type: "output"; content: string } | { type: "stable" };
+type ServerMessage =
+	| { type: "output"; content: string }
+	| { type: "stable" }
+	| { type: "session"; session: string };
 
-const wsStatus = document.getElementById("ws-status") as HTMLElement;
+const wsDot = document.getElementById("ws-dot") as HTMLElement;
+const sessionNameEl = document.getElementById("session-name") as HTMLElement;
 const output = document.getElementById("output") as HTMLElement;
 const textInput = document.getElementById("text-input") as HTMLTextAreaElement;
 const sendBtn = document.getElementById("send-btn") as HTMLButtonElement;
@@ -61,9 +65,7 @@ function connect(): void {
 	ws = new WebSocket(`${protocol}//${location.host}`);
 
 	ws.addEventListener("open", () => {
-		wsStatus.classList.add("connected");
-		wsStatus.title = "Connected";
-		wsStatus.querySelector(".ws-label")!.textContent = "Live";
+		wsDot.classList.add("connected");
 
 		// Apply terminal column width on connect
 		updateColumns();
@@ -80,12 +82,14 @@ function connect(): void {
 		if (message.type === "stable" && ttsEnabled) {
 			speakLatest();
 		}
+
+		if (message.type === "session") {
+			sessionNameEl.textContent = message.session;
+		}
 	});
 
 	ws.addEventListener("close", () => {
-		wsStatus.classList.remove("connected");
-		wsStatus.title = "Disconnected";
-		wsStatus.querySelector(".ws-label")!.textContent = "Offline";
+		wsDot.classList.remove("connected");
 		setTimeout(() => {
 			connect();
 		}, 2000);
@@ -551,9 +555,6 @@ const ttsRateValue = document.getElementById("tts-rate-value") as HTMLElement;
 const ttsVoiceSelect = document.getElementById(
 	"tts-voice"
 ) as HTMLSelectElement;
-const tmuxSessionInput = document.getElementById(
-	"tmux-session"
-) as HTMLInputElement;
 const colorList = document.getElementById("color-list") as HTMLElement;
 
 const ACCENT_COLORS = [
@@ -593,7 +594,6 @@ function openSettings(): void {
 	ttsModeSelect.value = localStorage.getItem("wormhole-tts-mode") ?? "summary";
 	ttsRateInput.value = String(ttsRate);
 	ttsRateValue.textContent = ttsRate.toFixed(1) + "x";
-	tmuxSessionInput.value = localStorage.getItem("wormhole-tmux-session") ?? "";
 	renderSkillChips();
 }
 
@@ -712,13 +712,6 @@ speechSynthesis.addEventListener("voiceschanged", populateVoices);
 
 ttsVoiceSelect.addEventListener("change", () => {
 	localStorage.setItem("wormhole-tts-voice", ttsVoiceSelect.value);
-});
-
-// tmux session
-
-tmuxSessionInput.addEventListener("change", () => {
-	const val = tmuxSessionInput.value.trim();
-	localStorage.setItem("wormhole-tmux-session", val);
 });
 
 // Skills (chip input)
@@ -1041,6 +1034,121 @@ if (savedAutoCols === "false") {
 	autoColsCheckbox.checked = true;
 	colsRow.classList.add("disabled");
 }
+
+// --- Session modal ---
+
+const sessionBtn = document.getElementById("session-btn") as HTMLButtonElement;
+const sessionModal = document.getElementById("session-modal") as HTMLElement;
+const sessionList = document.getElementById("session-list") as HTMLElement;
+const sessionNewName = document.getElementById(
+	"session-new-name"
+) as HTMLInputElement;
+const sessionCreateBtn = document.getElementById(
+	"session-create-btn"
+) as HTMLButtonElement;
+const sessionError = document.getElementById("session-error") as HTMLElement;
+
+async function fetchSessions(): Promise<string[]> {
+	try {
+		const res = await fetch("/api/sessions");
+		const data = await res.json();
+
+		return data.sessions ?? [];
+	} catch {
+		return [];
+	}
+}
+
+function renderSessionList(sessions: string[]): void {
+	sessionList.innerHTML = "";
+	const current = sessionNameEl.textContent ?? "";
+
+	for (const name of sessions) {
+		const btn = document.createElement("button");
+		btn.className = "session-item";
+
+		if (name === current) {
+			btn.classList.add("active");
+		}
+
+		btn.textContent = name;
+
+		btn.addEventListener("click", () => {
+			if (name !== current && ws && ws.readyState === WebSocket.OPEN) {
+				ws.send(JSON.stringify({ type: "switch", session: name }));
+			}
+
+			closeSessionModal();
+		});
+
+		sessionList.appendChild(btn);
+	}
+}
+
+async function openSessionModal(): Promise<void> {
+	sessionError.hidden = true;
+	sessionNewName.value = "";
+	sessionModal.hidden = false;
+
+	const sessions = await fetchSessions();
+	renderSessionList(sessions);
+}
+
+function closeSessionModal(): void {
+	sessionModal.hidden = true;
+}
+
+sessionBtn.addEventListener("click", () => {
+	openSessionModal();
+});
+
+sessionModal.addEventListener("click", (e) => {
+	if (e.target === sessionModal) {
+		closeSessionModal();
+	}
+});
+
+sessionCreateBtn.addEventListener("click", async () => {
+	const name = sessionNewName.value.trim();
+
+	if (!name) {
+		return;
+	}
+
+	sessionError.hidden = true;
+
+	try {
+		const res = await fetch("/api/sessions", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name })
+		});
+
+		if (!res.ok) {
+			const data = await res.json();
+			sessionError.textContent = data.error ?? "Failed to create session";
+			sessionError.hidden = false;
+
+			return;
+		}
+
+		// Auto-switch to new session
+		if (ws && ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({ type: "switch", session: name }));
+		}
+
+		closeSessionModal();
+	} catch {
+		sessionError.textContent = "Failed to create session";
+		sessionError.hidden = false;
+	}
+});
+
+sessionNewName.addEventListener("keydown", (e) => {
+	if (e.key === "Enter") {
+		sessionCreateBtn.click();
+	}
+});
 
 syncKeyLayout();
 syncFooterPadding();

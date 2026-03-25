@@ -1,13 +1,11 @@
 import { execFile } from "node:child_process";
 
-const SESSION = process.env.TMUX_SESSION ?? "claude";
-
-export function sendKeys(text: string): Promise<void> {
+export function sendKeys(session: string, text: string): Promise<void> {
 	const clean = text.replace(/[\r\n]+/g, " ");
 
 	return new Promise((resolve, reject) => {
 		// Send text literally (-l) to avoid interpreting special keys
-		execFile("tmux", ["send-keys", "-t", SESSION, "-l", clean], (error) => {
+		execFile("tmux", ["send-keys", "-t", session, "-l", clean], (error) => {
 			if (error) {
 				reject(error);
 
@@ -15,7 +13,7 @@ export function sendKeys(text: string): Promise<void> {
 			}
 
 			// Send Enter as a separate keystroke
-			execFile("tmux", ["send-keys", "-t", SESSION, "Enter"], (enterError) => {
+			execFile("tmux", ["send-keys", "-t", session, "Enter"], (enterError) => {
 				if (enterError) {
 					reject(enterError);
 				} else {
@@ -69,13 +67,13 @@ function isAllowedKey(key: string): boolean {
 	return false;
 }
 
-export function sendRawKey(key: string): Promise<void> {
+export function sendRawKey(session: string, key: string): Promise<void> {
 	if (!isAllowedKey(key)) {
 		return Promise.reject(new Error("Key not allowed"));
 	}
 
 	return new Promise((resolve, reject) => {
-		execFile("tmux", ["send-keys", "-t", SESSION, key], (error) => {
+		execFile("tmux", ["send-keys", "-t", session, key], (error) => {
 			if (error) {
 				reject(error);
 			} else {
@@ -85,13 +83,13 @@ export function sendRawKey(key: string): Promise<void> {
 	});
 }
 
-export function resizePane(cols: number): Promise<void> {
+export function resizePane(session: string, cols: number): Promise<void> {
 	const clamped = Math.max(40, Math.min(300, Math.round(cols)));
 
 	return new Promise((resolve, reject) => {
 		execFile(
 			"tmux",
-			["resize-window", "-t", SESSION, "-x", String(clamped)],
+			["resize-window", "-t", session, "-x", String(clamped)],
 			(error) => {
 				if (error) {
 					reject(error);
@@ -103,11 +101,11 @@ export function resizePane(cols: number): Promise<void> {
 	});
 }
 
-export function capturePane(): Promise<string> {
+export function capturePane(session: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 		execFile(
 			"tmux",
-			["capture-pane", "-t", SESSION, "-p", "-e", "-S", "-500"],
+			["capture-pane", "-t", session, "-p", "-e", "-S", "-500"],
 			(error, stdout) => {
 				if (error) {
 					reject(error);
@@ -116,5 +114,38 @@ export function capturePane(): Promise<string> {
 				}
 			}
 		);
+	});
+}
+
+export function listSessions(): Promise<string[]> {
+	return new Promise((resolve) => {
+		execFile(
+			"tmux",
+			["list-sessions", "-F", "#{session_name}"],
+			(error, stdout) => {
+				if (error) {
+					resolve([]);
+				} else {
+					resolve(
+						stdout
+							.trim()
+							.split("\n")
+							.filter((s) => s.length > 0)
+					);
+				}
+			}
+		);
+	});
+}
+
+export function createSession(name: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		execFile("tmux", ["new-session", "-d", "-s", name], (error) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve();
+			}
+		});
 	});
 }

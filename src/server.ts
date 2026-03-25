@@ -1,4 +1,3 @@
-
 import { createServer } from "node:http";
 import { createServer as createHTTPSServer } from "node:https";
 import path from "node:path";
@@ -9,12 +8,20 @@ import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 
 import type { ServerMessage } from "./types.js";
-import { sendKeys, sendRawKey, resizePane, capturePane } from "./tmux.js";
+import {
+	sendKeys,
+	sendRawKey,
+	resizePane,
+	capturePane,
+	listSessions,
+	createSession
+} from "./tmux.js";
 
 const PORT = Number(process.env.PORT ?? 5173);
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? "./uploads";
 const TLS_CERT = process.env.TLS_CERT ?? "";
 const TLS_KEY = process.env.TLS_KEY ?? "";
+const DEFAULT_SESSION = process.env.TMUX_SESSION ?? "claude";
 
 const uploadDir = path.resolve(UPLOAD_DIR);
 
@@ -35,6 +42,7 @@ const upload = multer({
 });
 
 const app = express();
+app.use(express.json());
 
 const useTLS = TLS_CERT && TLS_KEY;
 
@@ -63,6 +71,61 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
 	res.json({ path: filePath });
 });
 
+// --- Session management ---
+
+const SESSION_NAME_RE = /^[^.:]+$/;
+const SESSION_MAX_LEN = 20;
+
+function isValidSessionName(name: string): string | null {
+	if (!name || name.trim().length === 0) {
+		return "Session name cannot be empty";
+	}
+
+	if (name.length > SESSION_MAX_LEN) {
+		return `Session name must be ${SESSION_MAX_LEN} characters or fewer`;
+	}
+
+	if (!SESSION_NAME_RE.test(name)) {
+		return "Session name cannot contain . or :";
+	}
+
+	return null;
+}
+
+app.get("/api/sessions", async (_req, res) => {
+	const sessions = await listSessions();
+	res.json({ sessions });
+});
+
+app.post("/api/sessions", async (req, res) => {
+	const { name } = req.body;
+	const error = isValidSessionName(name);
+
+	if (error) {
+		res.status(400).json({ error });
+
+		return;
+	}
+
+	const sessions = await listSessions();
+
+	if (sessions.includes(name)) {
+		res.status(409).json({ error: "Session already exists" });
+
+		return;
+	}
+
+	try {
+		await createSession(name);
+		res.json({ ok: true });
+	} catch {
+		res.status(500).json({ error: "Failed to create session" });
+	}
+});
+
+// --- Tmux polling ---
+
+let activeSession = DEFAULT_SESSION;
 let lastCapture = "";
 let lastChangeMs = Date.now();
 let stableSent = false;
@@ -81,7 +144,7 @@ function broadcast(message: ServerMessage): void {
 
 async function pollTmux(): Promise<void> {
 	try {
-		const content = await capturePane();
+		const content = await capturePane(activeSession);
 
 		if (content !== lastCapture) {
 			lastCapture = content;
@@ -105,6 +168,9 @@ setInterval(() => {
 }, POLL_INTERVAL_MS);
 
 wss.on("connection", (ws) => {
+	// Send current session name and output on connect
+	ws.send(JSON.stringify({ type: "session", session: activeSession }));
+
 	if (lastCapture) {
 		ws.send(JSON.stringify({ type: "output", content: lastCapture }));
 	}
@@ -122,15 +188,22 @@ wss.on("connection", (ws) => {
 					}
 				}
 
-				await sendKeys(text);
+				await sendKeys(activeSession, text);
 			}
 
 			if (message.type === "key" && message.key) {
-				await sendRawKey(message.key);
+				await sendRawKey(activeSession, message.key);
 			}
 
 			if (message.type === "resize" && message.cols) {
-				await resizePane(message.cols);
+				await resizePane(activeSession, message.cols);
+			}
+
+			if (message.type === "switch" && message.session) {
+				activeSession = message.session;
+				lastCapture = "";
+				stableSent = false;
+				broadcast({ type: "session", session: activeSession });
 			}
 		} catch {
 			// Ignore malformed messages

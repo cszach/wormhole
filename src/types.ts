@@ -6,4 +6,5 @@ export type ClientMessage = {
 
 export type ServerMessage =
 	| { type: "output"; content: string }
-	| { type: "stable" };
+	| { type: "stable" }
+	| { type: "session"; session: string };

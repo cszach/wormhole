@@ -19,11 +19,14 @@
 		<header>
 			<div class="header-left">
 				<span class="header-title">Wormhole</span>
-				<div id="ws-status" class="ws-status" title="Disconnected">
-					<span class="ws-dot"></span>
-					<span class="ws-label">Offline</span>
-				</div>
 			</div>
+			<button id="session-btn" class="session-btn" title="Switch session">
+				<div class="session-top">
+					<span id="session-name" class="session-name">claude</span>
+					<span id="ws-dot" class="ws-dot"></span>
+				</div>
+				<span class="session-hint">Tap to switch</span>
+			</button>
 			<div class="header-right">
 				<button id="settings-btn" title="Settings" aria-label="Settings">
 					<i data-lucide="settings" aria-hidden="true"></i>
@@ -38,6 +41,31 @@
 				</button>
 			</div>
 		</header>
+
+		<!-- Session modal -->
+		<div id="session-modal" class="modal-backdrop" hidden>
+			<div class="modal">
+				<h2 class="modal-title">Sessions</h2>
+				<div id="session-list" class="session-list"></div>
+				<div class="session-create">
+					<input
+						type="text"
+						id="session-new-name"
+						class="settings-input"
+						placeholder="New session name..."
+						maxlength="20"
+						autocomplete="off"
+						autocorrect="off"
+						autocapitalize="off"
+						spellcheck="false"
+					/>
+					<button id="session-create-btn" class="session-create-btn">
+						Create
+					</button>
+				</div>
+				<p id="session-error" class="session-error" hidden></p>
+			</div>
+		</div>
 
 		<main id="output"></main>
 
@@ -116,24 +144,6 @@
 							/>
 							<span id="cols-value" class="settings-value">80</span>
 						</label>
-					</div>
-
-					<div class="settings-section">
-						<h3>Connection</h3>
-						<label class="settings-row">
-							<span class="settings-label">tmux session</span>
-							<input
-								type="text"
-								id="tmux-session"
-								class="settings-input"
-								placeholder="claude"
-								autocomplete="off"
-								autocorrect="off"
-								autocapitalize="off"
-								spellcheck="false"
-							/>
-						</label>
-						<p class="settings-hint">Requires server restart to take effect.</p>
 					</div>
 
 					<div class="settings-section">
