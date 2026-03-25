@@ -102,9 +102,12 @@ let inClaudeCode = false;
 const ccKeys = document.getElementById("cc-keys") as HTMLElement;
 const termKeys = document.getElementById("term-keys") as HTMLElement;
 
+const imageBtn = document.getElementById("image-btn") as HTMLElement;
+
 function syncKeyLayout(): void {
 	ccKeys.hidden = !inClaudeCode;
 	termKeys.hidden = inClaudeCode;
+	imageBtn.classList.toggle("disabled", !inClaudeCode);
 
 	if (inClaudeCode) {
 		textInput.removeAttribute("autocomplete");

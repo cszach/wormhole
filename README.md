@@ -1,17 +1,18 @@
 # Wormhole
 
-Talk to Claude Code from your phone.
+A mobile interface for tmux, with first-class Claude Code support.
 
-Wormhole is a web app that runs on the same machine as Claude Code and gives
-you a mobile interface to control it -- voice in, voice out, image attachments,
-and full terminal output with colors. Access it from any device on your network.
+Wormhole gives you a phone-friendly frontend for any tmux session -- live
+terminal output with colors, context-aware key layouts, and a polished
+glassmorphism UI. When it detects Claude Code, it unlocks voice dictation,
+text-to-speech, image attachments, and a tailored command palette.
 
 ## How it works
 
-Claude Code runs in a tmux session. Wormhole connects to that session: it sends
-your input via `tmux send-keys` and streams the terminal output back to your
-browser via WebSocket. Your phone's browser provides the mic, speakers, and
-camera that a terminal can't.
+Wormhole connects to a tmux session on your machine: it sends your input via
+`tmux send-keys` and streams the terminal output back to your browser via
+WebSocket. Your phone's browser provides the mic, speakers, and camera that a
+terminal can't.
 
 ```
 Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code

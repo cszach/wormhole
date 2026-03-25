@@ -680,6 +680,11 @@ footer {
 	background: var(--bg-glass-hover);
 }
 
+#image-btn.disabled {
+	opacity: 0.25;
+	pointer-events: none;
+}
+
 #text-input {
 	flex: 1;
 	background: transparent;
