@@ -121,7 +121,7 @@ export function listSessions(): Promise<string[]> {
 	return new Promise((resolve) => {
 		execFile(
 			"tmux",
-			["list-sessions", "-F", "#{session_name}"],
+			["list-sessions", "-F", "#{session_created}:#{session_name}"],
 			(error, stdout) => {
 				if (error) {
 					resolve([]);
@@ -131,6 +131,13 @@ export function listSessions(): Promise<string[]> {
 							.trim()
 							.split("\n")
 							.filter((s) => s.length > 0)
+							.sort((a, b) => {
+								const ta = parseInt(a.split(":")[0], 10);
+								const tb = parseInt(b.split(":")[0], 10);
+
+								return ta - tb;
+							})
+							.map((s) => s.substring(s.indexOf(":") + 1))
 					);
 				}
 			}
