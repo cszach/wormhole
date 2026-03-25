@@ -239,6 +239,7 @@ wss.on("connection", (ws) => {
 				lastCapture = "";
 				stableSent = false;
 				broadcast({ type: "session", session: activeSession });
+				pollTmux();
 			}
 		} catch {
 			// Ignore malformed messages
