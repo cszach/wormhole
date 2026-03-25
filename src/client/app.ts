@@ -179,12 +179,22 @@ function syncFooterPadding(): void {
 	output.style.paddingBottom = footer.offsetHeight + 8 + "px";
 }
 
+let inputFocusedBeforeExpand = false;
+
+keysExpand.addEventListener("pointerdown", () => {
+	inputFocusedBeforeExpand = document.activeElement === textInput;
+});
+
 keysExpand.addEventListener("click", () => {
 	const showing = !extraKeys.hidden;
 
 	extraKeys.hidden = showing;
 	keysExpand.classList.toggle("active", !showing);
 	syncFooterPadding();
+
+	if (inputFocusedBeforeExpand) {
+		textInput.focus();
+	}
 });
 
 // Auto-resize textarea
