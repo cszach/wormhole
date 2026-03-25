@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#06060e">
+	<title>Wormhole</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+	<canvas id="bg-shader" width="800" height="600"></canvas>
+
+	<header>
+		<div class="header-left">
+			<span class="header-title">Wormhole</span>
+			<div id="ws-status" class="ws-status" title="Disconnected">
+				<span class="ws-dot"></span>
+				<span class="ws-label">Offline</span>
+			</div>
+		</div>
+		<div class="header-right">
+			<button id="settings-btn" title="Settings" aria-label="Settings">
+				<i data-lucide="settings" aria-hidden="true"></i>
+			</button>
+			<button id="tts-toggle" title="Toggle text-to-speech" aria-label="Toggle text-to-speech">
+				<i data-lucide="volume-off" class="tts-off" aria-hidden="true"></i>
+				<i data-lucide="volume-2" class="tts-on" aria-hidden="true"></i>
+			</button>
+		</div>
+	</header>
+
+	<main id="output"></main>
+
+	<!-- Settings panel -->
+	<div id="settings-panel" class="settings-panel" hidden>
+		<div class="settings-backdrop"></div>
+		<div class="settings-drawer">
+			<div class="settings-header">
+				<h2>Settings</h2>
+				<button id="settings-close" aria-label="Close settings">
+					<i data-lucide="x" aria-hidden="true"></i>
+				</button>
+			</div>
+			<div class="settings-body">
+				<div class="settings-section">
+					<h3>Theme</h3>
+					<div id="theme-list" class="theme-list"></div>
+				</div>
+
+				<div class="settings-section">
+					<h3>Accent Color</h3>
+					<div id="color-list" class="color-list"></div>
+				</div>
+
+				<div class="settings-section">
+					<h3>Text-to-Speech</h3>
+					<label class="settings-row">
+						<span class="settings-label">Reads</span>
+						<select id="tts-mode" class="settings-select">
+							<option value="summary">Summary</option>
+							<option value="full">Full response</option>
+						</select>
+					</label>
+					<label class="settings-row">
+						<span class="settings-label">Speed</span>
+						<input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="1.1" class="settings-range">
+						<span id="tts-rate-value" class="settings-value">1.1x</span>
+					</label>
+					<label class="settings-row">
+						<span class="settings-label">Voice</span>
+						<select id="tts-voice" class="settings-select">
+							<option value="">System Default</option>
+						</select>
+					</label>
+				</div>
+
+				<div class="settings-section">
+					<h3>Terminal</h3>
+					<label class="settings-row">
+						<span class="settings-label">Auto columns</span>
+						<input type="checkbox" id="auto-cols" class="settings-checkbox" checked>
+					</label>
+					<label class="settings-row" id="cols-row">
+						<span class="settings-label">Columns</span>
+						<input type="range" id="cols-slider" min="40" max="200" step="1" value="80" class="settings-range">
+						<span id="cols-value" class="settings-value">80</span>
+					</label>
+				</div>
+
+				<div class="settings-section">
+					<h3>Connection</h3>
+					<label class="settings-row">
+						<span class="settings-label">tmux session</span>
+						<input type="text" id="tmux-session" class="settings-input" placeholder="claude" autocomplete="off">
+					</label>
+					<p class="settings-hint">Requires server restart to take effect.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<div id="image-previews"></div>
+
+		<div class="key-row">
+			<button class="key-btn" data-key="Up" title="Up arrow" aria-label="Up arrow">
+				<i data-lucide="chevron-up" aria-hidden="true"></i>
+			</button>
+			<button class="key-btn" data-key="Down" title="Down arrow" aria-label="Down arrow">
+				<i data-lucide="chevron-down" aria-hidden="true"></i>
+			</button>
+			<button class="key-btn key-btn--label" data-key="Enter" title="Enter">
+				<i data-lucide="corner-down-left" aria-hidden="true"></i>
+				<span>Enter</span>
+			</button>
+			<button class="key-btn key-btn--label key-btn--esc" data-key="Escape" title="Interrupt">
+				<i data-lucide="x" aria-hidden="true"></i>
+				<span>Esc</span>
+			</button>
+			<button id="mode-btn" class="key-btn key-btn--label" title="Cycle permission mode" aria-label="Cycle permission mode">
+				<i data-lucide="refresh-cw" aria-hidden="true"></i>
+				<span id="mode-label"></span>
+			</button>
+		</div>
+
+		<div class="composer">
+			<div class="composer-inner">
+				<label id="image-btn" title="Attach image" role="button" aria-label="Attach image">
+					<input type="file" id="image-input" accept="image/*" multiple hidden>
+					<i data-lucide="image" aria-hidden="true"></i>
+				</label>
+
+				<textarea id="text-input" name="message" rows="1" placeholder="Drift a thought..."></textarea>
+
+				<button id="mic-btn" title="Voice dictation" aria-label="Voice dictation">
+					<i data-lucide="mic" aria-hidden="true"></i>
+				</button>
+
+				<button id="send-btn" title="Send message" aria-label="Send message">
+					<i data-lucide="send" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+	</footer>
+
+	<script src="/app.js"></script>
+</body>
+</html>

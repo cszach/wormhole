@@ -1,0 +1,34 @@
+{
+	"name": "wormhole",
+	"version": "0.1.0",
+	"description": "Mobile voice/image interface for Claude Code over tmux",
+	"type": "module",
+	"scripts": {
+		"build": "esbuild src/client/app.ts --bundle --outfile=public/app.js --format=iife --target=es2020",
+		"dev": "npm run build && tsx src/server.ts",
+		"lint": "eslint .",
+		"format": "prettier --write .",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"ansi_up": "^6.0.6",
+		"express": "^5.2.1",
+		"lucide": "^1.6.0",
+		"multer": "^2.1.1",
+		"ws": "^8.20.0"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.6",
+		"@types/multer": "^2.1.0",
+		"@types/ws": "^8.18.1",
+		"esbuild": "^0.27.4",
+		"eslint": "^9.39.4",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-import": "^2.32.0",
+		"prettier": "^3.8.1",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.57.2",
+		"vitest": "^4.1.1"
+	}
+}
