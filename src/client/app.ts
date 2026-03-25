@@ -173,6 +173,7 @@ function send(): void {
 }
 
 sendBtn.addEventListener("click", () => {
+	navigator.vibrate?.(15);
 	send();
 });
 
@@ -187,6 +188,8 @@ for (const btn of Array.from(
 	)
 )) {
 	btn.addEventListener("click", () => {
+		navigator.vibrate?.(15);
+
 		if (!ws || ws.readyState !== WebSocket.OPEN) {
 			return;
 		}
@@ -287,6 +290,7 @@ for (const modBtn of Array.from(
 	document.querySelectorAll<HTMLButtonElement>(".key-btn--mod")
 )) {
 	modBtn.addEventListener("click", () => {
+		navigator.vibrate?.(15);
 		const mod = modBtn.dataset.mod!;
 
 		if (activeMods.has(mod)) {
