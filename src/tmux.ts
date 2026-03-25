@@ -149,3 +149,15 @@ export function createSession(name: string): Promise<void> {
 		});
 	});
 }
+
+export function killSession(name: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		execFile("tmux", ["kill-session", "-t", name], (error) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve();
+			}
+		});
+	});
+}

@@ -222,14 +222,10 @@ header {
 .session-item {
 	display: flex;
 	align-items: center;
-	padding: 8px 12px;
+	padding: 4px;
 	border-radius: var(--radius-md);
 	background: transparent;
 	border: 1px solid transparent;
-	color: var(--text-secondary);
-	font-family: var(--sans);
-	font-size: 13px;
-	cursor: pointer;
 	transition:
 		background var(--ease),
 		border-color var(--ease);
@@ -242,7 +238,51 @@ header {
 .session-item.active {
 	background: rgba(255, 255, 255, 0.08);
 	border-color: var(--accent);
+}
+
+.session-item-name {
+	flex: 1;
+	padding: 4px 8px;
+	background: none;
+	border: none;
+	color: var(--text-secondary);
+	font-family: var(--sans);
+	font-size: 13px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.session-item.active .session-item-name {
 	color: var(--text-primary);
+}
+
+.session-delete {
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: none;
+	border: none;
+	border-radius: var(--radius-sm);
+	color: var(--text-muted);
+	font-size: 16px;
+	cursor: pointer;
+	opacity: 0.5;
+	transition:
+		opacity var(--ease),
+		color var(--ease);
+}
+
+.session-delete:hover {
+	opacity: 1;
+	color: var(--danger);
+}
+
+.session-delete:disabled {
+	opacity: 0.15;
+	cursor: default;
+	color: var(--text-muted);
 }
 
 .session-create {

@@ -14,7 +14,8 @@ import {
 	resizePane,
 	capturePane,
 	listSessions,
-	createSession
+	createSession,
+	killSession
 } from "./tmux.js";
 
 const PORT = Number(process.env.PORT ?? 5173);
@@ -120,6 +121,40 @@ app.post("/api/sessions", async (req, res) => {
 		res.json({ ok: true });
 	} catch {
 		res.status(500).json({ error: "Failed to create session" });
+	}
+});
+
+app.delete("/api/sessions/:name", async (req, res) => {
+	const { name } = req.params;
+	const sessions = await listSessions();
+
+	if (sessions.length <= 1) {
+		res.status(400).json({ error: "Cannot delete the last session" });
+
+		return;
+	}
+
+	if (!sessions.includes(name)) {
+		res.status(404).json({ error: "Session not found" });
+
+		return;
+	}
+
+	try {
+		await killSession(name);
+
+		// If we deleted the active session, switch to another one
+		if (name === activeSession) {
+			const remaining = sessions.filter((s) => s !== name);
+			activeSession = remaining[0];
+			lastCapture = "";
+			stableSent = false;
+			broadcast({ type: "session", session: activeSession });
+		}
+
+		res.json({ ok: true });
+	} catch {
+		res.status(500).json({ error: "Failed to delete session" });
 	}
 });
 

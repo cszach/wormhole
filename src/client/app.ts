@@ -1062,18 +1062,21 @@ async function fetchSessions(): Promise<string[]> {
 function renderSessionList(sessions: string[]): void {
 	sessionList.innerHTML = "";
 	const current = sessionNameEl.textContent ?? "";
+	const canDelete = sessions.length > 1;
 
 	for (const name of sessions) {
-		const btn = document.createElement("button");
-		btn.className = "session-item";
+		const row = document.createElement("div");
+		row.className = "session-item";
 
 		if (name === current) {
-			btn.classList.add("active");
+			row.classList.add("active");
 		}
 
-		btn.textContent = name;
+		const label = document.createElement("button");
+		label.className = "session-item-name";
+		label.textContent = name;
 
-		btn.addEventListener("click", () => {
+		label.addEventListener("click", () => {
 			if (name !== current && ws && ws.readyState === WebSocket.OPEN) {
 				ws.send(JSON.stringify({ type: "switch", session: name }));
 			}
@@ -1081,7 +1084,40 @@ function renderSessionList(sessions: string[]): void {
 			closeSessionModal();
 		});
 
-		sessionList.appendChild(btn);
+		row.appendChild(label);
+
+		const del = document.createElement("button");
+		del.className = "session-delete";
+		del.textContent = "\u00d7";
+		del.title = "Delete session";
+		del.disabled = !canDelete;
+
+		del.addEventListener("click", async (e) => {
+			e.stopPropagation();
+
+			try {
+				const res = await fetch("/api/sessions/" + encodeURIComponent(name), {
+					method: "DELETE"
+				});
+
+				if (!res.ok) {
+					const data = await res.json();
+					sessionError.textContent = data.error ?? "Failed to delete";
+					sessionError.hidden = false;
+
+					return;
+				}
+
+				const updated = await fetchSessions();
+				renderSessionList(updated);
+			} catch {
+				sessionError.textContent = "Failed to delete session";
+				sessionError.hidden = false;
+			}
+		});
+
+		row.appendChild(del);
+		sessionList.appendChild(row);
 	}
 }
 
