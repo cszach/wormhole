@@ -254,6 +254,27 @@ footer {
 	color: var(--accent);
 }
 
+@media (min-width: 640px) {
+	.key-layout:not([hidden]) {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 8px;
+	}
+
+	.key-layout:not([hidden]) .key-row {
+		display: contents;
+	}
+
+	.key-layout:not([hidden]) .key-row--extra[hidden] {
+		display: contents;
+	}
+
+	.keys-expand {
+		display: none;
+	}
+}
+
 .key-btn {
 	display: flex;
 	align-items: center;
