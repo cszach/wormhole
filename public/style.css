@@ -858,6 +858,51 @@ main::-webkit-scrollbar-thumb:hover {
 	border-color: var(--accent);
 }
 
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.chips:empty {
+	display: none;
+}
+
+.chip {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 8px 4px 10px;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	border-radius: 20px;
+	font-family: var(--mono);
+	font-size: 12px;
+	color: var(--text-primary);
+}
+
+.chip-remove {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	border: none;
+	background: none;
+	color: var(--text-muted);
+	cursor: pointer;
+	padding: 0;
+	font-size: 14px;
+	line-height: 1;
+	border-radius: 50%;
+	transition: color var(--ease);
+}
+
+.chip-remove:active {
+	color: var(--danger);
+}
+
 .settings-hint {
 	font-family: var(--sans);
 	font-size: 11px;
@@ -875,6 +920,165 @@ main::-webkit-scrollbar-thumb:hover {
 		backdrop-filter: blur(30px);
 		-webkit-backdrop-filter: blur(30px);
 	}
+}
+
+/* Command palette */
+
+.cmd-palette {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	overflow: hidden;
+}
+
+.cmd-palette[hidden] {
+	display: none;
+}
+
+.cmd-backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}
+
+.cmd-drawer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: 100%;
+	background: var(--bg-void);
+	display: flex;
+	flex-direction: column;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+	.cmd-drawer {
+		width: 360px;
+		border-left: 1px solid var(--border-glass);
+		background: rgba(8, 8, 12, 0.95);
+		backdrop-filter: blur(30px);
+		-webkit-backdrop-filter: blur(30px);
+	}
+}
+
+.cmd-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 16px 20px;
+	border-bottom: 1px solid var(--border-glass);
+	flex-shrink: 0;
+}
+
+.cmd-header h2 {
+	font-family: var(--serif);
+	font-size: 22px;
+	font-weight: 400;
+	font-style: italic;
+	color: var(--text-primary);
+	flex-shrink: 0;
+}
+
+.cmd-search {
+	flex: 1;
+	min-width: 0;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	color: var(--text-primary);
+	padding: 6px 10px;
+	border-radius: var(--radius-sm, 6px);
+	font-family: var(--sans);
+	font-size: 13px;
+	outline: none;
+}
+
+.cmd-search:focus-visible {
+	border-color: var(--accent);
+}
+
+#cmd-close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	color: var(--text-muted);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	transition:
+		color var(--ease),
+		transform var(--ease);
+	flex-shrink: 0;
+}
+
+#cmd-close:active {
+	transform: scale(0.94);
+	color: var(--text-primary);
+}
+
+#cmd-close svg {
+	width: 18px;
+	height: 18px;
+}
+
+.cmd-body {
+	padding: 12px 20px;
+	flex: 1;
+}
+
+.cmd-section-label {
+	font-family: var(--sans);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+	margin: 16px 0 8px;
+}
+
+.cmd-section-label:first-child {
+	margin-top: 0;
+}
+
+.cmd-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 10px 12px;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	transition:
+		border-color var(--ease),
+		background var(--ease);
+	color: var(--text-primary);
+	font-family: var(--mono);
+	font-size: 13px;
+	text-align: left;
+	margin-bottom: 6px;
+}
+
+.cmd-item:active {
+	background: var(--bg-glass-hover);
+	border-color: var(--accent);
+}
+
+.cmd-item-desc {
+	font-family: var(--sans);
+	font-size: 11px;
+	color: var(--text-muted);
+	margin-left: auto;
+	flex-shrink: 0;
 }
 
 /* Settings button in header */

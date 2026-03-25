@@ -462,6 +462,7 @@ function openSettings(): void {
 	ttsRateInput.value = String(ttsRate);
 	ttsRateValue.textContent = ttsRate.toFixed(1) + "x";
 	tmuxSessionInput.value = localStorage.getItem("wormhole-tmux-session") ?? "";
+	renderSkillChips();
 }
 
 function closeSettings(): void {
@@ -586,6 +587,198 @@ ttsVoiceSelect.addEventListener("change", () => {
 tmuxSessionInput.addEventListener("change", () => {
 	const val = tmuxSessionInput.value.trim();
 	localStorage.setItem("wormhole-tmux-session", val);
+});
+
+// Skills (chip input)
+
+const skillsChips = document.getElementById("skills-chips") as HTMLElement;
+const skillsAdd = document.getElementById("skills-add") as HTMLInputElement;
+
+function getSkills(): string[] {
+	const raw = localStorage.getItem("wormhole-skills") ?? "";
+
+	return raw
+		.split("\n")
+		.map((s) => s.trim())
+		.filter(Boolean);
+}
+
+function saveSkills(skills: string[]): void {
+	localStorage.setItem("wormhole-skills", skills.join("\n"));
+}
+
+function renderSkillChips(): void {
+	skillsChips.innerHTML = "";
+
+	for (const skill of getSkills()) {
+		const chip = document.createElement("span");
+		chip.className = "chip";
+
+		const label = document.createElement("span");
+		label.textContent = skill;
+
+		const remove = document.createElement("button");
+		remove.className = "chip-remove";
+		remove.textContent = "\u00D7";
+		remove.setAttribute("aria-label", "Remove " + skill);
+
+		remove.addEventListener("click", () => {
+			const skills = getSkills().filter((s) => s !== skill);
+			saveSkills(skills);
+			renderSkillChips();
+		});
+
+		chip.appendChild(label);
+		chip.appendChild(remove);
+		skillsChips.appendChild(chip);
+	}
+}
+
+skillsAdd.addEventListener("keydown", (event) => {
+	if (event.key === "Enter") {
+		event.preventDefault();
+
+		const val = skillsAdd.value.trim();
+
+		if (!val) {
+			return;
+		}
+
+		const skills = getSkills();
+
+		if (!skills.includes(val)) {
+			skills.push(val);
+			saveSkills(skills);
+			renderSkillChips();
+		}
+
+		skillsAdd.value = "";
+	}
+});
+
+// --- Command palette ---
+
+type Command = {
+	name: string;
+	desc: string;
+	section: string;
+};
+
+const BUILTIN_COMMANDS: Command[] = [
+	{ name: "/help", desc: "Show help", section: "Built-in" },
+	{ name: "/compact", desc: "Compact conversation", section: "Built-in" },
+	{ name: "/context", desc: "Show context usage", section: "Built-in" },
+	{ name: "/clear", desc: "Clear conversation", section: "Built-in" },
+	{ name: "/cost", desc: "Show token costs", section: "Built-in" },
+	{ name: "/memory", desc: "Edit memory", section: "Built-in" },
+	{ name: "/mcp", desc: "MCP server status", section: "Built-in" },
+	{ name: "/skills", desc: "List skills", section: "Built-in" },
+	{ name: "/config", desc: "Show config", section: "Built-in" }
+];
+
+function getSkillCommands(): Command[] {
+	return getSkills().map((s) => ({
+		name: "/" + s,
+		desc: "",
+		section: "Skills"
+	}));
+}
+
+const cmdPalette = document.getElementById("cmd-palette") as HTMLElement;
+const cmdList = document.getElementById("cmd-list") as HTMLElement;
+const cmdSearch = document.getElementById("cmd-search") as HTMLInputElement;
+const cmdClose = document.getElementById("cmd-close") as HTMLButtonElement;
+const cmdBackdrop = cmdPalette.querySelector(".cmd-backdrop") as HTMLElement;
+
+function renderCommandList(filter: string): void {
+	cmdList.innerHTML = "";
+
+	const allCommands = [...BUILTIN_COMMANDS, ...getSkillCommands()];
+	const q = filter.toLowerCase();
+	const filtered = q
+		? allCommands.filter(
+				(c) =>
+					c.name.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q)
+			)
+		: allCommands;
+
+	let currentSection = "";
+
+	for (const cmd of filtered) {
+		if (cmd.section !== currentSection) {
+			currentSection = cmd.section;
+
+			const label = document.createElement("div");
+			label.className = "cmd-section-label";
+			label.textContent = currentSection;
+			cmdList.appendChild(label);
+		}
+
+		const btn = document.createElement("button");
+		btn.className = "cmd-item";
+
+		const name = document.createElement("span");
+		name.textContent = cmd.name;
+
+		const desc = document.createElement("span");
+		desc.className = "cmd-item-desc";
+		desc.textContent = cmd.desc;
+
+		btn.appendChild(name);
+		btn.appendChild(desc);
+
+		btn.addEventListener("click", () => {
+			textInput.value = cmd.name + " ";
+			textInput.focus();
+			closeCmdPalette();
+		});
+
+		cmdList.appendChild(btn);
+	}
+
+	if (filtered.length === 0) {
+		const empty = document.createElement("div");
+		empty.className = "cmd-section-label";
+		empty.textContent = "No commands found";
+		cmdList.appendChild(empty);
+	}
+}
+
+function openCmdPalette(): void {
+	cmdPalette.hidden = false;
+	cmdSearch.value = "";
+	renderCommandList("");
+	cmdSearch.focus();
+}
+
+function closeCmdPalette(): void {
+	cmdPalette.hidden = true;
+	textInput.focus();
+}
+
+cmdClose.addEventListener("click", () => {
+	closeCmdPalette();
+});
+
+cmdBackdrop.addEventListener("click", () => {
+	closeCmdPalette();
+});
+
+cmdSearch.addEventListener("input", () => {
+	renderCommandList(cmdSearch.value);
+});
+
+// Open palette when user types / as first character (not backspace)
+let prevInputLen = 0;
+
+textInput.addEventListener("input", () => {
+	const len = textInput.value.length;
+
+	if (textInput.value === "/" && len > prevInputLen) {
+		openCmdPalette();
+	}
+
+	prevInputLen = len;
 });
 
 // Terminal columns

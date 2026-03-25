@@ -132,7 +132,43 @@
 						</label>
 						<p class="settings-hint">Requires server restart to take effect.</p>
 					</div>
+
+					<div class="settings-section">
+						<h3>Skills</h3>
+						<div id="skills-chips" class="chips"></div>
+						<input
+							type="text"
+							id="skills-add"
+							class="settings-input"
+							placeholder="Add skill..."
+							autocomplete="off"
+						/>
+						<p class="settings-hint">
+							Added skills appear in the command palette.
+						</p>
+					</div>
 				</div>
+			</div>
+		</div>
+
+		<!-- Command palette -->
+		<div id="cmd-palette" class="cmd-palette" hidden>
+			<div class="cmd-backdrop"></div>
+			<div class="cmd-drawer">
+				<div class="cmd-header">
+					<h2>Commands</h2>
+					<input
+						type="text"
+						id="cmd-search"
+						class="cmd-search"
+						placeholder="Search..."
+						autocomplete="off"
+					/>
+					<button id="cmd-close" aria-label="Close commands">
+						<i data-lucide="x" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div class="cmd-body" id="cmd-list"></div>
 			</div>
 		</div>
 
