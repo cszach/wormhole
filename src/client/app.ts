@@ -195,12 +195,18 @@ for (const btn of Array.from(
 
 const keysExpand = document.getElementById("keys-expand") as HTMLButtonElement;
 const extraKeys = document.getElementById("extra-keys") as HTMLElement;
+const footer = document.querySelector("footer") as HTMLElement;
+
+function syncFooterPadding(): void {
+	output.style.paddingBottom = footer.offsetHeight + 8 + "px";
+}
 
 keysExpand.addEventListener("click", () => {
 	const showing = !extraKeys.hidden;
 
 	extraKeys.hidden = showing;
 	keysExpand.classList.toggle("active", !showing);
+	syncFooterPadding();
 });
 
 // Auto-resize textarea
@@ -208,6 +214,7 @@ keysExpand.addEventListener("click", () => {
 textInput.addEventListener("input", () => {
 	textInput.style.height = "auto";
 	textInput.style.height = Math.min(textInput.scrollHeight, 120) + "px";
+	syncFooterPadding();
 });
 
 // --- Image upload ---
@@ -267,11 +274,13 @@ function addPreviewThumbnail(serverPath: string, blobUrl: string): void {
 
 		URL.revokeObjectURL(blobUrl);
 		wrapper.remove();
+		syncFooterPadding();
 	});
 
 	wrapper.appendChild(img);
 	wrapper.appendChild(removeBtn);
 	imagePreviews.appendChild(wrapper);
+	syncFooterPadding();
 }
 
 function clearImages(): void {
@@ -282,6 +291,7 @@ function clearImages(): void {
 	}
 
 	imagePreviews.innerHTML = "";
+	syncFooterPadding();
 }
 
 // --- Voice dictation (Web Speech API) ---
@@ -916,6 +926,7 @@ if (savedAutoCols === "false") {
 	colsRow.classList.add("disabled");
 }
 
+syncFooterPadding();
 connect();
 initSpeechRecognition();
 
