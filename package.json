@@ -8,7 +8,16 @@
 		"dev": "npm run build && tsx src/server.ts",
 		"lint": "eslint .",
 		"format": "prettier --write .",
-		"test": "vitest run"
+		"test": "vitest run",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"*.{ts,mjs}": [
+			"eslint --fix"
+		],
+		"*.{ts,mjs,json,css,html,md}": [
+			"prettier --write"
+		]
 	},
 	"dependencies": {
 		"ansi_up": "^6.0.6",
@@ -25,6 +34,8 @@
 		"eslint": "^9.39.4",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-import": "^2.32.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.4.0",
 		"prettier": "^3.8.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
