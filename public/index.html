@@ -175,88 +175,208 @@
 		<footer>
 			<div id="image-previews"></div>
 
-			<div class="key-row">
-				<button
-					class="key-btn"
-					data-key="Up"
-					title="Up arrow"
-					aria-label="Up arrow"
-				>
-					<i data-lucide="chevron-up" aria-hidden="true"></i>
-				</button>
-				<button
-					class="key-btn"
-					data-key="Down"
-					title="Down arrow"
-					aria-label="Down arrow"
-				>
-					<i data-lucide="chevron-down" aria-hidden="true"></i>
-				</button>
-				<button class="key-btn key-btn--label" data-key="Enter" title="Enter">
-					<i data-lucide="corner-down-left" aria-hidden="true"></i>
-					<span>Enter</span>
-				</button>
-				<button
-					class="key-btn key-btn--label key-btn--esc"
-					data-key="Escape"
-					title="Interrupt"
-				>
+			<!-- Modifier combo overlay -->
+			<div id="mod-overlay" class="mod-overlay" hidden>
+				<span id="mod-combo-label" class="mod-combo-label"></span>
+				<input
+					type="text"
+					id="mod-input"
+					class="mod-input"
+					maxlength="1"
+					autocomplete="off"
+					autocapitalize="off"
+				/>
+				<button id="mod-cancel" class="key-btn key-btn--label mod-cancel">
 					<i data-lucide="x" aria-hidden="true"></i>
-					<span>Esc</span>
-				</button>
-				<button
-					class="key-btn key-btn--label key-btn--grow"
-					data-raw="BTab"
-					title="Shift+Tab"
-					aria-label="Shift+Tab"
-				>
-					<span>Shift+Tab</span>
-				</button>
-				<button
-					id="keys-expand"
-					class="key-btn"
-					title="More keys"
-					aria-label="More keys"
-				>
-					<i data-lucide="ellipsis" aria-hidden="true"></i>
 				</button>
 			</div>
 
-			<div class="key-row key-row--extra" id="extra-keys" hidden>
-				<button
-					class="key-btn"
-					data-key="Left"
-					title="Left arrow"
-					aria-label="Left arrow"
-				>
-					<i data-lucide="chevron-left" aria-hidden="true"></i>
-				</button>
-				<button
-					class="key-btn"
-					data-key="Right"
-					title="Right arrow"
-					aria-label="Right arrow"
-				>
-					<i data-lucide="chevron-right" aria-hidden="true"></i>
-				</button>
-				<button class="key-btn key-btn--label" data-key="Tab" title="Tab">
-					<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
-					<span>Tab</span>
-				</button>
-				<button
-					class="key-btn key-btn--label"
-					data-raw="C-o"
-					title="Ctrl+O (expand)"
-				>
-					<span>Ctrl+O</span>
-				</button>
-				<button
-					class="key-btn key-btn--label key-btn--esc"
-					data-raw="C-c"
-					title="Ctrl+C (kill)"
-				>
-					<span>Ctrl+C</span>
-				</button>
+			<!-- Claude Code key layout -->
+			<div id="cc-keys" class="key-layout" hidden>
+				<div class="key-row">
+					<button
+						class="key-btn"
+						data-key="Up"
+						title="Up arrow"
+						aria-label="Up arrow"
+					>
+						<i data-lucide="chevron-up" aria-hidden="true"></i>
+					</button>
+					<button
+						class="key-btn"
+						data-key="Down"
+						title="Down arrow"
+						aria-label="Down arrow"
+					>
+						<i data-lucide="chevron-down" aria-hidden="true"></i>
+					</button>
+					<button class="key-btn key-btn--label" data-key="Enter" title="Enter">
+						<i data-lucide="corner-down-left" aria-hidden="true"></i>
+						<span>Enter</span>
+					</button>
+					<button
+						class="key-btn key-btn--label key-btn--esc"
+						data-key="Escape"
+						title="Interrupt"
+					>
+						<i data-lucide="x" aria-hidden="true"></i>
+						<span>Esc</span>
+					</button>
+					<button
+						class="key-btn key-btn--label key-btn--grow"
+						data-raw="BTab"
+						title="Shift+Tab"
+						aria-label="Shift+Tab"
+					>
+						<span>Shift+Tab</span>
+					</button>
+					<button
+						class="key-btn keys-expand"
+						title="More keys"
+						aria-label="More keys"
+					>
+						<i data-lucide="ellipsis" aria-hidden="true"></i>
+					</button>
+				</div>
+
+				<div class="key-row key-row--extra" hidden>
+					<button
+						class="key-btn"
+						data-key="Left"
+						title="Left arrow"
+						aria-label="Left arrow"
+					>
+						<i data-lucide="chevron-left" aria-hidden="true"></i>
+					</button>
+					<button
+						class="key-btn"
+						data-key="Right"
+						title="Right arrow"
+						aria-label="Right arrow"
+					>
+						<i data-lucide="chevron-right" aria-hidden="true"></i>
+					</button>
+					<button class="key-btn key-btn--label" data-key="Tab" title="Tab">
+						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
+						<span>Tab</span>
+					</button>
+					<button
+						class="key-btn key-btn--label"
+						data-raw="C-o"
+						title="Ctrl+O (expand)"
+					>
+						<span>Ctrl+O</span>
+					</button>
+					<button
+						class="key-btn key-btn--label key-btn--esc"
+						data-raw="C-c"
+						title="Ctrl+C (kill)"
+					>
+						<span>Ctrl+C</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Terminal key layout -->
+			<div id="term-keys" class="key-layout">
+				<div class="key-row">
+					<button class="key-btn" data-key="Up" title="Up" aria-label="Up">
+						<i data-lucide="chevron-up" aria-hidden="true"></i>
+					</button>
+					<button
+						class="key-btn"
+						data-key="Down"
+						title="Down"
+						aria-label="Down"
+					>
+						<i data-lucide="chevron-down" aria-hidden="true"></i>
+					</button>
+					<button class="key-btn key-btn--label" data-key="Enter" title="Enter">
+						<i data-lucide="corner-down-left" aria-hidden="true"></i>
+						<span>Enter</span>
+					</button>
+					<button
+						class="key-btn key-btn--label key-btn--esc"
+						data-key="Escape"
+						title="Escape"
+					>
+						<i data-lucide="x" aria-hidden="true"></i>
+						<span>Esc</span>
+					</button>
+					<button class="key-btn key-btn--label" data-key="Tab" title="Tab">
+						<span>Tab</span>
+					</button>
+					<button
+						class="key-btn keys-expand"
+						title="More keys"
+						aria-label="More keys"
+					>
+						<i data-lucide="ellipsis" aria-hidden="true"></i>
+					</button>
+				</div>
+
+				<div class="key-row key-row--extra" hidden>
+					<button
+						class="key-btn"
+						data-key="Left"
+						title="Left"
+						aria-label="Left"
+					>
+						<i data-lucide="chevron-left" aria-hidden="true"></i>
+					</button>
+					<button
+						class="key-btn"
+						data-key="Right"
+						title="Right"
+						aria-label="Right"
+					>
+						<i data-lucide="chevron-right" aria-hidden="true"></i>
+					</button>
+					<button class="key-btn key-btn--label" data-key="Home" title="Home">
+						<span>Home</span>
+					</button>
+					<button class="key-btn key-btn--label" data-key="End" title="End">
+						<span>End</span>
+					</button>
+					<button
+						class="key-btn key-btn--label"
+						data-key="PgUp"
+						title="Page Up"
+					>
+						<span>PgUp</span>
+					</button>
+					<button
+						class="key-btn key-btn--label"
+						data-key="PgDn"
+						title="Page Down"
+					>
+						<span>PgDn</span>
+					</button>
+				</div>
+
+				<div class="key-row key-row--extra key-row--mods" hidden>
+					<button
+						class="key-btn key-btn--label key-btn--mod"
+						data-mod="C"
+						title="Ctrl modifier"
+					>
+						<span>Ctrl</span>
+					</button>
+					<button
+						class="key-btn key-btn--label key-btn--mod"
+						data-mod="M"
+						title="Alt modifier"
+					>
+						<span>Alt</span>
+					</button>
+					<button
+						class="key-btn key-btn--label key-btn--mod"
+						data-mod="S"
+						title="Shift modifier"
+					>
+						<span>Shift</span>
+					</button>
+				</div>
 			</div>
 
 			<div class="composer">

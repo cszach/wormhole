@@ -35,12 +35,42 @@ const ALLOWED_KEYS = new Set([
 	"Right",
 	"Enter",
 	"Tab",
-	"C-o",
-	"C-c"
+	"Home",
+	"End",
+	"PgUp",
+	"PgDn"
 ]);
 
+const MODIFIER_RE = /^(C-|M-|S-)+(.)$/;
+
+function isAllowedKey(key: string): boolean {
+	if (ALLOWED_KEYS.has(key)) {
+		return true;
+	}
+
+	// Allow modifier combos: C-c, M-x, S-Up, C-S-x, etc.
+	if (MODIFIER_RE.test(key)) {
+		return true;
+	}
+
+	// Allow modifier + named key: C-Home, S-Up, etc.
+	const parts = key.split("-");
+	const base = parts[parts.length - 1];
+	const mods = parts.slice(0, -1);
+
+	if (
+		mods.length > 0 &&
+		mods.every((m) => m === "C" || m === "M" || m === "S") &&
+		ALLOWED_KEYS.has(base)
+	) {
+		return true;
+	}
+
+	return false;
+}
+
 export function sendRawKey(key: string): Promise<void> {
-	if (!ALLOWED_KEYS.has(key)) {
+	if (!isAllowedKey(key)) {
 		return Promise.reject(new Error("Key not allowed"));
 	}
 

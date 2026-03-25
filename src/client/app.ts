@@ -94,10 +94,23 @@ function connect(): void {
 
 // --- Output rendering ---
 
-let inClaudeCode = true;
+let inClaudeCode = false;
+const ccKeys = document.getElementById("cc-keys") as HTMLElement;
+const termKeys = document.getElementById("term-keys") as HTMLElement;
+
+function syncKeyLayout(): void {
+	ccKeys.hidden = !inClaudeCode;
+	termKeys.hidden = inClaudeCode;
+}
 
 function renderOutput(content: string): void {
+	const wasCC = inClaudeCode;
 	inClaudeCode = isClaudeCode(content);
+
+	if (inClaudeCode !== wasCC) {
+		syncKeyLayout();
+		syncFooterPadding();
+	}
 
 	const html = ansi.ansi_to_html(content);
 	output.innerHTML = html;
@@ -149,10 +162,12 @@ sendBtn.addEventListener("click", () => {
 // Enter inserts newline (default textarea behavior).
 // Send only via the send button.
 
-// --- Key buttons (mode cycle, arrows, enter) ---
+// --- Key buttons ---
 
 for (const btn of Array.from(
-	document.querySelectorAll<HTMLButtonElement>(".key-btn")
+	document.querySelectorAll<HTMLButtonElement>(
+		".key-btn[data-key], .key-btn[data-raw]"
+	)
 )) {
 	btn.addEventListener("click", () => {
 		if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -169,10 +184,8 @@ for (const btn of Array.from(
 	});
 }
 
-// --- Extra keys toggle ---
+// --- Extra keys toggle (per layout) ---
 
-const keysExpand = document.getElementById("keys-expand") as HTMLButtonElement;
-const extraKeys = document.getElementById("extra-keys") as HTMLElement;
 const footer = document.querySelector("footer") as HTMLElement;
 
 function syncFooterPadding(): void {
@@ -181,19 +194,119 @@ function syncFooterPadding(): void {
 
 let inputFocusedBeforeExpand = false;
 
-keysExpand.addEventListener("pointerdown", () => {
-	inputFocusedBeforeExpand = document.activeElement === textInput;
+for (const expandBtn of Array.from(
+	document.querySelectorAll<HTMLButtonElement>(".keys-expand")
+)) {
+	expandBtn.addEventListener("pointerdown", () => {
+		inputFocusedBeforeExpand = document.activeElement === textInput;
+	});
+
+	expandBtn.addEventListener("click", () => {
+		const layout = expandBtn.closest(".key-layout") as HTMLElement;
+		const extraRows = layout.querySelectorAll<HTMLElement>(".key-row--extra");
+		const anyVisible = Array.from(extraRows).some((r) => !r.hidden);
+
+		for (const row of Array.from(extraRows)) {
+			row.hidden = anyVisible;
+		}
+
+		expandBtn.classList.toggle("active", !anyVisible);
+		syncFooterPadding();
+
+		if (inputFocusedBeforeExpand) {
+			textInput.focus();
+		}
+	});
+}
+
+// --- Sticky modifier buttons ---
+
+const modOverlay = document.getElementById("mod-overlay") as HTMLElement;
+const modComboLabel = document.getElementById("mod-combo-label") as HTMLElement;
+const modInput = document.getElementById("mod-input") as HTMLInputElement;
+const modCancel = document.getElementById("mod-cancel") as HTMLButtonElement;
+const activeMods = new Set<string>();
+
+function updateModLabel(): void {
+	const parts = Array.from(activeMods).map((m) => {
+		if (m === "C") {return "Ctrl";}
+		if (m === "M") {return "Alt";}
+		if (m === "S") {return "Shift";}
+
+		return m;
+	});
+
+	modComboLabel.textContent = parts.join(" + ") + " +";
+}
+
+function openModOverlay(): void {
+	updateModLabel();
+	modOverlay.hidden = false;
+	modInput.value = "";
+	modInput.focus();
+	syncFooterPadding();
+}
+
+function closeModOverlay(): void {
+	activeMods.clear();
+	modOverlay.hidden = true;
+
+	for (const btn of Array.from(
+		document.querySelectorAll<HTMLButtonElement>(".key-btn--mod")
+	)) {
+		btn.classList.remove("active");
+	}
+
+	syncFooterPadding();
+}
+
+for (const modBtn of Array.from(
+	document.querySelectorAll<HTMLButtonElement>(".key-btn--mod")
+)) {
+	modBtn.addEventListener("click", () => {
+		const mod = modBtn.dataset.mod!;
+
+		if (activeMods.has(mod)) {
+			activeMods.delete(mod);
+			modBtn.classList.remove("active");
+
+			if (activeMods.size === 0) {
+				closeModOverlay();
+
+				return;
+			}
+
+			updateModLabel();
+		} else {
+			activeMods.add(mod);
+			modBtn.classList.add("active");
+			openModOverlay();
+		}
+	});
+}
+
+modInput.addEventListener("input", () => {
+	const ch = modInput.value;
+
+	if (!ch || !ws || ws.readyState !== WebSocket.OPEN) {
+		return;
+	}
+
+	// Build tmux key: C-S-x, M-a, etc.
+	const prefix = Array.from(activeMods).join("-");
+	const key = prefix + "-" + ch;
+
+	ws.send(JSON.stringify({ type: "key", key }));
+	closeModOverlay();
 });
 
-keysExpand.addEventListener("click", () => {
-	const showing = !extraKeys.hidden;
+modCancel.addEventListener("click", () => {
+	closeModOverlay();
+});
 
-	extraKeys.hidden = showing;
-	keysExpand.classList.toggle("active", !showing);
-	syncFooterPadding();
-
-	if (inputFocusedBeforeExpand) {
-		textInput.focus();
+modInput.addEventListener("keydown", (e) => {
+	if (e.key === "Escape") {
+		closeModOverlay();
 	}
 });
 
@@ -913,6 +1026,7 @@ if (savedAutoCols === "false") {
 	colsRow.classList.add("disabled");
 }
 
+syncKeyLayout();
 syncFooterPadding();
 connect();
 initSpeechRecognition();

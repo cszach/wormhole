@@ -117,21 +117,45 @@ export function cleanTextForSend(text: string): string {
 	return text.replace(/[\r\n]+/g, " ");
 }
 
-export function isAllowedKey(key: string): boolean {
-	const allowed = new Set([
-		"BTab",
-		"Escape",
-		"Up",
-		"Down",
-		"Left",
-		"Right",
-		"Enter",
-		"Tab",
-		"C-o",
-		"C-c"
-	]);
+const ALLOWED_BASE_KEYS = new Set([
+	"BTab",
+	"Escape",
+	"Up",
+	"Down",
+	"Left",
+	"Right",
+	"Enter",
+	"Tab",
+	"Home",
+	"End",
+	"PgUp",
+	"PgDn"
+]);
 
-	return allowed.has(key);
+export function isAllowedKey(key: string): boolean {
+	if (ALLOWED_BASE_KEYS.has(key)) {
+		return true;
+	}
+
+	// Modifier combos: C-c, M-x, S-Up, C-S-x, etc.
+	if (/^(C-|M-|S-)+(.)$/.test(key)) {
+		return true;
+	}
+
+	// Modifier + named key: C-Home, S-Up, etc.
+	const parts = key.split("-");
+	const base = parts[parts.length - 1];
+	const mods = parts.slice(0, -1);
+
+	if (
+		mods.length > 0 &&
+		mods.every((m) => m === "C" || m === "M" || m === "S") &&
+		ALLOWED_BASE_KEYS.has(base)
+	) {
+		return true;
+	}
+
+	return false;
 }
 
 export function extractSummary(text: string): string {

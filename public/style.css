@@ -250,7 +250,7 @@ footer {
 	display: none;
 }
 
-#keys-expand.active {
+.keys-expand.active {
 	color: var(--accent);
 }
 
@@ -300,8 +300,69 @@ footer {
 	justify-content: center;
 }
 
+@media (min-width: 640px) {
+	.key-btn--grow {
+		flex: none;
+	}
+}
+
 .key-btn--esc:active {
 	color: var(--danger);
+}
+
+.key-btn--mod.active {
+	background: var(--accent);
+	color: #000;
+}
+
+.key-layout[hidden] {
+	display: none;
+}
+
+/* Modifier combo overlay */
+.mod-overlay {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	background: rgba(255 255 255 / 0.08);
+	border: 1px solid rgba(255 255 255 / 0.12);
+	border-radius: 10px;
+	backdrop-filter: blur(12px);
+	margin: 0 4px 6px;
+}
+
+.mod-overlay[hidden] {
+	display: none;
+}
+
+.mod-combo-label {
+	font-family: var(--sans);
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--accent);
+	white-space: nowrap;
+}
+
+.mod-input {
+	width: 2ch;
+	background: rgba(255 255 255 / 0.1);
+	border: 1px solid rgba(255 255 255 / 0.2);
+	border-radius: 6px;
+	color: var(--fg);
+	font-family: var(--mono);
+	font-size: 14px;
+	text-align: center;
+	padding: 4px;
+	outline: none;
+}
+
+.mod-input:focus {
+	border-color: var(--accent);
+}
+
+.mod-cancel {
+	padding: 4px 6px;
 }
 
 #image-previews {

@@ -247,15 +247,36 @@ describe("isAllowedKey", () => {
 		expect(isAllowedKey("Tab")).toBe(true);
 	});
 
+	it("allows Home, End, PgUp, PgDn", () => {
+		expect(isAllowedKey("Home")).toBe(true);
+		expect(isAllowedKey("End")).toBe(true);
+		expect(isAllowedKey("PgUp")).toBe(true);
+		expect(isAllowedKey("PgDn")).toBe(true);
+	});
+
 	it("allows Ctrl combos", () => {
 		expect(isAllowedKey("C-o")).toBe(true);
 		expect(isAllowedKey("C-c")).toBe(true);
+		expect(isAllowedKey("C-z")).toBe(true);
+	});
+
+	it("allows Alt combos", () => {
+		expect(isAllowedKey("M-x")).toBe(true);
+	});
+
+	it("allows Shift combos", () => {
+		expect(isAllowedKey("S-Up")).toBe(true);
+		expect(isAllowedKey("S-Home")).toBe(true);
+	});
+
+	it("allows stacked modifiers", () => {
+		expect(isAllowedKey("C-S-x")).toBe(true);
+		expect(isAllowedKey("C-M-a")).toBe(true);
 	});
 
 	it("rejects arbitrary keys", () => {
 		expect(isAllowedKey("Delete")).toBe(false);
 		expect(isAllowedKey("q")).toBe(false);
-		expect(isAllowedKey("C-z")).toBe(false);
 	});
 });
 
