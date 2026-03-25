@@ -101,6 +101,16 @@ const termKeys = document.getElementById("term-keys") as HTMLElement;
 function syncKeyLayout(): void {
 	ccKeys.hidden = !inClaudeCode;
 	termKeys.hidden = inClaudeCode;
+
+	if (inClaudeCode) {
+		textInput.removeAttribute("autocomplete");
+		textInput.removeAttribute("autocorrect");
+		textInput.setAttribute("autocapitalize", "sentences");
+	} else {
+		textInput.setAttribute("autocomplete", "off");
+		textInput.setAttribute("autocorrect", "off");
+		textInput.setAttribute("autocapitalize", "off");
+	}
 }
 
 function renderOutput(content: string): void {
@@ -229,9 +239,15 @@ const activeMods = new Set<string>();
 
 function updateModLabel(): void {
 	const parts = Array.from(activeMods).map((m) => {
-		if (m === "C") {return "Ctrl";}
-		if (m === "M") {return "Alt";}
-		if (m === "S") {return "Shift";}
+		if (m === "C") {
+			return "Ctrl";
+		}
+		if (m === "M") {
+			return "Alt";
+		}
+		if (m === "S") {
+			return "Shift";
+		}
 
 		return m;
 	});
