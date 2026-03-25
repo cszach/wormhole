@@ -1,4 +1,4 @@
-import type { Theme } from "../themes/types.js"; // eslint-disable-line no-restricted-imports
+import type { Theme } from "@/themes/types.js";
 
 const VERT = `
 attribute vec2 a_pos;

@@ -14,14 +14,13 @@ import {
 	X
 } from "lucide";
 
-/* eslint-disable no-restricted-imports */
 import {
 	extractMode as extractModeFromContent,
 	stripChrome,
 	getTTSText
-} from "../text-processing.js";
-import { getDefaultTheme, getTheme, themes } from "../themes/index.js";
-/* eslint-enable no-restricted-imports */
+} from "@/text-processing.js";
+import { getDefaultTheme, getTheme, themes } from "@/themes/index.js";
+
 import { initShader } from "./shader.js";
 
 type ServerMessage = { type: "output"; content: string } | { type: "stable" };
