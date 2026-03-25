@@ -167,35 +167,6 @@ header {
 	outline-offset: 2px;
 }
 
-#mode-btn {
-	flex: 1;
-	justify-content: center;
-}
-
-@media (min-width: 640px) {
-	#mode-btn {
-		flex: none;
-	}
-}
-
-#mode-label {
-	font-family: var(--sans);
-	font-size: 10px;
-	font-weight: 500;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	white-space: nowrap;
-}
-
-#mode-label:empty {
-	display: none;
-}
-
-#mode-btn.disabled {
-	opacity: 0.3;
-	pointer-events: none;
-}
-
 #tts-toggle:active {
 	transform: scale(0.96);
 }
@@ -322,6 +293,11 @@ footer {
 	font-size: 11px;
 	font-weight: 500;
 	letter-spacing: 0.04em;
+}
+
+.key-btn--grow {
+	flex: 1;
+	justify-content: center;
 }
 
 .key-btn--esc:active {

@@ -10,7 +10,6 @@ import {
 	Ellipsis,
 	Image,
 	Mic,
-	RefreshCw,
 	Send,
 	Settings,
 	Volume2,
@@ -18,11 +17,7 @@ import {
 	X
 } from "lucide";
 
-import {
-	extractMode as extractModeFromContent,
-	isClaudeCode,
-	getTTSText
-} from "@/text-processing.js";
+import { isClaudeCode, getTTSText } from "@/text-processing.js";
 import { getDefaultTheme, getTheme, themes } from "@/themes/index.js";
 
 import { initShader } from "./shader.js";
@@ -35,7 +30,6 @@ const textInput = document.getElementById("text-input") as HTMLTextAreaElement;
 const sendBtn = document.getElementById("send-btn") as HTMLButtonElement;
 const micBtn = document.getElementById("mic-btn") as HTMLButtonElement;
 const ttsToggle = document.getElementById("tts-toggle") as HTMLButtonElement;
-const modeBtn = document.getElementById("mode-btn") as HTMLButtonElement;
 const imageInput = document.getElementById("image-input") as HTMLInputElement;
 const imagePreviews = document.getElementById("image-previews") as HTMLElement;
 const settingsBtn = document.getElementById(
@@ -100,19 +94,10 @@ function connect(): void {
 
 // --- Output rendering ---
 
-const modeLabel = document.getElementById("mode-label") as HTMLElement;
 let inClaudeCode = true;
 
 function renderOutput(content: string): void {
 	inClaudeCode = isClaudeCode(content);
-
-	if (inClaudeCode) {
-		modeLabel.textContent = extractModeFromContent(content);
-		modeBtn.classList.remove("disabled");
-	} else {
-		modeLabel.textContent = "";
-		modeBtn.classList.add("disabled");
-	}
 
 	const html = ansi.ansi_to_html(content);
 	output.innerHTML = html;
@@ -153,6 +138,7 @@ function send(): void {
 
 	textInput.value = "";
 	textInput.style.height = "auto";
+	prevInputLen = 0;
 	clearImages();
 }
 
@@ -164,14 +150,6 @@ sendBtn.addEventListener("click", () => {
 // Send only via the send button.
 
 // --- Key buttons (mode cycle, arrows, enter) ---
-
-modeBtn.addEventListener("click", () => {
-	if (!ws || ws.readyState !== WebSocket.OPEN) {
-		return;
-	}
-
-	ws.send(JSON.stringify({ type: "key", key: "BTab" }));
-});
 
 for (const btn of Array.from(
 	document.querySelectorAll<HTMLButtonElement>(".key-btn")
@@ -894,7 +872,6 @@ try {
 			Ellipsis,
 			Image,
 			Mic,
-			RefreshCw,
 			Send,
 			Settings,
 			Volume2,
