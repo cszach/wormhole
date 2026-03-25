@@ -242,8 +242,8 @@ main {
 	font-family: var(--mono);
 	font-size: 12px;
 	line-height: 1.75;
-	white-space: pre-wrap;
-	word-break: break-word;
+	white-space: pre;
+	overflow-x: auto;
 	color: var(--text-secondary);
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior: contain;

@@ -21,7 +21,6 @@ import {
 import {
 	extractMode as extractModeFromContent,
 	isClaudeCode,
-	stripChrome,
 	getTTSText
 } from "@/text-processing.js";
 import { getDefaultTheme, getTheme, themes } from "@/themes/index.js";
@@ -115,8 +114,7 @@ function renderOutput(content: string): void {
 		modeBtn.classList.add("disabled");
 	}
 
-	const processed = inClaudeCode ? stripChrome(content) : content;
-	const html = ansi.ansi_to_html(processed);
+	const html = ansi.ansi_to_html(content);
 	output.innerHTML = html;
 
 	if (autoScroll) {
@@ -363,15 +361,8 @@ ttsToggle.addEventListener("click", () => {
 });
 
 function speakLatest(): void {
-	let snippet: string;
-
-	if (inClaudeCode) {
-		const ttsMode = localStorage.getItem("wormhole-tts-mode") ?? "summary";
-		snippet = getTTSText(rawOutput, ttsMode);
-	} else {
-		const lines = rawOutput.split("\n").filter((l) => l.trim());
-		snippet = lines.slice(-5).join(" ").trim();
-	}
+	const ttsMode = localStorage.getItem("wormhole-tts-mode") ?? "summary";
+	const snippet = getTTSText(rawOutput, ttsMode);
 
 	if (!snippet) {
 		return;
