@@ -114,8 +114,7 @@ export function extractLatestResponse(text: string): string {
 		}
 	}
 
-	const responseLines =
-		promptIdx >= 0 ? lines.slice(promptIdx + 1) : lines;
+	const responseLines = promptIdx >= 0 ? lines.slice(promptIdx + 1) : lines;
 
 	const filtered = responseLines.filter((line) => {
 		const trimmed = line.trim();
@@ -239,7 +238,10 @@ export function extractSummary(text: string): string {
 		}
 
 		// Skip file paths
-		if (/^(src|public|node_modules)\//.test(trimmed) || /\.\w{1,4}:\d+/.test(trimmed)) {
+		if (
+			/^(src|public|node_modules)\//.test(trimmed) ||
+			/\.\w{1,4}:\d+/.test(trimmed)
+		) {
 			if (proseLines.length > 0) {
 				break;
 			}
@@ -255,10 +257,7 @@ export function extractSummary(text: string): string {
 	return proseLines.join(" ").trim();
 }
 
-export function getTTSText(
-	rawOutput: string,
-	mode: string
-): string {
+export function getTTSText(rawOutput: string, mode: string): string {
 	const clean = stripAnsi(rawOutput);
 	const full = extractLatestResponse(clean);
 

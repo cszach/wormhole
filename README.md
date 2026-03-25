@@ -77,13 +77,13 @@ npm run dev
 
 ## Configuration
 
-| Variable       | Default   | Description             |
-| -------------- | --------- | ----------------------- |
-| `PORT`         | `5173`    | Server port             |
-| `TMUX_SESSION` | `claude`  | tmux session name       |
-| `UPLOAD_DIR`   | `./uploads` | Image upload directory |
-| `TLS_CERT`     |           | Path to TLS certificate |
-| `TLS_KEY`      |           | Path to TLS private key |
+| Variable       | Default     | Description             |
+| -------------- | ----------- | ----------------------- |
+| `PORT`         | `5173`      | Server port             |
+| `TMUX_SESSION` | `claude`    | tmux session name       |
+| `UPLOAD_DIR`   | `./uploads` | Image upload directory  |
+| `TLS_CERT`     |             | Path to TLS certificate |
+| `TLS_KEY`      |             | Path to TLS private key |
 
 ## Testing
 

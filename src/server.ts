@@ -1,4 +1,3 @@
-import type { ServerMessage } from "./types.js";
 
 import { createServer } from "node:http";
 import { createServer as createHTTPSServer } from "node:https";
@@ -9,6 +8,7 @@ import express from "express";
 import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 
+import type { ServerMessage } from "./types.js";
 import { sendKeys, sendRawKey, resizePane, capturePane } from "./tmux.js";
 
 const PORT = Number(process.env.PORT ?? 5173);
@@ -88,7 +88,10 @@ async function pollTmux(): Promise<void> {
 			lastChangeMs = Date.now();
 			stableSent = false;
 			broadcast({ type: "output", content });
-		} else if (!stableSent && Date.now() - lastChangeMs >= STABLE_THRESHOLD_MS) {
+		} else if (
+			!stableSent &&
+			Date.now() - lastChangeMs >= STABLE_THRESHOLD_MS
+		) {
 			stableSent = true;
 			broadcast({ type: "stable" });
 		}

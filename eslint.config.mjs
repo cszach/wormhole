@@ -3,6 +3,9 @@ import prettierConfig from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
 
 export default tseslint.config(
+	{
+		ignores: ["public/**", "dist/**", "node_modules/**"]
+	},
 	...tseslint.configs.recommended,
 	prettierConfig,
 	{
@@ -115,6 +118,12 @@ export default tseslint.config(
 					message: "Use named exports. Never use default exports."
 				}
 			]
+		}
+	},
+	{
+		files: ["*.mjs"],
+		rules: {
+			"no-restricted-syntax": "off"
 		}
 	}
 );

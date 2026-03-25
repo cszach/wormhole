@@ -7,30 +7,22 @@ export function sendKeys(text: string): Promise<void> {
 
 	return new Promise((resolve, reject) => {
 		// Send text literally (-l) to avoid interpreting special keys
-		execFile(
-			"tmux",
-			["send-keys", "-t", SESSION, "-l", clean],
-			(error) => {
-				if (error) {
-					reject(error);
+		execFile("tmux", ["send-keys", "-t", SESSION, "-l", clean], (error) => {
+			if (error) {
+				reject(error);
 
-					return;
-				}
-
-				// Send Enter as a separate keystroke
-				execFile(
-					"tmux",
-					["send-keys", "-t", SESSION, "Enter"],
-					(enterError) => {
-						if (enterError) {
-							reject(enterError);
-						} else {
-							resolve();
-						}
-					}
-				);
+				return;
 			}
-		);
+
+			// Send Enter as a separate keystroke
+			execFile("tmux", ["send-keys", "-t", SESSION, "Enter"], (enterError) => {
+				if (enterError) {
+					reject(enterError);
+				} else {
+					resolve();
+				}
+			});
+		});
 	});
 }
 
@@ -42,17 +34,13 @@ export function sendRawKey(key: string): Promise<void> {
 	}
 
 	return new Promise((resolve, reject) => {
-		execFile(
-			"tmux",
-			["send-keys", "-t", SESSION, key],
-			(error) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve();
-				}
+		execFile("tmux", ["send-keys", "-t", SESSION, key], (error) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve();
 			}
-		);
+		});
 	});
 }
 

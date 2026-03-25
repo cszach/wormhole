@@ -18,9 +18,7 @@ describe("stripAnsi", () => {
 	});
 
 	it("removes multiple codes", () => {
-		expect(
-			stripAnsi("\x1b[1mbold\x1b[0m \x1b[31mred\x1b[0m")
-		).toBe("bold red");
+		expect(stripAnsi("\x1b[1mbold\x1b[0m \x1b[31mred\x1b[0m")).toBe("bold red");
 	});
 
 	it("returns plain text unchanged", () => {
@@ -55,19 +53,15 @@ describe("extractMode", () => {
 	});
 
 	it("extracts plan mode", () => {
-		const content = [
-			"some text",
-			"⏸ plan mode on (shift+tab to cycle)"
-		].join("\n");
+		const content = ["some text", "⏸ plan mode on (shift+tab to cycle)"].join(
+			"\n"
+		);
 
 		expect(extractMode(content)).toBe("plan mode");
 	});
 
 	it("returns default when no mode found", () => {
-		const content = [
-			"some text",
-			"? for shortcuts"
-		].join("\n");
+		const content = ["some text", "? for shortcuts"].join("\n");
 
 		expect(extractMode(content)).toBe("default");
 	});
@@ -107,9 +101,9 @@ describe("isChromeLine", () => {
 	});
 
 	it("treats status bar with shift+tab as chrome", () => {
-		expect(
-			isChromeLine("⏵⏵ bypass permissions on (shift+tab to cycle)")
-		).toBe(true);
+		expect(isChromeLine("⏵⏵ bypass permissions on (shift+tab to cycle)")).toBe(
+			true
+		);
 	});
 
 	it("treats ⏵⏵ lines as chrome", () => {
@@ -139,9 +133,7 @@ describe("isChromeLine", () => {
 	});
 
 	it("treats project name bar as chrome", () => {
-		expect(
-			isChromeLine("───── wormhole-mobile-voice-interface ──")
-		).toBe(true);
+		expect(isChromeLine("───── wormhole-mobile-voice-interface ──")).toBe(true);
 	});
 
 	it("treats thinking indicators as chrome", () => {
@@ -232,22 +224,16 @@ describe("stripChrome", () => {
 
 describe("extractLatestResponse", () => {
 	it("extracts text after last user prompt", () => {
-		const text = [
-			"❯ hello",
-			"● Hi there!",
-			"  How can I help?"
-		].join("\n");
+		const text = ["❯ hello", "● Hi there!", "  How can I help?"].join("\n");
 
 		const result = extractLatestResponse(text);
 		expect(result).toBe("Hi there!\n  How can I help?");
 	});
 
 	it("strips ● bullet from response lines", () => {
-		const text = [
-			"❯ test",
-			"● First paragraph",
-			"● Second paragraph"
-		].join("\n");
+		const text = ["❯ test", "● First paragraph", "● Second paragraph"].join(
+			"\n"
+		);
 
 		const result = extractLatestResponse(text);
 		expect(result).toBe("First paragraph\nSecond paragraph");
@@ -300,11 +286,9 @@ describe("extractLatestResponse", () => {
 	});
 
 	it("filters out thinking indicators", () => {
-		const text = [
-			"❯ think about this",
-			"● Here is my thought.",
-			"✢"
-		].join("\n");
+		const text = ["❯ think about this", "● Here is my thought.", "✢"].join(
+			"\n"
+		);
 
 		const result = extractLatestResponse(text);
 		expect(result).toBe("Here is my thought.");
@@ -372,10 +356,7 @@ describe("getTTSText", () => {
 	});
 
 	it("does not include user prompt in TTS", () => {
-		const raw = [
-			"❯ what is 2+2",
-			"● The answer is 4."
-		].join("\n");
+		const raw = ["❯ what is 2+2", "● The answer is 4."].join("\n");
 
 		expect(getTTSText(raw, "full")).toBe("The answer is 4.");
 		expect(getTTSText(raw, "full")).not.toContain("what is 2+2");
@@ -413,10 +394,7 @@ describe("getTTSText", () => {
 	});
 
 	it("strips ● bullet so TTS does not say 'filled circle'", () => {
-		const raw = [
-			"❯ test",
-			"● This is my response."
-		].join("\n");
+		const raw = ["❯ test", "● This is my response."].join("\n");
 
 		expect(getTTSText(raw, "full")).toBe("This is my response.");
 		expect(getTTSText(raw, "full")).not.toContain("●");

@@ -1,13 +1,4 @@
 import { AnsiUp } from "ansi_up";
-
-import {
-	stripAnsi as stripAnsiRaw,
-	extractMode as extractModeFromContent,
-	stripChrome,
-	getTTSText
-} from "../text-processing.js";
-import { getDefaultTheme, getTheme, themes } from "../themes/index.js";
-import { initShader } from "./shader.js";
 import {
 	createIcons,
 	ChevronDown,
@@ -23,9 +14,17 @@ import {
 	X
 } from "lucide";
 
-type ServerMessage =
-	| { type: "output"; content: string }
-	| { type: "stable" };
+/* eslint-disable no-restricted-imports */
+import {
+	extractMode as extractModeFromContent,
+	stripChrome,
+	getTTSText
+} from "../text-processing.js";
+import { getDefaultTheme, getTheme, themes } from "../themes/index.js";
+/* eslint-enable no-restricted-imports */
+import { initShader } from "./shader.js";
+
+type ServerMessage = { type: "output"; content: string } | { type: "stable" };
 
 const wsStatus = document.getElementById("ws-status") as HTMLElement;
 const output = document.getElementById("output") as HTMLElement;
@@ -36,10 +35,16 @@ const ttsToggle = document.getElementById("tts-toggle") as HTMLButtonElement;
 const modeBtn = document.getElementById("mode-btn") as HTMLButtonElement;
 const imageInput = document.getElementById("image-input") as HTMLInputElement;
 const imagePreviews = document.getElementById("image-previews") as HTMLElement;
-const settingsBtn = document.getElementById("settings-btn") as HTMLButtonElement;
+const settingsBtn = document.getElementById(
+	"settings-btn"
+) as HTMLButtonElement;
 const settingsPanel = document.getElementById("settings-panel") as HTMLElement;
-const settingsClose = document.getElementById("settings-close") as HTMLButtonElement;
-const settingsBackdrop = settingsPanel.querySelector(".settings-backdrop") as HTMLElement;
+const settingsClose = document.getElementById(
+	"settings-close"
+) as HTMLButtonElement;
+const settingsBackdrop = settingsPanel.querySelector(
+	".settings-backdrop"
+) as HTMLElement;
 const themeList = document.getElementById("theme-list") as HTMLElement;
 
 const ansi = new AnsiUp();
@@ -51,7 +56,6 @@ let autoScroll = true;
 let recognition: SpeechRecognition | null = null;
 let isRecording = false;
 let rawOutput = "";
-let lastSentText = "";
 
 // --- WebSocket ---
 
@@ -131,15 +135,13 @@ function send(): void {
 		return;
 	}
 
-	lastSentText = text;
-
-	ws.send(JSON.stringify({
-		type: "send",
-		text,
-		imagePaths: attachedImagePaths.length > 0
-			? attachedImagePaths
-			: undefined
-	}));
+	ws.send(
+		JSON.stringify({
+			type: "send",
+			text,
+			imagePaths: attachedImagePaths.length > 0 ? attachedImagePaths : undefined
+		})
+	);
 
 	textInput.value = "";
 	textInput.style.height = "auto";
@@ -171,7 +173,7 @@ for (const btn of Array.from(
 			return;
 		}
 
-		const key = btn.dataset.key;
+		const {key} = btn.dataset;
 
 		if (key) {
 			ws.send(JSON.stringify({ type: "key", key }));
@@ -189,7 +191,7 @@ textInput.addEventListener("input", () => {
 // --- Image upload ---
 
 imageInput.addEventListener("change", async () => {
-	const files = imageInput.files;
+	const {files} = imageInput;
 
 	if (!files || files.length === 0) {
 		return;
@@ -218,10 +220,7 @@ imageInput.addEventListener("change", async () => {
 	imageInput.value = "";
 });
 
-function addPreviewThumbnail(
-	serverPath: string,
-	blobUrl: string
-): void {
+function addPreviewThumbnail(serverPath: string, blobUrl: string): void {
 	const wrapper = document.createElement("div");
 	wrapper.className = "preview-thumb";
 
@@ -242,9 +241,7 @@ function addPreviewThumbnail(
 		'<line x1="12" y1="4" x2="4" y2="12"/></svg>';
 
 	removeBtn.addEventListener("click", () => {
-		attachedImagePaths = attachedImagePaths.filter(
-			(p) => p !== serverPath
-		);
+		attachedImagePaths = attachedImagePaths.filter((p) => p !== serverPath);
 
 		URL.revokeObjectURL(blobUrl);
 		wrapper.remove();
@@ -258,9 +255,7 @@ function addPreviewThumbnail(
 function clearImages(): void {
 	attachedImagePaths = [];
 
-	for (const img of Array.from(
-		imagePreviews.querySelectorAll("img")
-	)) {
+	for (const img of Array.from(imagePreviews.querySelectorAll("img"))) {
 		URL.revokeObjectURL(img.src);
 	}
 
@@ -286,7 +281,7 @@ function initSpeechRecognition(): void {
 	recognition.lang = "en-US";
 
 	recognition.addEventListener("result", (event) => {
-		const transcript = event.results[0][0].transcript;
+		const {transcript} = event.results[0][0];
 
 		if (textInput.value && !textInput.value.endsWith(" ")) {
 			textInput.value += " ";
@@ -294,8 +289,7 @@ function initSpeechRecognition(): void {
 
 		textInput.value += transcript;
 		textInput.style.height = "auto";
-		textInput.style.height =
-			Math.min(textInput.scrollHeight, 120) + "px";
+		textInput.style.height = Math.min(textInput.scrollHeight, 120) + "px";
 	});
 
 	recognition.addEventListener("end", () => {
@@ -360,9 +354,9 @@ function speakLatest(): void {
 	const savedVoice = localStorage.getItem("wormhole-tts-voice");
 
 	if (savedVoice) {
-		const voice = speechSynthesis.getVoices().find(
-			(v) => v.name === savedVoice
-		);
+		const voice = speechSynthesis
+			.getVoices()
+			.find((v) => v.name === savedVoice);
 
 		if (voice) {
 			utterance.voice = voice;
@@ -375,11 +369,10 @@ function speakLatest(): void {
 // --- Theme system ---
 
 const savedThemeId = localStorage.getItem("wormhole-theme");
-const initialTheme = (savedThemeId && getTheme(savedThemeId))
-	|| getDefaultTheme();
+const initialTheme =
+	(savedThemeId && getTheme(savedThemeId)) || getDefaultTheme();
 
-const canvas =
-	document.getElementById("bg-shader") as HTMLCanvasElement;
+const canvas = document.getElementById("bg-shader") as HTMLCanvasElement;
 
 let shaderEngine: ReturnType<typeof initShader> = null;
 
@@ -406,8 +399,12 @@ function applyTheme(id: string): void {
 const ttsModeSelect = document.getElementById("tts-mode") as HTMLSelectElement;
 const ttsRateInput = document.getElementById("tts-rate") as HTMLInputElement;
 const ttsRateValue = document.getElementById("tts-rate-value") as HTMLElement;
-const ttsVoiceSelect = document.getElementById("tts-voice") as HTMLSelectElement;
-const tmuxSessionInput = document.getElementById("tmux-session") as HTMLInputElement;
+const ttsVoiceSelect = document.getElementById(
+	"tts-voice"
+) as HTMLSelectElement;
+const tmuxSessionInput = document.getElementById(
+	"tmux-session"
+) as HTMLInputElement;
 const colorList = document.getElementById("color-list") as HTMLElement;
 
 const ACCENT_COLORS = [
@@ -433,10 +430,7 @@ function applyAccentColor(hex: string): void {
 	const g = parseInt(hex.slice(3, 5), 16);
 	const b = parseInt(hex.slice(5, 7), 16);
 
-	root.style.setProperty(
-		"--accent-dim",
-		`rgba(${r}, ${g}, ${b}, 0.08)`
-	);
+	root.style.setProperty("--accent-dim", `rgba(${r}, ${g}, ${b}, 0.08)`);
 
 	activeAccent = hex;
 	localStorage.setItem("wormhole-accent", hex);
@@ -447,12 +441,10 @@ function openSettings(): void {
 	renderThemeList();
 	renderColorList();
 	populateVoices();
-	ttsModeSelect.value =
-		localStorage.getItem("wormhole-tts-mode") ?? "summary";
+	ttsModeSelect.value = localStorage.getItem("wormhole-tts-mode") ?? "summary";
 	ttsRateInput.value = String(ttsRate);
 	ttsRateValue.textContent = ttsRate.toFixed(1) + "x";
-	tmuxSessionInput.value =
-		localStorage.getItem("wormhole-tmux-session") ?? "";
+	tmuxSessionInput.value = localStorage.getItem("wormhole-tmux-session") ?? "";
 }
 
 function closeSettings(): void {
@@ -551,8 +543,7 @@ function populateVoices(): void {
 	const voices = speechSynthesis.getVoices();
 	const saved = localStorage.getItem("wormhole-tts-voice") ?? "";
 
-	ttsVoiceSelect.innerHTML =
-		'<option value="">System Default</option>';
+	ttsVoiceSelect.innerHTML = '<option value="">System Default</option>';
 
 	for (const voice of voices) {
 		const opt = document.createElement("option");
@@ -582,7 +573,9 @@ tmuxSessionInput.addEventListener("change", () => {
 
 // Terminal columns
 
-const autoColsCheckbox = document.getElementById("auto-cols") as HTMLInputElement;
+const autoColsCheckbox = document.getElementById(
+	"auto-cols"
+) as HTMLInputElement;
 const colsRow = document.getElementById("cols-row") as HTMLElement;
 const colsSlider = document.getElementById("cols-slider") as HTMLInputElement;
 const colsValue = document.getElementById("cols-value") as HTMLElement;
@@ -594,8 +587,8 @@ function calculateColumns(): number {
 
 	// Approximate char width for monospace at this font size
 	const charWidth = fontSize * 0.6;
-	const padding = parseFloat(style.paddingLeft) +
-		parseFloat(style.paddingRight);
+	const padding =
+		parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
 	const available = outputEl.clientWidth - padding;
 
 	// Subtract scrollbar width buffer for consistency
@@ -667,9 +660,17 @@ applyAccentColor(activeAccent);
 try {
 	createIcons({
 		icons: {
-			ChevronDown, ChevronUp, CornerDownLeft,
-			Image, Mic, RefreshCw, Send, Settings,
-			Volume2, VolumeOff, X
+			ChevronDown,
+			ChevronUp,
+			CornerDownLeft,
+			Image,
+			Mic,
+			RefreshCw,
+			Send,
+			Settings,
+			Volume2,
+			VolumeOff,
+			X
 		}
 	});
 } catch (e) {
@@ -734,14 +735,14 @@ declare global {
 		confidence: number;
 	};
 
-	/* eslint-disable no-var */
+	 
 	var SpeechRecognition: {
 		new (): SpeechRecognition;
 	};
 	var webkitSpeechRecognition: {
 		new (): SpeechRecognition;
 	};
-	/* eslint-enable no-var */
+	 
 
 	type Window = {
 		SpeechRecognition?: typeof SpeechRecognition;

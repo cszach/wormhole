@@ -1,4 +1,4 @@
-import type { Theme } from "../themes/types.js";
+import type { Theme } from "../themes/types.js"; // eslint-disable-line no-restricted-imports
 
 const VERT = `
 attribute vec2 a_pos;
@@ -25,10 +25,7 @@ export function initShader(
 	// Enable derivatives for caustics (dFdx/dFdy)
 	gl.getExtension("OES_standard_derivatives");
 
-	function compile(
-		type: number,
-		src: string
-	): WebGLShader | null {
+	function compile(type: number, src: string): WebGLShader | null {
 		const s = gl!.createShader(type);
 
 		if (!s) {
