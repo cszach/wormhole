@@ -40,7 +40,7 @@ describe("extractMode", () => {
 			"⏵⏵ bypass permissions on (shift+tab to cycle)"
 		].join("\n");
 
-		expect(extractMode(content)).toBe("bypass perms");
+		expect(extractMode(content)).toBe("bypass");
 	});
 
 	it("extracts accept edits", () => {
@@ -49,7 +49,7 @@ describe("extractMode", () => {
 			"⏵⏵ accept edits on (shift+tab to cycle)"
 		].join("\n");
 
-		expect(extractMode(content)).toBe("accept edits");
+		expect(extractMode(content)).toBe("accept");
 	});
 
 	it("extracts plan mode", () => {
@@ -57,7 +57,7 @@ describe("extractMode", () => {
 			"\n"
 		);
 
-		expect(extractMode(content)).toBe("plan mode");
+		expect(extractMode(content)).toBe("plan");
 	});
 
 	it("returns default when no mode found", () => {
@@ -83,7 +83,7 @@ describe("extractMode", () => {
 			"\x1b[38;5;211m⏵⏵\x1b[39m \x1b[38;5;211mbypass\x1b[39m \x1b[38;5;211mpermissions\x1b[39m \x1b[38;5;211mon\x1b[39m"
 		].join("\n");
 
-		expect(extractMode(content)).toBe("bypass perms");
+		expect(extractMode(content)).toBe("bypass");
 	});
 });
 
@@ -334,10 +334,24 @@ describe("isAllowedKey", () => {
 		expect(isAllowedKey("Enter")).toBe(true);
 	});
 
+	it("allows Left and Right", () => {
+		expect(isAllowedKey("Left")).toBe(true);
+		expect(isAllowedKey("Right")).toBe(true);
+	});
+
+	it("allows Tab", () => {
+		expect(isAllowedKey("Tab")).toBe(true);
+	});
+
+	it("allows Ctrl combos", () => {
+		expect(isAllowedKey("C-o")).toBe(true);
+		expect(isAllowedKey("C-c")).toBe(true);
+	});
+
 	it("rejects arbitrary keys", () => {
 		expect(isAllowedKey("Delete")).toBe(false);
 		expect(isAllowedKey("q")).toBe(false);
-		expect(isAllowedKey("C-c")).toBe(false);
+		expect(isAllowedKey("C-z")).toBe(false);
 	});
 });
 

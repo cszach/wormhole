@@ -15,11 +15,15 @@ export function extractMode(content: string): string {
 		const mode = match[0].toLowerCase().replace(/\s+on$/, "");
 
 		if (mode === "bypass permissions") {
-			return "bypass perms";
+			return "bypass";
 		}
 
 		if (mode === "accept edits") {
-			return "accept edits";
+			return "accept";
+		}
+
+		if (mode === "plan mode") {
+			return "plan";
 		}
 
 		return mode;
@@ -176,7 +180,18 @@ export function cleanTextForSend(text: string): string {
 }
 
 export function isAllowedKey(key: string): boolean {
-	const allowed = new Set(["BTab", "Escape", "Up", "Down", "Enter"]);
+	const allowed = new Set([
+		"BTab",
+		"Escape",
+		"Up",
+		"Down",
+		"Left",
+		"Right",
+		"Enter",
+		"Tab",
+		"C-o",
+		"C-c"
+	]);
 
 	return allowed.has(key);
 }

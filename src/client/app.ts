@@ -1,9 +1,13 @@
 import { AnsiUp } from "ansi_up";
 import {
 	createIcons,
+	ArrowRightToLine,
 	ChevronDown,
+	ChevronLeft,
+	ChevronRight,
 	ChevronUp,
 	CornerDownLeft,
+	Ellipsis,
 	Image,
 	Mic,
 	RefreshCw,
@@ -172,13 +176,27 @@ for (const btn of Array.from(
 			return;
 		}
 
-		const {key} = btn.dataset;
+		const { key, raw } = btn.dataset;
 
 		if (key) {
 			ws.send(JSON.stringify({ type: "key", key }));
+		} else if (raw) {
+			ws.send(JSON.stringify({ type: "key", key: raw }));
 		}
 	});
 }
+
+// --- Extra keys toggle ---
+
+const keysExpand = document.getElementById("keys-expand") as HTMLButtonElement;
+const extraKeys = document.getElementById("extra-keys") as HTMLElement;
+
+keysExpand.addEventListener("click", () => {
+	const showing = !extraKeys.hidden;
+
+	extraKeys.hidden = showing;
+	keysExpand.classList.toggle("active", !showing);
+});
 
 // Auto-resize textarea
 
@@ -190,7 +208,7 @@ textInput.addEventListener("input", () => {
 // --- Image upload ---
 
 imageInput.addEventListener("change", async () => {
-	const {files} = imageInput;
+	const { files } = imageInput;
 
 	if (!files || files.length === 0) {
 		return;
@@ -280,7 +298,7 @@ function initSpeechRecognition(): void {
 	recognition.lang = "en-US";
 
 	recognition.addEventListener("result", (event) => {
-		const {transcript} = event.results[0][0];
+		const { transcript } = event.results[0][0];
 
 		if (textInput.value && !textInput.value.endsWith(" ")) {
 			textInput.value += " ";
@@ -659,9 +677,13 @@ applyAccentColor(activeAccent);
 try {
 	createIcons({
 		icons: {
+			ArrowRightToLine,
 			ChevronDown,
+			ChevronLeft,
+			ChevronRight,
 			ChevronUp,
 			CornerDownLeft,
+			Ellipsis,
 			Image,
 			Mic,
 			RefreshCw,
@@ -734,14 +756,12 @@ declare global {
 		confidence: number;
 	};
 
-	 
 	var SpeechRecognition: {
 		new (): SpeechRecognition;
 	};
 	var webkitSpeechRecognition: {
 		new (): SpeechRecognition;
 	};
-	 
 
 	type Window = {
 		SpeechRecognition?: typeof SpeechRecognition;

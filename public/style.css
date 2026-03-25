@@ -270,6 +270,14 @@ footer {
 	margin-bottom: 8px;
 }
 
+.key-row--extra[hidden] {
+	display: none;
+}
+
+#keys-expand.active {
+	color: var(--accent);
+}
+
 .key-btn {
 	display: flex;
 	align-items: center;

@@ -26,7 +26,18 @@ export function sendKeys(text: string): Promise<void> {
 	});
 }
 
-const ALLOWED_KEYS = new Set(["BTab", "Escape", "Up", "Down", "Enter"]);
+const ALLOWED_KEYS = new Set([
+	"BTab",
+	"Escape",
+	"Up",
+	"Down",
+	"Left",
+	"Right",
+	"Enter",
+	"Tab",
+	"C-o",
+	"C-c"
+]);
 
 export function sendRawKey(key: string): Promise<void> {
 	if (!ALLOWED_KEYS.has(key)) {

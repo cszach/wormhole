@@ -177,6 +177,51 @@
 					<i data-lucide="refresh-cw" aria-hidden="true"></i>
 					<span id="mode-label"></span>
 				</button>
+				<button
+					id="keys-expand"
+					class="key-btn"
+					title="More keys"
+					aria-label="More keys"
+				>
+					<i data-lucide="ellipsis" aria-hidden="true"></i>
+				</button>
+			</div>
+
+			<div class="key-row key-row--extra" id="extra-keys" hidden>
+				<button
+					class="key-btn"
+					data-key="Left"
+					title="Left arrow"
+					aria-label="Left arrow"
+				>
+					<i data-lucide="chevron-left" aria-hidden="true"></i>
+				</button>
+				<button
+					class="key-btn"
+					data-key="Right"
+					title="Right arrow"
+					aria-label="Right arrow"
+				>
+					<i data-lucide="chevron-right" aria-hidden="true"></i>
+				</button>
+				<button class="key-btn key-btn--label" data-key="Tab" title="Tab">
+					<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
+					<span>Tab</span>
+				</button>
+				<button
+					class="key-btn key-btn--label"
+					data-raw="C-o"
+					title="Ctrl+O (expand)"
+				>
+					<span>Ctrl+O</span>
+				</button>
+				<button
+					class="key-btn key-btn--label key-btn--esc"
+					data-raw="C-c"
+					title="Ctrl+C (kill)"
+				>
+					<span>Ctrl+C</span>
+				</button>
 			</div>
 
 			<div class="composer">
