@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 
 import {
 	stripAnsi,
+	isClaudeCode,
 	extractMode,
 	isChromeLine,
 	stripChrome,
@@ -27,6 +28,46 @@ describe("stripAnsi", () => {
 
 	it("handles empty string", () => {
 		expect(stripAnsi("")).toBe("");
+	});
+});
+
+describe("isClaudeCode", () => {
+	it("detects Claude Code by bypass permissions", () => {
+		const content = [
+			"some output",
+			"⏵⏵ bypass permissions on (shift+tab to cycle)"
+		].join("\n");
+
+		expect(isClaudeCode(content)).toBe(true);
+	});
+
+	it("detects Claude Code by shortcuts hint", () => {
+		const content = ["some output", "? for shortcuts"].join("\n");
+
+		expect(isClaudeCode(content)).toBe(true);
+	});
+
+	it("detects Claude Code by plan mode", () => {
+		const content = ["some output", "⏸ plan mode on (shift+tab to cycle)"].join(
+			"\n"
+		);
+
+		expect(isClaudeCode(content)).toBe(true);
+	});
+
+	it("returns false for plain terminal", () => {
+		const content = [
+			"$ ls -la",
+			"total 42",
+			"drwxr-xr-x  5 user user 4096 Mar 25 10:00 .",
+			"$ "
+		].join("\n");
+
+		expect(isClaudeCode(content)).toBe(false);
+	});
+
+	it("returns false for empty output", () => {
+		expect(isClaudeCode("")).toBe(false);
 	});
 });
 

@@ -2,6 +2,16 @@ export function stripAnsi(text: string): string {
 	return text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, "");
 }
 
+export function isClaudeCode(content: string): boolean {
+	const lines = content.split("\n");
+	const bottom = lines.slice(-12).join("\n");
+	const stripped = stripAnsi(bottom);
+
+	return /⏵⏵|⏸|shift\+tab|for shortcuts|bypass permissions|accept edits|plan mode/.test(
+		stripped
+	);
+}
+
 export function extractMode(content: string): string {
 	const lines = content.split("\n");
 	const bottom = lines.slice(-10).join("\n");

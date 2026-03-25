@@ -20,6 +20,7 @@ import {
 
 import {
 	extractMode as extractModeFromContent,
+	isClaudeCode,
 	stripChrome,
 	getTTSText
 } from "@/text-processing.js";
@@ -101,15 +102,21 @@ function connect(): void {
 // --- Output rendering ---
 
 const modeLabel = document.getElementById("mode-label") as HTMLElement;
-
-function updateMode(content: string): void {
-	modeLabel.textContent = extractModeFromContent(content);
-}
+let inClaudeCode = true;
 
 function renderOutput(content: string): void {
-	updateMode(content);
-	const stripped = stripChrome(content);
-	const html = ansi.ansi_to_html(stripped);
+	inClaudeCode = isClaudeCode(content);
+
+	if (inClaudeCode) {
+		modeLabel.textContent = extractModeFromContent(content);
+		modeBtn.classList.remove("disabled");
+	} else {
+		modeLabel.textContent = "";
+		modeBtn.classList.add("disabled");
+	}
+
+	const processed = inClaudeCode ? stripChrome(content) : content;
+	const html = ansi.ansi_to_html(processed);
 	output.innerHTML = html;
 
 	if (autoScroll) {
@@ -356,8 +363,15 @@ ttsToggle.addEventListener("click", () => {
 });
 
 function speakLatest(): void {
-	const ttsMode = localStorage.getItem("wormhole-tts-mode") ?? "summary";
-	const snippet = getTTSText(rawOutput, ttsMode);
+	let snippet: string;
+
+	if (inClaudeCode) {
+		const ttsMode = localStorage.getItem("wormhole-tts-mode") ?? "summary";
+		snippet = getTTSText(rawOutput, ttsMode);
+	} else {
+		const lines = rawOutput.split("\n").filter((l) => l.trim());
+		snippet = lines.slice(-5).join(" ").trim();
+	}
 
 	if (!snippet) {
 		return;
@@ -768,13 +782,13 @@ cmdSearch.addEventListener("input", () => {
 	renderCommandList(cmdSearch.value);
 });
 
-// Open palette when user types / as first character (not backspace)
+// Open palette when user types / as first character (not backspace, Claude Code only)
 let prevInputLen = 0;
 
 textInput.addEventListener("input", () => {
 	const len = textInput.value.length;
 
-	if (textInput.value === "/" && len > prevInputLen) {
+	if (textInput.value === "/" && len > prevInputLen && inClaudeCode) {
 		openCmdPalette();
 	}
 

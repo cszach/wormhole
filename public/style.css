@@ -191,6 +191,11 @@ header {
 	display: none;
 }
 
+#mode-btn.disabled {
+	opacity: 0.3;
+	pointer-events: none;
+}
+
 #tts-toggle:active {
 	transform: scale(0.96);
 }
