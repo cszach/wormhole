@@ -4,7 +4,14 @@ export function stripAnsi(text: string): string {
 
 export function isClaudeCode(content: string): boolean {
 	const lines = content.split("\n");
-	const bottom = lines.slice(-4).join("\n");
+
+	let end = lines.length;
+
+	while (end > 0 && lines[end - 1].trim() === "") {
+		end--;
+	}
+
+	const bottom = lines.slice(Math.max(0, end - 4), end).join("\n");
 	const stripped = stripAnsi(bottom);
 
 	return /⏵⏵|⏸|shift\+tab|for shortcuts|bypass permissions|accept edits|plan mode/.test(
