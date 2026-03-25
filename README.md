@@ -23,15 +23,19 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
 
 - **Voice** -- dictate prompts, hear responses read aloud (full or summary mode)
 - **Images** -- attach from camera or gallery, multiple at once
-- **Live terminal** -- ANSI colors, auto-scroll, Claude Code UI stripped out
-- **Controls** -- arrow keys, Enter, Esc, permission mode cycling
-- **Themes** -- animated GLSL shader backgrounds, switchable in settings
+- **Live terminal** -- ANSI colors, auto-scroll
+- **Multi-session** -- switch between tmux sessions, create and delete from the
+  app
+- **Context-aware keys** -- Claude Code layout (Shift+Tab, Ctrl+O, Ctrl+C) vs
+  terminal layout (Home, End, PgUp, PgDn, sticky Ctrl/Alt/Shift modifiers)
+- **Themes** -- animated GLSL shader backgrounds (Starry Night, Aurora, Nebula,
+  Topography)
 - **Customizable** -- accent color, TTS voice/speed, terminal column width
 
 ## Prerequisites
 
 - Node.js
-- tmux with a running session (default name: `claude`)
+- tmux
 - Optional: [Tailscale](https://tailscale.com) for secure access from your phone
 
 ## Setup
@@ -40,20 +44,14 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
 npm install
 ```
 
-Start Claude Code in tmux:
-
-```sh
-tmux new -s claude
-claude
-```
-
 Run Wormhole:
 
 ```sh
 npm run dev
 ```
 
-Open `http://<your-ip>:5173` on your phone.
+Open `http://<your-ip>:5173` on your phone. You can create and switch between
+tmux sessions from the session picker in the header.
 
 ### HTTPS (required for voice dictation)
 
@@ -67,23 +65,23 @@ sudo tailscale cert \
   <hostname>.<tailnet>.ts.net
 ```
 
-Then run with TLS:
+Then add the paths to your `.env`:
 
-```sh
-TLS_CERT=~/.local/share/tailscale/cert.pem \
-TLS_KEY=~/.local/share/tailscale/key.pem \
-npm run dev
+```
+TLS_CERT=/home/you/.local/share/tailscale/cert.pem
+TLS_KEY=/home/you/.local/share/tailscale/key.pem
 ```
 
 ## Configuration
 
-| Variable       | Default     | Description             |
-| -------------- | ----------- | ----------------------- |
-| `PORT`         | `5173`      | Server port             |
-| `TMUX_SESSION` | `claude`    | tmux session name       |
-| `UPLOAD_DIR`   | `./uploads` | Image upload directory  |
-| `TLS_CERT`     |             | Path to TLS certificate |
-| `TLS_KEY`      |             | Path to TLS private key |
+All configuration is via a `.env` file in the project root. Available variables:
+
+| Variable     | Default     | Description             |
+| ------------ | ----------- | ----------------------- |
+| `PORT`       | `5173`      | Server port             |
+| `UPLOAD_DIR` | `./uploads` | Image upload directory  |
+| `TLS_CERT`   |             | Path to TLS certificate |
+| `TLS_KEY`    |             | Path to TLS private key |
 
 ## Testing
 

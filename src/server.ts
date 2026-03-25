@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { createServer } from "node:http";
 import { createServer as createHTTPSServer } from "node:https";
 import path from "node:path";
@@ -22,7 +23,6 @@ const PORT = Number(process.env.PORT ?? 5173);
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? "./uploads";
 const TLS_CERT = process.env.TLS_CERT ?? "";
 const TLS_KEY = process.env.TLS_KEY ?? "";
-const DEFAULT_SESSION = process.env.TMUX_SESSION ?? "claude";
 
 const uploadDir = path.resolve(UPLOAD_DIR);
 
@@ -160,7 +160,7 @@ app.delete("/api/sessions/:name", async (req, res) => {
 
 // --- Tmux polling ---
 
-let activeSession = DEFAULT_SESSION;
+let activeSession = "";
 let lastCapture = "";
 let lastChangeMs = Date.now();
 let stableSent = false;
@@ -179,6 +179,17 @@ function broadcast(message: ServerMessage): void {
 
 async function pollTmux(): Promise<void> {
 	try {
+		if (!activeSession) {
+			const sessions = await listSessions();
+
+			if (sessions.length > 0) {
+				activeSession = sessions[0];
+				broadcast({ type: "session", session: activeSession });
+			} else {
+				return;
+			}
+		}
+
 		const content = await capturePane(activeSession);
 
 		if (content !== lastCapture) {
