@@ -1,8 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="color-scheme: dark">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+		/>
 		<meta name="theme-color" content="#06060e" />
 		<title>Wormhole</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,7 +50,8 @@
 				type="text"
 				id="search-input"
 				class="search-input"
-				placeholder="Search output..."
+				placeholder="Search output…"
+				aria-label="Search output"
 				autocomplete="off"
 				autocorrect="off"
 				autocapitalize="off"
@@ -72,7 +76,8 @@
 						type="text"
 						id="session-new-name"
 						class="settings-input"
-						placeholder="New session name..."
+						placeholder="New session name…"
+						aria-label="New session name"
 						maxlength="20"
 						autocomplete="off"
 						autocorrect="off"
@@ -181,7 +186,8 @@
 							type="text"
 							id="skills-add"
 							class="settings-input"
-							placeholder="Add skill..."
+							placeholder="Add skill…"
+							aria-label="Add skill"
 							autocomplete="off"
 							autocorrect="off"
 							autocapitalize="off"
@@ -200,7 +206,8 @@
 							type="text"
 							id="snippets-add"
 							class="settings-input"
-							placeholder="Add snippet..."
+							placeholder="Add snippet…"
+							aria-label="Add snippet"
 							autocomplete="off"
 							autocorrect="off"
 							autocapitalize="off"
@@ -226,7 +233,8 @@
 						type="text"
 						id="cmd-search"
 						class="cmd-search"
-						placeholder="Search..."
+						placeholder="Search…"
+						aria-label="Search commands"
 						autocomplete="off"
 						autocorrect="off"
 						autocapitalize="off"
@@ -269,13 +277,18 @@
 					type="text"
 					id="mod-input"
 					class="mod-input"
+					aria-label="Key to combine with modifier"
 					maxlength="1"
 					autocomplete="off"
 					autocorrect="off"
 					autocapitalize="off"
 					spellcheck="false"
 				/>
-				<button id="mod-cancel" class="key-btn key-btn--label mod-cancel">
+				<button
+					id="mod-cancel"
+					class="key-btn key-btn--label mod-cancel"
+					aria-label="Cancel modifier"
+				>
 					<i data-lucide="x" aria-hidden="true"></i>
 				</button>
 			</div>
@@ -507,7 +520,8 @@
 						id="text-input"
 						name="message"
 						rows="1"
-						placeholder="Drift a thought..."
+						placeholder="Drift a thought…"
+						aria-label="Message"
 					></textarea>
 
 					<button

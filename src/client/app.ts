@@ -831,6 +831,7 @@ function renderSnippetList(): void {
 		del.className = "session-delete";
 		del.textContent = "\u00d7";
 		del.title = "Remove snippet";
+		del.setAttribute("aria-label", "Remove snippet");
 
 		del.addEventListener("click", () => {
 			const snippets = getSnippets().filter((s) => s !== snippet);
@@ -1227,6 +1228,7 @@ function renderSessionList(sessions: string[]): void {
 		del.className = "session-delete";
 		del.textContent = "\u00d7";
 		del.title = "Delete session";
+		del.setAttribute("aria-label", "Delete session");
 		del.disabled = !canDelete;
 
 		del.addEventListener("click", async (event) => {
