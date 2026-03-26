@@ -50,7 +50,7 @@ cat << 'BANNER'
 
 BANNER
 printf "${RESET}"
-printf "   ${DIM}tmux, anywhere${RESET}\n\n"
+printf "   ${DIM}Terminal telekinesis${RESET}\n\n"
 
 # Check dependencies
 missing=0

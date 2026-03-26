@@ -1,7 +1,7 @@
 {
 	"name": "wormhole",
 	"version": "0.1.0",
-	"description": "Mobile voice/image interface for Claude Code over tmux",
+	"description": "Mobile terminal client with Claude Code superpowers",
 	"type": "module",
 	"scripts": {
 		"build": "esbuild src/client/app.ts src/client/landing.ts --bundle --outdir=public --format=iife --target=es2020 --alias:@=./src",

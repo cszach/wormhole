@@ -1,18 +1,18 @@
 # Wormhole
 
-A mobile interface for tmux, with first-class Claude Code support.
+A mobile terminal client with Claude Code superpowers.
 
-Wormhole gives you a phone-friendly frontend for any tmux session -- live
-terminal output with colors, context-aware key layouts, and a polished
-glassmorphism UI. When it detects Claude Code, it unlocks voice dictation,
-text-to-speech, image attachments, and a tailored command palette.
+Wormhole turns your phone into a remote for your terminal. Dictate commands,
+snap photos, hear responses read aloud — all streamed live over your network.
+When it detects Claude Code, it unlocks a tailored mobile experience with
+context-aware controls and a command palette.
 
 ## How it works
 
-Wormhole connects to a tmux session on your machine: it sends your input via
-`tmux send-keys` and streams the terminal output back to your browser via
-WebSocket. Your phone's browser provides the mic, speakers, and camera that a
-terminal can't.
+Wormhole runs a lightweight server on your machine that connects to tmux. It
+streams terminal output to your phone's browser via WebSocket and sends your
+input back — giving you the mic, speakers, and camera that a terminal doesn't
+have.
 
 ```
 Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
@@ -22,32 +22,23 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
 
 ## Features
 
-- **Voice** -- dictate prompts, hear responses read aloud (full or summary mode)
-- **Images** -- attach from camera or gallery, multiple at once
-- **Live terminal** -- ANSI colors, auto-scroll
-- **Multi-session** -- switch between tmux sessions, create and delete from the
+- **Voice** — dictate prompts, hear responses read aloud (full or summary mode)
+- **Images** — attach from camera or gallery, multiple at once
+- **Live terminal** — ANSI colors, auto-scroll, output search
+- **Multi-session** — switch between tmux sessions, create and delete from the
   app
-- **Context-aware keys** -- Claude Code layout (Shift+Tab, Ctrl+O, Ctrl+C) vs
+- **Context-aware keys** — Claude Code layout (Shift+Tab, Ctrl+O, Ctrl+C) vs
   terminal layout (Home, End, PgUp, PgDn, sticky Ctrl/Alt/Shift modifiers)
-- **Themes** -- animated GLSL shader backgrounds (Starry Night, Aurora, Nebula,
+- **Snippets** — save and recall commands from a palette
+- **Themes** — animated GLSL shader backgrounds (Starry Night, Aurora, Nebula,
   Topography)
-- **Customizable** -- accent color, TTS voice/speed, terminal column width
+- **Customizable** — accent color, TTS voice/speed, terminal column width
 
-## Prerequisites
-
-- Node.js
-- tmux
-- Optional: [Tailscale](https://tailscale.com) for secure access from your phone
-
-## Setup
+## Quick start
 
 ```sh
-npm install
-```
-
-Run Wormhole:
-
-```sh
+curl -sL https://raw.githubusercontent.com/cszach/wormhole/main/install.sh | sh
+cd wormhole
 npm run dev
 ```
 
