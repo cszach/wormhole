@@ -97,6 +97,8 @@ function connect(): void {
 
 // --- Output rendering ---
 
+let rerunSearch: () => void = () => {};
+
 let inClaudeCode = false;
 const ccKeys = document.getElementById("cc-keys") as HTMLElement;
 const termKeys = document.getElementById("term-keys") as HTMLElement;
@@ -130,6 +132,8 @@ function renderOutput(content: string): void {
 
 	const html = ansi.ansi_to_html(content);
 	output.innerHTML = html;
+
+	rerunSearch();
 
 	if (autoScroll) {
 		output.scrollTop = output.scrollHeight;
@@ -1312,6 +1316,12 @@ function closeSearch(): void {
 	searchBar.hidden = true;
 	clearSearch();
 }
+
+rerunSearch = () => {
+	if (!searchBar.hidden && searchInput.value) {
+		doSearch(searchInput.value);
+	}
+};
 
 searchBtn.addEventListener("click", () => {
 	if (searchBar.hidden) {
