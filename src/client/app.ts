@@ -186,6 +186,10 @@ function send(): void {
 	textInput.style.height = "auto";
 	prevInputLen = 0;
 	clearImages();
+
+	if (!inClaudeCode) {
+		textInput.focus();
+	}
 }
 
 sendBtn.addEventListener("click", () => {
