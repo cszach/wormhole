@@ -144,6 +144,7 @@ app.delete("/api/sessions/:name", async (req, res) => {
 
 	try {
 		await killSession(name);
+		bgState.delete(name);
 
 		// If we deleted the active session, switch to another one
 		if (name === activeSession) {
@@ -160,13 +161,23 @@ app.delete("/api/sessions/:name", async (req, res) => {
 	}
 });
 
+type SessionState = {
+	lastCapture: string;
+	lastChangeMs: number;
+	stableSent: boolean;
+	hasChanged: boolean;
+}
+
 let activeSession = "";
 let lastCapture = "";
 let lastChangeMs = Date.now();
 let stableSent = false;
+const bgState = new Map<string, SessionState>();
+
 const STABLE_THRESHOLD_MS = 2000;
 const POLL_INTERVAL_MS = 250;
 const HEARTBEAT_INTERVAL_MS = 15000;
+const BG_POLL_INTERVAL_MS = 2000;
 
 function broadcast(message: ServerMessage): void {
 	const data = JSON.stringify(message);
@@ -214,6 +225,50 @@ setInterval(() => {
 	pollTmux();
 }, POLL_INTERVAL_MS);
 
+async function pollBackgroundSessions(): Promise<void> {
+	if (!activeSession) {return;}
+
+	try {
+		const sessions = await listSessions();
+
+		for (const name of sessions) {
+			if (name === activeSession) {continue;}
+
+			const content = await capturePane(name);
+			const isBlank = content.trim().length === 0;
+			const state = bgState.get(name);
+
+			if (!state) {
+				bgState.set(name, {
+					lastCapture: content,
+					lastChangeMs: Date.now(),
+					stableSent: false,
+					hasChanged: false
+				});
+			} else if (content !== state.lastCapture) {
+				state.lastCapture = content;
+				state.lastChangeMs = Date.now();
+				state.stableSent = false;
+				state.hasChanged = true;
+			} else if (
+				!state.stableSent &&
+				state.hasChanged &&
+				!isBlank &&
+				Date.now() - state.lastChangeMs >= STABLE_THRESHOLD_MS
+			) {
+				state.stableSent = true;
+				broadcast({ type: "bg-stable", session: name });
+			}
+		}
+	} catch {
+		// Ignore errors from background polling
+	}
+}
+
+setInterval(() => {
+	pollBackgroundSessions();
+}, BG_POLL_INTERVAL_MS);
+
 // Heartbeat: ping all clients, terminate unresponsive ones
 setInterval(() => {
 	for (const client of wss.clients) {
@@ -245,6 +300,13 @@ wss.on("connection", (ws) => {
 		ws.send(JSON.stringify({ type: "output", content: lastCapture }));
 	}
 
+	// Send current stable background sessions
+	for (const [name, state] of bgState) {
+		if (state.stableSent) {
+			ws.send(JSON.stringify({ type: "bg-stable", session: name }));
+		}
+	}
+
 	ws.on("message", async (raw) => {
 		try {
 			const message = JSON.parse(String(raw));
@@ -270,9 +332,30 @@ wss.on("connection", (ws) => {
 			}
 
 			if (message.type === "switch" && message.session) {
+				// Save current active session state to background map
+				if (activeSession) {
+					bgState.set(activeSession, {
+						lastCapture,
+						lastChangeMs,
+						stableSent,
+						hasChanged: false
+					});
+				}
+
+				// Restore state from background map if available
+				const restored = bgState.get(message.session);
+
+				if (restored) {
+					({ lastCapture, lastChangeMs, stableSent } = restored);
+					bgState.delete(message.session);
+				} else {
+					lastCapture = "";
+					stableSent = false;
+				}
+
 				activeSession = message.session;
-				lastCapture = "";
-				stableSent = false;
+				lastChangeMs = Date.now();
+				broadcast({ type: "bg-clear", session: activeSession });
 				broadcast({ type: "session", session: activeSession });
 				pollTmux();
 			}

@@ -27,7 +27,9 @@ type ServerMessage =
 	| { type: "output"; content: string }
 	| { type: "stable" }
 	| { type: "session"; session: string }
-	| { type: "pong"; ts: number };
+	| { type: "pong"; ts: number }
+	| { type: "bg-stable"; session: string }
+	| { type: "bg-clear"; session: string };
 
 const PING_INTERVAL_MS = 15000;
 const PING_HISTORY_SIZE = 3;
@@ -38,7 +40,9 @@ const pingHistory: number[] = [];
 let latencyMs = -1;
 
 function getAvgLatency(): number {
-	if (pingHistory.length === 0) {return -1;}
+	if (pingHistory.length === 0) {
+		return -1;
+	}
 	return Math.round(
 		pingHistory.reduce((a, b) => a + b, 0) / pingHistory.length
 	);
@@ -55,7 +59,9 @@ function recordPing(rtt: number): void {
 
 function updateDotColor(): void {
 	wsDot.classList.remove("ping-good", "ping-warn", "ping-poor");
-	if (latencyMs < 0) {return;}
+	if (latencyMs < 0) {
+		return;
+	}
 
 	if (latencyMs <= PING_GOOD_MS) {
 		wsDot.classList.add("ping-good");
@@ -74,6 +80,29 @@ function sendPing(): void {
 
 const wsDot = document.getElementById("ws-dot") as HTMLElement;
 const sessionNameEl = document.getElementById("session-name") as HTMLElement;
+const sessionHint = document.getElementById("session-hint") as HTMLElement;
+const wormholingEl = document.getElementById("wormholing") as HTMLElement;
+const wormholingHint = document.getElementById(
+	"wormholing-hint"
+) as HTMLElement;
+let wormholingTimer = 0;
+const WORMHOLING_HINT_MS = 8000;
+
+const readySessions = new Set<string>();
+
+function updateSessionHint(): void {
+	const count = readySessions.size;
+
+	if (count === 0) {
+		sessionHint.textContent = "Tap to switch";
+		sessionHint.classList.remove("has-ready");
+	} else {
+		const label =
+			count === 1 ? "1 other session ready" : `${count} other sessions ready`;
+		sessionHint.textContent = label;
+		sessionHint.classList.add("has-ready");
+	}
+}
 const output = document.getElementById("output") as HTMLElement;
 const textInput = document.getElementById("text-input") as HTMLTextAreaElement;
 const sendBtn = document.getElementById("send-btn") as HTMLButtonElement;
@@ -124,6 +153,9 @@ function connect(): void {
 		if (message.type === "output") {
 			rawOutput = message.content;
 			renderOutput(message.content);
+			wormholingEl.hidden = true;
+			wormholingHint.classList.remove("visible");
+			clearTimeout(wormholingTimer);
 		}
 
 		if (message.type === "stable" && ttsEnabled) {
@@ -132,10 +164,30 @@ function connect(): void {
 
 		if (message.type === "session") {
 			sessionNameEl.textContent = message.session;
+			output.innerHTML = "";
+			rawOutput = "";
+			wormholingEl.hidden = false;
+			wormholingHint.classList.remove("visible");
+			clearTimeout(wormholingTimer);
+			wormholingTimer = window.setTimeout(() => {
+				if (!wormholingEl.hidden) {
+					wormholingHint.classList.add("visible");
+				}
+			}, WORMHOLING_HINT_MS);
 		}
 
 		if (message.type === "pong") {
 			recordPing(Date.now() - message.ts);
+		}
+
+		if (message.type === "bg-stable") {
+			readySessions.add(message.session);
+			updateSessionHint();
+		}
+
+		if (message.type === "bg-clear") {
+			readySessions.delete(message.session);
+			updateSessionHint();
 		}
 	});
 
@@ -145,6 +197,8 @@ function connect(): void {
 		clearInterval(pingTimer);
 		pingHistory.length = 0;
 		latencyMs = -1;
+		readySessions.clear();
+		updateSessionHint();
 		setTimeout(() => {
 			connect();
 		}, RECONNECT_DELAY_MS);
@@ -1274,12 +1328,20 @@ function renderSessionList(sessions: string[]): void {
 			row.classList.add("active");
 		}
 
+		if (readySessions.has(name)) {
+			const dot = document.createElement("span");
+			dot.className = "session-ready-dot";
+			row.appendChild(dot);
+		}
+
 		const label = document.createElement("button");
 		label.className = "session-item-name";
 		label.textContent = name;
 
 		label.addEventListener("click", () => {
 			if (name !== current && ws && ws.readyState === WebSocket.OPEN) {
+				readySessions.delete(name);
+				updateSessionHint();
 				ws.send(JSON.stringify({ type: "switch", session: name }));
 			}
 
@@ -1332,9 +1394,13 @@ async function openSessionModal(): Promise<void> {
 	if (latencyMs >= 0) {
 		modalPingValue.textContent = `${latencyMs}ms`;
 		modalPing.classList.remove("ping-good", "ping-warn", "ping-poor");
-		if (latencyMs <= PING_GOOD_MS) {modalPing.classList.add("ping-good");}
-		else if (latencyMs <= PING_WARN_MS) {modalPing.classList.add("ping-warn");}
-		else {modalPing.classList.add("ping-poor");}
+		if (latencyMs <= PING_GOOD_MS) {
+			modalPing.classList.add("ping-good");
+		} else if (latencyMs <= PING_WARN_MS) {
+			modalPing.classList.add("ping-warn");
+		} else {
+			modalPing.classList.add("ping-poor");
+		}
 		modalPing.hidden = false;
 	} else {
 		modalPing.hidden = true;

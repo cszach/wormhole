@@ -219,6 +219,23 @@ mark.search-active {
 	color: var(--text-muted);
 	letter-spacing: 0.03em;
 	opacity: 0.6;
+	transition:
+		color var(--ease),
+		opacity var(--ease);
+}
+
+.session-hint.has-ready {
+	color: var(--accent-warm);
+	opacity: 1;
+}
+
+.session-ready-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--accent-warm);
+	flex-shrink: 0;
+	margin-right: 4px;
 }
 
 .ws-dot {
@@ -487,6 +504,149 @@ main {
 
 main > div {
 	white-space: pre;
+}
+
+/* Wormholing loader */
+
+.wormholing {
+	position: fixed;
+	inset: 0;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+}
+
+.wormholing[hidden] {
+	display: none;
+}
+
+.wormholing-tunnel {
+	position: relative;
+	width: 120px;
+	height: 120px;
+}
+
+.wormholing-ring {
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	border: 1.5px solid rgba(255, 255, 255, 0.6);
+	opacity: 0;
+	animation: tunnel-ring 3s linear infinite;
+}
+
+.wormholing-ring:nth-child(1) {
+	animation-delay: -2.5s;
+}
+.wormholing-ring:nth-child(2) {
+	animation-delay: -2s;
+}
+.wormholing-ring:nth-child(3) {
+	animation-delay: -1.5s;
+}
+.wormholing-ring:nth-child(4) {
+	animation-delay: -1s;
+}
+.wormholing-ring:nth-child(5) {
+	animation-delay: -0.5s;
+}
+.wormholing-ring:nth-child(6) {
+	animation-delay: 0s;
+}
+
+@keyframes tunnel-ring {
+	0% {
+		transform: scale(0);
+		opacity: 0;
+	}
+	10% {
+		opacity: 0.5;
+	}
+	80% {
+		opacity: 0.15;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 0;
+	}
+}
+
+.wormholing-spokes {
+	position: absolute;
+	inset: 0;
+}
+
+.wormholing-spoke {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 50%;
+	height: 1.5px;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.5) 40%,
+		transparent 100%
+	);
+	transform-origin: 0 0;
+	opacity: 0.15;
+}
+
+.wormholing-text {
+	font-family: var(--serif);
+	font-style: italic;
+	font-size: 16px;
+	color: var(--text-secondary);
+	letter-spacing: 0.04em;
+	opacity: 0.7;
+	margin-top: 26px;
+}
+
+.wormholing-text::after {
+	content: ".";
+	animation: wormhole-dots 1.5s steps(1) infinite;
+}
+
+@keyframes wormhole-dots {
+	0% {
+		content: ".";
+	}
+	33% {
+		content: "..";
+	}
+	66% {
+		content: "...";
+	}
+}
+
+.wormholing-hint {
+	font-family: var(--sans);
+	font-size: 12px;
+	color: var(--text-muted);
+	text-align: center;
+	max-width: 220px;
+	line-height: 1.5;
+	margin-top: 14px;
+	opacity: 0;
+	transition: opacity 400ms ease-out;
+}
+
+.wormholing-hint.visible {
+	opacity: 1;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 /* Scroll to bottom */

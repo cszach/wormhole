@@ -46,7 +46,7 @@
 					<span id="session-name" class="session-name">claude</span>
 					<span id="ws-dot" class="ws-dot"></span>
 				</div>
-				<span class="session-hint">Tap to switch</span>
+				<span id="session-hint" class="session-hint">Tap to switch</span>
 			</button>
 			<div class="header-right">
 				<button
@@ -117,6 +117,47 @@
 		</div>
 
 		<main id="output"></main>
+
+		<div id="wormholing" class="wormholing" hidden>
+			<div class="wormholing-tunnel">
+				<div class="wormholing-ring"></div>
+				<div class="wormholing-ring"></div>
+				<div class="wormholing-ring"></div>
+				<div class="wormholing-ring"></div>
+				<div class="wormholing-ring"></div>
+				<div class="wormholing-ring"></div>
+				<div class="wormholing-spokes">
+					<div class="wormholing-spoke" style="transform: rotate(0deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(15deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(30deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(45deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(60deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(75deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(90deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(105deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(120deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(135deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(150deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(165deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(180deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(195deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(210deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(225deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(240deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(255deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(270deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(285deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(300deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(315deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(330deg)"></div>
+					<div class="wormholing-spoke" style="transform: rotate(345deg)"></div>
+				</div>
+			</div>
+			<span class="wormholing-text">Wormholing</span>
+			<span id="wormholing-hint" class="wormholing-hint"
+				>Taking a while? Try refreshing or check your network.</span
+			>
+		</div>
 
 		<!-- Settings panel -->
 		<div id="settings-panel" class="settings-panel" hidden>
