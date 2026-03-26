@@ -61,6 +61,10 @@ const wss = new WebSocketServer({ server });
 
 app.use(express.static(path.resolve("public")));
 
+app.get("/app", (_req, res) => {
+	res.sendFile(path.resolve("public/app.html"));
+});
+
 app.post("/api/upload", upload.single("image"), (req, res) => {
 	if (!req.file) {
 		res.status(400).json({ error: "No file uploaded" });

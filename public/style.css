@@ -93,6 +93,7 @@ header {
 	font-style: italic;
 	color: var(--text-primary);
 	text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+	text-decoration: none;
 }
 
 .header-right {

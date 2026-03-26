@@ -4,7 +4,7 @@
 	"description": "Mobile voice/image interface for Claude Code over tmux",
 	"type": "module",
 	"scripts": {
-		"build": "esbuild src/client/app.ts --bundle --outfile=public/app.js --format=iife --target=es2020 --alias:@=./src",
+		"build": "esbuild src/client/app.ts src/client/landing.ts --bundle --outdir=public --format=iife --target=es2020 --alias:@=./src",
 		"dev": "npm run build && tsx src/server.ts",
 		"typecheck": "tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.client.json",
 		"lint": "eslint .",

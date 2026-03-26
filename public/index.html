@@ -6,539 +6,851 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 		/>
-		<meta name="theme-color" content="#06060e" />
+		<meta name="theme-color" content="#08080c" />
 		<title>Wormhole</title>
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="apple-touch-icon" href="/icon-192.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600&display=swap"
 			rel="stylesheet"
 		/>
-		<link rel="stylesheet" href="/style.css" />
+		<style>
+			*,
+			*::before,
+			*::after {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			:root {
+				--bg-void: #050507;
+				--bg-glass: rgba(14, 14, 16, 0.45);
+				--bg-glass-hover: rgba(255, 255, 255, 0.035);
+				--border-glass: rgba(255, 255, 255, 0.07);
+				--border-glow: rgba(255, 255, 255, 0.15);
+				--text-primary: #eeeeee;
+				--text-secondary: #a0a0a0;
+				--text-muted: #585858;
+				--accent: #8fb8c9;
+				--serif: "Instrument Serif", Georgia, serif;
+				--sans: "Space Grotesk", system-ui, sans-serif;
+				--radius-lg: 16px;
+				--radius-xl: 24px;
+				--ease: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			html,
+			body {
+				height: 100%;
+				height: 100dvh;
+				background: var(--bg-void);
+				color: var(--text-primary);
+				font-family: var(--sans);
+				font-size: 15px;
+				overflow: hidden;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			body {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+			}
+
+			/* Shader background */
+
+			#bg-shader {
+				position: fixed;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				z-index: 0;
+			}
+
+			/* Landing content */
+
+			.landing {
+				position: relative;
+				z-index: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				width: 100%;
+				max-width: 560px;
+				padding: 0 24px;
+				animation: fade-in 600ms ease-out both;
+			}
+
+			@keyframes fade-in {
+				from {
+					opacity: 0;
+					transform: translateY(12px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.title {
+				font-family: var(--serif);
+				font-size: clamp(64px, 14vw, 104px);
+				font-weight: 400;
+				font-style: italic;
+				color: var(--text-primary);
+				text-shadow:
+					0 0 60px rgba(143, 184, 201, 0.15),
+					0 0 120px rgba(143, 184, 201, 0.06);
+				line-height: 1;
+				margin-bottom: 8px;
+				user-select: none;
+			}
+
+			.subtitle {
+				font-size: 15px;
+				color: var(--text-secondary);
+				margin-bottom: 40px;
+				letter-spacing: 0.02em;
+			}
+
+			/* Setup button */
+
+			.setup-btn {
+				background: none;
+				border: 1px solid var(--border-glass);
+				color: var(--text-muted);
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				font-family: var(--sans);
+				font-size: 12px;
+				font-weight: 500;
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				vertical-align: middle;
+				margin-left: 8px;
+				transition:
+					color var(--ease),
+					border-color var(--ease);
+			}
+
+			.setup-btn:hover {
+				color: var(--text-secondary);
+				border-color: var(--border-glow);
+			}
+
+			/* Setup modal */
+
+			.modal-backdrop {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.5);
+				backdrop-filter: blur(40px);
+				-webkit-backdrop-filter: blur(40px);
+				overscroll-behavior: contain;
+				padding: 24px;
+				opacity: 0;
+				transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+				pointer-events: none;
+			}
+
+			.modal-backdrop.open {
+				opacity: 1;
+				pointer-events: auto;
+			}
+
+			.modal-backdrop[hidden] {
+				display: none;
+			}
+
+			.modal {
+				background: rgba(14, 14, 18, 0.88);
+				border: 1px solid var(--border-glow);
+				border-radius: var(--radius-lg);
+				width: min(460px, 90vw);
+				max-height: 80dvh;
+				overflow-y: auto;
+				overscroll-behavior: contain;
+				box-shadow:
+					inset 0 1px 0 rgba(255, 255, 255, 0.06),
+					0 8px 32px rgba(0, 0, 0, 0.4);
+				transform: scale(0.96) translateY(8px);
+				transition:
+					transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+					opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.modal-backdrop.open .modal {
+				transform: scale(1) translateY(0);
+			}
+
+			.modal-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 20px 20px 0;
+			}
+
+			.modal-title {
+				font-family: var(--serif);
+				font-size: 22px;
+				font-weight: 400;
+				font-style: italic;
+				color: var(--text-primary);
+			}
+
+			.modal-close {
+				background: none;
+				border: none;
+				color: var(--text-muted);
+				cursor: pointer;
+				padding: 4px;
+				display: flex;
+				align-items: center;
+				transition: color var(--ease);
+			}
+
+			.modal-close:hover {
+				color: var(--text-primary);
+			}
+
+			.modal-close svg {
+				width: 18px;
+				height: 18px;
+			}
+
+			.modal-body {
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+			}
+
+			.setup-step {
+				display: flex;
+				gap: 14px;
+			}
+
+			.step-num {
+				flex-shrink: 0;
+				width: 26px;
+				height: 26px;
+				border-radius: 50%;
+				border: 1px solid var(--border-glow);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 12px;
+				font-weight: 500;
+				color: var(--text-secondary);
+				margin-top: 1px;
+			}
+
+			.step-content {
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+
+			.step-title {
+				font-size: 15px;
+				font-weight: 500;
+				color: var(--text-primary);
+			}
+
+			.step-detail {
+				font-size: 13px;
+				color: var(--text-secondary);
+				line-height: 1.5;
+			}
+
+			.step-detail a {
+				color: var(--accent);
+				text-decoration: none;
+			}
+
+			.step-detail a:hover {
+				text-decoration: underline;
+			}
+
+			.step-detail code {
+				background: rgba(255, 255, 255, 0.06);
+				padding: 1px 5px;
+				border-radius: 4px;
+				font-size: 12px;
+			}
+
+			.step-detail strong {
+				color: var(--text-primary);
+				font-weight: 500;
+			}
+
+			.step-code {
+				display: block;
+				background: rgba(255, 255, 255, 0.04);
+				border: 1px solid var(--border-glass);
+				border-radius: 8px;
+				padding: 10px 14px;
+				font-family: "SF Mono", "Fira Code", monospace;
+				font-size: 12px;
+				color: var(--accent);
+				white-space: pre;
+				overflow-x: auto;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.step-code::-webkit-scrollbar {
+				display: none;
+			}
+
+			/* Address bar */
+
+			.address-bar {
+				display: flex;
+				align-items: center;
+				width: 100%;
+				background: var(--bg-glass);
+				border: 1px solid var(--border-glass);
+				border-radius: var(--radius-xl);
+				backdrop-filter: blur(40px) saturate(1.6);
+				-webkit-backdrop-filter: blur(40px) saturate(1.6);
+				overflow: hidden;
+				transition:
+					border-color var(--ease),
+					box-shadow var(--ease);
+				box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+			}
+
+			.address-bar:focus-within {
+				border-color: var(--border-glow);
+				box-shadow:
+					0 4px 24px rgba(0, 0, 0, 0.3),
+					0 0 0 1px rgba(143, 184, 201, 0.08);
+			}
+
+			.protocol-toggle {
+				background: none;
+				border: none;
+				border-right: 1px solid var(--border-glass);
+				color: var(--text-muted);
+				font-family: var(--sans);
+				font-size: 14px;
+				padding: 16px 12px 16px 20px;
+				cursor: pointer;
+				white-space: nowrap;
+				transition: color var(--ease);
+				user-select: none;
+			}
+
+			.protocol-toggle:hover {
+				color: var(--text-secondary);
+			}
+
+			.address-bar input {
+				flex: 1;
+				background: none;
+				border: none;
+				outline: none;
+				color: var(--text-primary);
+				font-family: var(--sans);
+				font-size: 16px;
+				padding: 16px 0 16px 12px;
+				min-width: 0;
+			}
+
+			.address-bar input::placeholder {
+				color: var(--text-muted);
+			}
+
+			.address-bar button {
+				background: none;
+				border: none;
+				color: var(--text-secondary);
+				padding: 14px 18px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: color var(--ease);
+			}
+
+			.address-bar button:hover {
+				color: var(--accent);
+			}
+
+			.address-bar button svg {
+				width: 20px;
+				height: 20px;
+			}
+
+			/* Recent list */
+
+			.recent {
+				width: 100%;
+				margin-top: 24px;
+				max-height: 40dvh;
+				overflow-y: auto;
+				overscroll-behavior: contain;
+			}
+
+			.recent-label {
+				font-size: 11px;
+				color: var(--text-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				margin-bottom: 8px;
+				padding-left: 24px;
+			}
+
+			.recent-list {
+				list-style: none;
+				background: var(--bg-glass);
+				border: 1px solid var(--border-glass);
+				border-radius: var(--radius-lg);
+				backdrop-filter: blur(40px) saturate(1.6);
+				-webkit-backdrop-filter: blur(40px) saturate(1.6);
+				overflow: hidden;
+			}
+
+			.recent-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 14px 20px 14px 24px;
+				cursor: pointer;
+				transition: background var(--ease);
+				border-bottom: 1px solid var(--border-glass);
+			}
+
+			.recent-item:last-child {
+				border-bottom: none;
+			}
+
+			.recent-item:hover {
+				background: var(--bg-glass-hover);
+			}
+
+			.recent-address {
+				flex: 1;
+				font-size: 15px;
+				color: var(--text-primary);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.recent-remove {
+				background: none;
+				border: none;
+				color: var(--text-muted);
+				cursor: pointer;
+				padding: 4px;
+				border-radius: 6px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition:
+					color var(--ease),
+					background var(--ease);
+				opacity: 0.5;
+			}
+
+			.recent-item:hover .recent-remove {
+				opacity: 1;
+			}
+
+			.recent-remove:hover {
+				color: var(--text-primary);
+				background: rgba(255, 255, 255, 0.06);
+			}
+
+			.recent-remove svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			.recent-arrow {
+				color: var(--text-muted);
+				display: flex;
+				align-items: center;
+				transition:
+					color var(--ease),
+					transform var(--ease);
+			}
+
+			.recent-item:hover .recent-arrow {
+				color: var(--accent);
+				transform: translateX(2px);
+			}
+
+			.recent-arrow svg {
+				width: 16px;
+				height: 16px;
+			}
+
+			/* Mobile: always show remove button */
+
+			@media (hover: none) {
+				.recent-remove {
+					opacity: 1;
+				}
+			}
+
+			/* Safe area padding */
+
+			@supports (padding-bottom: env(safe-area-inset-bottom)) {
+				body {
+					padding-bottom: env(safe-area-inset-bottom);
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<canvas id="bg-shader" width="800" height="600"></canvas>
 
-		<header>
-			<div class="header-left">
-				<span class="header-title">Wormhole</span>
-			</div>
-			<button id="session-btn" class="session-btn" title="Switch session">
-				<div class="session-top">
-					<span id="session-name" class="session-name">claude</span>
-					<span id="ws-dot" class="ws-dot"></span>
-				</div>
-				<span class="session-hint">Tap to switch</span>
-			</button>
-			<div class="header-right">
+		<div class="landing">
+			<h1 class="title">Wormhole</h1>
+			<p class="subtitle">
+				tmux, anywhere
 				<button
-					id="search-btn"
-					title="Search output"
-					aria-label="Search output"
+					id="setup-btn"
+					class="setup-btn"
+					title="Setup guide"
+					aria-label="Setup guide"
 				>
-					<i data-lucide="search" aria-hidden="true"></i>
+					?
 				</button>
-				<button id="settings-btn" title="Settings" aria-label="Settings">
-					<i data-lucide="settings" aria-hidden="true"></i>
+			</p>
+
+			<!-- Setup modal -->
+			<div id="setup-modal" class="modal-backdrop" hidden>
+				<div class="modal">
+					<div class="modal-header">
+						<h2 class="modal-title">Setup</h2>
+						<button id="setup-close" class="modal-close" aria-label="Close">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
+							</svg>
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<div class="setup-step">
+							<span class="step-num">1</span>
+							<div class="step-content">
+								<p class="step-title">Install</p>
+								<p class="step-detail">
+									Requires <strong>Node.js</strong> and <strong>tmux</strong>.
+								</p>
+								<code class="step-code"
+									>curl -sL
+									https://raw.githubusercontent.com/cszach/wormhole/main/install.sh
+									| sh</code
+								>
+							</div>
+						</div>
+
+						<div class="setup-step">
+							<span class="step-num">2</span>
+							<div class="step-content">
+								<p class="step-title">Run</p>
+								<code class="step-code">npm run dev</code>
+								<p class="step-detail">
+									Starts on port 5173 by default. Configure in
+									<code>.env</code>.
+								</p>
+							</div>
+						</div>
+
+						<div class="setup-step">
+							<span class="step-num">3</span>
+							<div class="step-content">
+								<p class="step-title">Connect</p>
+								<p class="step-detail">
+									Enter your server's address above. Use
+									<a href="https://tailscale.com" target="_blank" rel="noopener"
+										>Tailscale</a
+									>
+									for secure access from your phone.
+								</p>
+							</div>
+						</div>
+
+						<div class="setup-step">
+							<span class="step-num">4</span>
+							<div class="step-content">
+								<p class="step-title">Voice (optional)</p>
+								<p class="step-detail">
+									Voice dictation requires HTTPS. With Tailscale, run
+									<code>tailscale cert</code> and add paths to
+									<code>.env</code>:
+								</p>
+								<code class="step-code"
+									>TLS_CERT=/path/to/cert.pem TLS_KEY=/path/to/key.pem</code
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<form class="address-bar" id="connect-form">
+				<button
+					type="button"
+					id="protocol-toggle"
+					class="protocol-toggle"
+					title="Toggle protocol"
+					aria-label="Toggle protocol"
+				>
+					https://
 				</button>
-			</div>
-		</header>
-
-		<!-- Search bar -->
-		<div id="search-bar" class="search-bar" hidden>
-			<input
-				type="text"
-				id="search-input"
-				class="search-input"
-				placeholder="Search output…"
-				aria-label="Search output"
-				autocomplete="off"
-				autocorrect="off"
-				autocapitalize="off"
-				spellcheck="false"
-			/>
-			<span id="search-count" class="search-count"></span>
-			<button id="search-prev" class="search-nav" aria-label="Previous match">
-				<i data-lucide="chevron-up" aria-hidden="true"></i>
-			</button>
-			<button id="search-next" class="search-nav" aria-label="Next match">
-				<i data-lucide="chevron-down" aria-hidden="true"></i>
-			</button>
-		</div>
-
-		<!-- Session modal -->
-		<div id="session-modal" class="modal-backdrop" hidden>
-			<div class="modal">
-				<h2 class="modal-title">Sessions</h2>
-				<div id="session-list" class="session-list"></div>
-				<div class="session-create">
-					<input
-						type="text"
-						id="session-new-name"
-						class="settings-input"
-						placeholder="New session name…"
-						aria-label="New session name"
-						maxlength="20"
-						autocomplete="off"
-						autocorrect="off"
-						autocapitalize="off"
-						spellcheck="false"
-					/>
-					<button id="session-create-btn" class="session-create-btn">
-						Create
-					</button>
-				</div>
-				<p id="session-error" class="session-error" hidden></p>
-			</div>
-		</div>
-
-		<main id="output"></main>
-
-		<!-- Settings panel -->
-		<div id="settings-panel" class="settings-panel" hidden>
-			<div class="settings-backdrop"></div>
-			<div class="settings-drawer">
-				<div class="settings-header">
-					<h2>Settings</h2>
-					<button id="settings-close" aria-label="Close settings">
-						<i data-lucide="x" aria-hidden="true"></i>
-					</button>
-				</div>
-				<div class="settings-body">
-					<div class="settings-section">
-						<h3>Theme</h3>
-						<div id="theme-list" class="theme-list"></div>
-					</div>
-
-					<div class="settings-section">
-						<h3>Accent Color</h3>
-						<div id="color-list" class="color-list"></div>
-					</div>
-
-					<div class="settings-section">
-						<h3>Text-to-Speech</h3>
-						<label class="settings-row">
-							<span class="settings-label">Enabled</span>
-							<input
-								type="checkbox"
-								id="tts-toggle"
-								class="settings-checkbox"
-							/>
-						</label>
-						<label class="settings-row">
-							<span class="settings-label">Reads</span>
-							<select id="tts-mode" class="settings-select">
-								<option value="summary">Summary</option>
-								<option value="full">Full response</option>
-							</select>
-						</label>
-						<label class="settings-row">
-							<span class="settings-label">Speed</span>
-							<input
-								type="range"
-								id="tts-rate"
-								min="0.5"
-								max="2"
-								step="0.1"
-								value="1.1"
-								class="settings-range"
-							/>
-							<span id="tts-rate-value" class="settings-value">1.1x</span>
-						</label>
-						<label class="settings-row">
-							<span class="settings-label">Voice</span>
-							<select id="tts-voice" class="settings-select">
-								<option value="">System Default</option>
-							</select>
-						</label>
-					</div>
-
-					<div class="settings-section">
-						<h3>Terminal</h3>
-						<label class="settings-row">
-							<span class="settings-label">Auto columns</span>
-							<input
-								type="checkbox"
-								id="auto-cols"
-								class="settings-checkbox"
-								checked
-							/>
-						</label>
-						<label class="settings-row" id="cols-row">
-							<span class="settings-label">Columns</span>
-							<input
-								type="range"
-								id="cols-slider"
-								min="40"
-								max="200"
-								step="1"
-								value="80"
-								class="settings-range"
-							/>
-							<span id="cols-value" class="settings-value">80</span>
-						</label>
-					</div>
-
-					<div class="settings-section">
-						<h3>Skills</h3>
-						<div id="skills-chips" class="chips"></div>
-						<input
-							type="text"
-							id="skills-add"
-							class="settings-input"
-							placeholder="Add skill…"
-							aria-label="Add skill"
-							autocomplete="off"
-							autocorrect="off"
-							autocapitalize="off"
-							spellcheck="false"
-							enterkeyhint="done"
-						/>
-						<p class="settings-hint">
-							Added skills appear in the command palette.
-						</p>
-					</div>
-
-					<div class="settings-section">
-						<h3>Snippets</h3>
-						<div id="snippets-list" class="snippets-list"></div>
-						<input
-							type="text"
-							id="snippets-add"
-							class="settings-input"
-							placeholder="Add snippet…"
-							aria-label="Add snippet"
-							autocomplete="off"
-							autocorrect="off"
-							autocapitalize="off"
-							spellcheck="false"
-							enterkeyhint="done"
-						/>
-						<p class="settings-hint">
-							Saved commands appear in the command palette. You can also
-							highlight text in the output to save it.
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Command palette -->
-		<div id="cmd-palette" class="cmd-palette" hidden>
-			<div class="cmd-backdrop"></div>
-			<div class="cmd-drawer">
-				<div class="cmd-header">
-					<h2>Commands</h2>
-					<input
-						type="text"
-						id="cmd-search"
-						class="cmd-search"
-						placeholder="Search…"
-						aria-label="Search commands"
-						autocomplete="off"
-						autocorrect="off"
-						autocapitalize="off"
-						spellcheck="false"
-					/>
-					<button id="cmd-close" aria-label="Close commands">
-						<i data-lucide="x" aria-hidden="true"></i>
-					</button>
-				</div>
-				<div class="cmd-body" id="cmd-list"></div>
-			</div>
-		</div>
-
-		<button
-			id="save-snippet-btn"
-			class="save-snippet-btn"
-			title="Save as snippet"
-			hidden
-		>
-			Save snippet
-		</button>
-
-		<button
-			id="scroll-btn"
-			class="scroll-btn"
-			title="Scroll to bottom"
-			aria-label="Scroll to bottom"
-			hidden
-		>
-			<i data-lucide="chevron-down" aria-hidden="true"></i>
-		</button>
-
-		<footer>
-			<div id="image-previews"></div>
-
-			<!-- Modifier combo overlay -->
-			<div id="mod-overlay" class="mod-overlay" hidden>
-				<span id="mod-combo-label" class="mod-combo-label"></span>
 				<input
 					type="text"
-					id="mod-input"
-					class="mod-input"
-					aria-label="Key to combine with modifier"
-					maxlength="1"
+					id="address-input"
+					placeholder="address:port"
 					autocomplete="off"
 					autocorrect="off"
 					autocapitalize="off"
 					spellcheck="false"
+					enterkeyhint="go"
+					aria-label="Server address"
+					autofocus
 				/>
-				<button
-					id="mod-cancel"
-					class="key-btn key-btn--label mod-cancel"
-					aria-label="Cancel modifier"
-				>
-					<i data-lucide="x" aria-hidden="true"></i>
+				<button type="submit" aria-label="Connect">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<line x1="5" y1="12" x2="19" y2="12" />
+						<polyline points="12 5 19 12 12 19" />
+					</svg>
 				</button>
-			</div>
+			</form>
 
-			<!-- Claude Code key layout -->
-			<div id="cc-keys" class="key-layout" hidden>
-				<div class="key-row">
-					<button
-						class="key-btn"
-						data-key="Up"
-						title="Up arrow"
-						aria-label="Up arrow"
-					>
-						<i data-lucide="chevron-up" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn"
-						data-key="Down"
-						title="Down arrow"
-						aria-label="Down arrow"
-					>
-						<i data-lucide="chevron-down" aria-hidden="true"></i>
-					</button>
-					<button class="key-btn key-btn--label" data-key="Enter" title="Enter">
-						<i data-lucide="corner-down-left" aria-hidden="true"></i>
-						<span>Enter</span>
-					</button>
-					<button
-						class="key-btn key-btn--label key-btn--esc"
-						data-key="Escape"
-						title="Interrupt"
-					>
-						<i data-lucide="x" aria-hidden="true"></i>
-						<span>Esc</span>
-					</button>
-					<button
-						class="key-btn key-btn--label key-btn--grow"
-						data-raw="BTab"
-						title="Shift+Tab"
-						aria-label="Shift+Tab"
-					>
-						<span>Shift+Tab</span>
-					</button>
-					<button
-						class="key-btn keys-expand"
-						title="More keys"
-						aria-label="More keys"
-					>
-						<i data-lucide="ellipsis" aria-hidden="true"></i>
-					</button>
-				</div>
+			<div id="recent" class="recent"></div>
+		</div>
 
-				<div class="key-row key-row--extra" hidden>
-					<button
-						class="key-btn"
-						data-key="Left"
-						title="Left arrow"
-						aria-label="Left arrow"
-					>
-						<i data-lucide="chevron-left" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn"
-						data-key="Right"
-						title="Right arrow"
-						aria-label="Right arrow"
-					>
-						<i data-lucide="chevron-right" aria-hidden="true"></i>
-					</button>
-					<button class="key-btn key-btn--label" data-key="Tab" title="Tab">
-						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
-						<span>Tab</span>
-					</button>
-					<button
-						class="key-btn key-btn--label"
-						data-raw="C-o"
-						title="Ctrl+O (expand)"
-					>
-						<span>Ctrl+O</span>
-					</button>
-					<button
-						class="key-btn key-btn--label key-btn--esc"
-						data-raw="C-c"
-						title="Ctrl+C (kill)"
-					>
-						<span>Ctrl+C</span>
-					</button>
-					<button
-						class="key-btn key-btn--label"
-						data-raw="C-d"
-						title="Ctrl+D (EOF)"
-					>
-						<span>Ctrl+D</span>
-					</button>
-				</div>
-			</div>
+		<script src="/landing.js"></script>
+		<script>
+			const setupBtn = document.getElementById("setup-btn");
+			const setupModal = document.getElementById("setup-modal");
+			const setupClose = document.getElementById("setup-close");
 
-			<!-- Terminal key layout -->
-			<div id="term-keys" class="key-layout">
-				<div class="key-row">
-					<button class="key-btn" data-key="Up" title="Up" aria-label="Up">
-						<i data-lucide="chevron-up" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn"
-						data-key="Down"
-						title="Down"
-						aria-label="Down"
-					>
-						<i data-lucide="chevron-down" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn"
-						data-key="Left"
-						title="Left"
-						aria-label="Left"
-					>
-						<i data-lucide="chevron-left" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn"
-						data-key="Right"
-						title="Right"
-						aria-label="Right"
-					>
-						<i data-lucide="chevron-right" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn"
-						data-key="Enter"
-						title="Enter"
-						aria-label="Enter"
-					>
-						<i data-lucide="corner-down-left" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn key-btn--esc"
-						data-key="Escape"
-						title="Escape"
-						aria-label="Escape"
-					>
-						<i data-lucide="x" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn key-btn--label key-btn--mod"
-						data-mod="C"
-						title="Ctrl modifier"
-					>
-						<span>Ctrl</span>
-					</button>
-					<button
-						class="key-btn keys-expand"
-						title="More keys"
-						aria-label="More keys"
-					>
-						<i data-lucide="ellipsis" aria-hidden="true"></i>
-					</button>
-				</div>
+			function openSetup() {
+				setupModal.hidden = false;
+				requestAnimationFrame(() => setupModal.classList.add("open"));
+			}
 
-				<div class="key-row key-row--extra" hidden>
-					<button class="key-btn key-btn--label" data-key="Home" title="Home">
-						<span>Home</span>
-					</button>
-					<button class="key-btn key-btn--label" data-key="End" title="End">
-						<span>End</span>
-					</button>
-					<button
-						class="key-btn key-btn--label"
-						data-key="PgUp"
-						title="Page Up"
-					>
-						<span>PgUp</span>
-					</button>
-					<button
-						class="key-btn key-btn--label"
-						data-key="PgDn"
-						title="Page Down"
-					>
-						<span>PgDn</span>
-					</button>
-					<button class="key-btn" data-key="Tab" title="Tab" aria-label="Tab">
-						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
-					</button>
-					<button
-						class="key-btn key-btn--label key-btn--mod"
-						data-mod="M"
-						title="Alt modifier"
-					>
-						<span>Alt</span>
-					</button>
-					<button
-						class="key-btn key-btn--label key-btn--mod"
-						data-mod="S"
-						title="Shift modifier"
-					>
-						<span>Shift</span>
-					</button>
-				</div>
-			</div>
+			function closeSetup() {
+				setupModal.classList.remove("open");
+				setupModal.addEventListener(
+					"transitionend",
+					() => {
+						setupModal.hidden = true;
+					},
+					{ once: true }
+				);
+			}
 
-			<div class="composer">
-				<div class="composer-inner">
-					<label
-						id="image-btn"
-						title="Attach image"
-						role="button"
-						aria-label="Attach image"
-					>
-						<input
-							type="file"
-							id="image-input"
-							accept="image/*"
-							multiple
-							hidden
-						/>
-						<i data-lucide="image" aria-hidden="true"></i>
-					</label>
-					<button
-						id="snippets-btn"
-						class="snippets-btn"
-						title="Snippets"
-						aria-label="Snippets"
-						hidden
-					>
-						<i data-lucide="bookmark" aria-hidden="true"></i>
-					</button>
+			setupBtn.addEventListener("click", openSetup);
+			setupClose.addEventListener("click", closeSetup);
 
-					<textarea
-						id="text-input"
-						name="message"
-						rows="1"
-						placeholder="Drift a thought…"
-						aria-label="Message"
-					></textarea>
+			setupModal.addEventListener("click", (e) => {
+				if (e.target === setupModal) closeSetup();
+			});
 
-					<button
-						id="mic-btn"
-						title="Voice dictation"
-						aria-label="Voice dictation"
-					>
-						<i data-lucide="mic" aria-hidden="true"></i>
-					</button>
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape" && !setupModal.hidden) closeSetup();
+			});
 
-					<button id="send-btn" title="Send message" aria-label="Send message">
-						<i data-lucide="send" aria-hidden="true"></i>
-					</button>
-				</div>
-			</div>
-		</footer>
+			const STORAGE_KEY = "wormhole-recent";
+			const MAX_RECENT = 10;
 
-		<script src="/app.js"></script>
+			const form = document.getElementById("connect-form");
+			const input = document.getElementById("address-input");
+			const protocolBtn = document.getElementById("protocol-toggle");
+			const recentEl = document.getElementById("recent");
+
+			let protocol = localStorage.getItem("wormhole-protocol") || "https://";
+
+			function updateProtocolBtn() {
+				protocolBtn.textContent = protocol;
+			}
+
+			protocolBtn.addEventListener("click", () => {
+				protocol = protocol === "https://" ? "http://" : "https://";
+				localStorage.setItem("wormhole-protocol", protocol);
+				updateProtocolBtn();
+			});
+
+			updateProtocolBtn();
+
+			function getRecent() {
+				try {
+					return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+				} catch {
+					return [];
+				}
+			}
+
+			function saveRecent(list) {
+				localStorage.setItem(
+					STORAGE_KEY,
+					JSON.stringify(list.slice(0, MAX_RECENT))
+				);
+			}
+
+			function addRecent(url) {
+				const list = getRecent().filter((a) => a !== url);
+				list.unshift(url);
+				saveRecent(list);
+			}
+
+			function removeRecent(url) {
+				saveRecent(getRecent().filter((a) => a !== url));
+				renderRecent();
+			}
+
+			function navigate(url) {
+				if (!url) return;
+				addRecent(url);
+				window.location.href = url;
+			}
+
+			function navigateFromInput() {
+				const addr = input.value.trim();
+				if (!addr) return;
+				const url = protocol + addr.replace(/\/+$/, "");
+				navigate(url);
+			}
+
+			function svgIcon(type) {
+				const svg = document.createElementNS(
+					"http://www.w3.org/2000/svg",
+					"svg"
+				);
+				svg.setAttribute("viewBox", "0 0 24 24");
+				svg.setAttribute("fill", "none");
+				svg.setAttribute("stroke", "currentColor");
+				svg.setAttribute("stroke-width", "2");
+				svg.setAttribute("stroke-linecap", "round");
+				svg.setAttribute("stroke-linejoin", "round");
+
+				if (type === "arrow") {
+					const line = document.createElementNS(
+						"http://www.w3.org/2000/svg",
+						"line"
+					);
+					line.setAttribute("x1", "5");
+					line.setAttribute("y1", "12");
+					line.setAttribute("x2", "19");
+					line.setAttribute("y2", "12");
+					const poly = document.createElementNS(
+						"http://www.w3.org/2000/svg",
+						"polyline"
+					);
+					poly.setAttribute("points", "12 5 19 12 12 19");
+					svg.append(line, poly);
+				} else if (type === "x") {
+					const l1 = document.createElementNS(
+						"http://www.w3.org/2000/svg",
+						"line"
+					);
+					l1.setAttribute("x1", "18");
+					l1.setAttribute("y1", "6");
+					l1.setAttribute("x2", "6");
+					l1.setAttribute("y2", "18");
+					const l2 = document.createElementNS(
+						"http://www.w3.org/2000/svg",
+						"line"
+					);
+					l2.setAttribute("x1", "6");
+					l2.setAttribute("y1", "6");
+					l2.setAttribute("x2", "18");
+					l2.setAttribute("y2", "18");
+					svg.append(l1, l2);
+				}
+
+				return svg;
+			}
+
+			function renderRecent() {
+				const list = getRecent();
+
+				recentEl.innerHTML = "";
+
+				if (list.length === 0) return;
+
+				const label = document.createElement("p");
+				label.className = "recent-label";
+				label.textContent = "Recent";
+				recentEl.append(label);
+
+				const ul = document.createElement("ul");
+				ul.className = "recent-list";
+
+				for (const addr of list) {
+					const li = document.createElement("li");
+					li.className = "recent-item";
+
+					const span = document.createElement("span");
+					span.className = "recent-address";
+					span.textContent = addr;
+
+					const removeBtn = document.createElement("button");
+					removeBtn.className = "recent-remove";
+					removeBtn.setAttribute("aria-label", "Remove");
+					removeBtn.setAttribute("title", "Remove");
+					removeBtn.append(svgIcon("x"));
+					removeBtn.addEventListener("click", (e) => {
+						e.stopPropagation();
+						removeRecent(addr);
+					});
+
+					const arrow = document.createElement("span");
+					arrow.className = "recent-arrow";
+					arrow.append(svgIcon("arrow"));
+
+					li.append(span, removeBtn, arrow);
+					li.addEventListener("click", () => navigate(addr));
+					ul.append(li);
+				}
+
+				recentEl.append(ul);
+			}
+
+			form.addEventListener("submit", (e) => {
+				e.preventDefault();
+				navigateFromInput();
+			});
+
+			renderRecent();
+		</script>
 	</body>
 </html>
