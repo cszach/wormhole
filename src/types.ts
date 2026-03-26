@@ -7,4 +7,5 @@ export type ClientMessage = {
 export type ServerMessage =
 	| { type: "output"; content: string }
 	| { type: "stable" }
-	| { type: "session"; session: string };
+	| { type: "session"; session: string }
+	| { type: "pong"; ts: number };

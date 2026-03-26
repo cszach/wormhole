@@ -265,6 +265,10 @@ wss.on("connection", (ws) => {
 				await resizePane(activeSession, message.cols);
 			}
 
+			if (message.type === "ping" && message.ts) {
+				ws.send(JSON.stringify({ type: "pong", ts: message.ts }));
+			}
+
 			if (message.type === "switch" && message.session) {
 				activeSession = message.session;
 				lastCapture = "";

@@ -14,6 +14,7 @@ import {
 	Search,
 	Send,
 	Settings,
+	Signal,
 	X
 } from "lucide";
 
@@ -25,7 +26,51 @@ import { initShader } from "./shader.js";
 type ServerMessage =
 	| { type: "output"; content: string }
 	| { type: "stable" }
-	| { type: "session"; session: string };
+	| { type: "session"; session: string }
+	| { type: "pong"; ts: number };
+
+const PING_INTERVAL_MS = 15000;
+const PING_HISTORY_SIZE = 3;
+const PING_GOOD_MS = 50;
+const PING_WARN_MS = 150;
+
+const pingHistory: number[] = [];
+let latencyMs = -1;
+
+function getAvgLatency(): number {
+	if (pingHistory.length === 0) {return -1;}
+	return Math.round(
+		pingHistory.reduce((a, b) => a + b, 0) / pingHistory.length
+	);
+}
+
+function recordPing(rtt: number): void {
+	pingHistory.push(rtt);
+	if (pingHistory.length > PING_HISTORY_SIZE) {
+		pingHistory.shift();
+	}
+	latencyMs = getAvgLatency();
+	updateDotColor();
+}
+
+function updateDotColor(): void {
+	wsDot.classList.remove("ping-good", "ping-warn", "ping-poor");
+	if (latencyMs < 0) {return;}
+
+	if (latencyMs <= PING_GOOD_MS) {
+		wsDot.classList.add("ping-good");
+	} else if (latencyMs <= PING_WARN_MS) {
+		wsDot.classList.add("ping-warn");
+	} else {
+		wsDot.classList.add("ping-poor");
+	}
+}
+
+function sendPing(): void {
+	if (ws && ws.readyState === WebSocket.OPEN) {
+		ws.send(JSON.stringify({ type: "ping", ts: Date.now() }));
+	}
+}
 
 const wsDot = document.getElementById("ws-dot") as HTMLElement;
 const sessionNameEl = document.getElementById("session-name") as HTMLElement;
@@ -64,11 +109,13 @@ function connect(): void {
 	const protocol = location.protocol === "https:" ? "wss:" : "ws:";
 	ws = new WebSocket(`${protocol}//${location.host}`);
 
+	let pingTimer = 0;
+
 	ws.addEventListener("open", () => {
 		wsDot.classList.add("connected");
-
-		// Apply terminal column width on connect
 		updateColumns();
+		sendPing();
+		pingTimer = window.setInterval(sendPing, PING_INTERVAL_MS);
 	});
 
 	ws.addEventListener("message", (event) => {
@@ -86,10 +133,18 @@ function connect(): void {
 		if (message.type === "session") {
 			sessionNameEl.textContent = message.session;
 		}
+
+		if (message.type === "pong") {
+			recordPing(Date.now() - message.ts);
+		}
 	});
 
 	ws.addEventListener("close", () => {
 		wsDot.classList.remove("connected");
+		wsDot.classList.remove("ping-good", "ping-warn", "ping-poor");
+		clearInterval(pingTimer);
+		pingHistory.length = 0;
+		latencyMs = -1;
 		setTimeout(() => {
 			connect();
 		}, RECONNECT_DELAY_MS);
@@ -1152,6 +1207,7 @@ try {
 			Search,
 			Send,
 			Settings,
+			Signal,
 			X
 		}
 	});
@@ -1189,6 +1245,10 @@ const sessionCreateBtn = document.getElementById(
 	"session-create-btn"
 ) as HTMLButtonElement;
 const sessionError = document.getElementById("session-error") as HTMLElement;
+const modalPing = document.getElementById("modal-ping") as HTMLElement;
+const modalPingValue = document.getElementById(
+	"modal-ping-value"
+) as HTMLElement;
 
 async function fetchSessions(): Promise<string[]> {
 	try {
@@ -1268,6 +1328,17 @@ async function openSessionModal(): Promise<void> {
 	sessionError.hidden = true;
 	sessionNewName.value = "";
 	sessionModal.hidden = false;
+
+	if (latencyMs >= 0) {
+		modalPingValue.textContent = `${latencyMs}ms`;
+		modalPing.classList.remove("ping-good", "ping-warn", "ping-poor");
+		if (latencyMs <= PING_GOOD_MS) {modalPing.classList.add("ping-good");}
+		else if (latencyMs <= PING_WARN_MS) {modalPing.classList.add("ping-warn");}
+		else {modalPing.classList.add("ping-poor");}
+		modalPing.hidden = false;
+	} else {
+		modalPing.hidden = true;
+	}
 
 	const sessions = await fetchSessions();
 	renderSessionList(sessions);
