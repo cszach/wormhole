@@ -631,11 +631,22 @@ main > div {
 	line-height: 1.5;
 	margin-top: 14px;
 	opacity: 0;
+	pointer-events: none;
 	transition: opacity 400ms ease-out;
 }
 
 .wormholing-hint.visible {
 	opacity: 1;
+	pointer-events: auto;
+}
+
+.wormholing-hint a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+.wormholing-hint a:hover {
+	text-decoration: underline;
 }
 
 @keyframes fade-in {
@@ -647,6 +658,45 @@ main > div {
 		opacity: 1;
 		transform: translateY(0);
 	}
+}
+
+/* Floating refresh button */
+
+.refresh-btn {
+	position: fixed;
+	top: 68px;
+	right: 16px;
+	z-index: 9;
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	color: var(--text-muted);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	cursor: pointer;
+	transition:
+		color var(--ease),
+		transform var(--ease);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.refresh-btn:active {
+	color: var(--accent);
+	transform: scale(0.9);
+}
+
+.refresh-btn[hidden] {
+	display: none;
+}
+
+.refresh-btn svg {
+	width: 16px;
+	height: 16px;
 }
 
 /* Scroll to bottom */

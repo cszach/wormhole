@@ -155,7 +155,9 @@
 			</div>
 			<span class="wormholing-text">Wormholing</span>
 			<span id="wormholing-hint" class="wormholing-hint"
-				>Taking a while? Try refreshing or check your network.</span
+				>Taking a while?
+				<a href="#" id="wormholing-refresh">Try refreshing</a> or check your
+				network.</span
 			>
 		</div>
 
@@ -320,6 +322,16 @@
 			hidden
 		>
 			Save snippet
+		</button>
+
+		<button
+			id="refresh-btn"
+			class="refresh-btn"
+			title="Refresh connection"
+			aria-label="Refresh connection"
+			hidden
+		>
+			<i data-lucide="refresh-cw" aria-hidden="true"></i>
 		</button>
 
 		<button

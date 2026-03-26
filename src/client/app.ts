@@ -12,6 +12,7 @@ import {
 	Image,
 	Mic,
 	Search,
+	RefreshCw,
 	Send,
 	Settings,
 	Signal,
@@ -142,6 +143,7 @@ function connect(): void {
 
 	ws.addEventListener("open", () => {
 		wsDot.classList.add("connected");
+		refreshBtn.hidden = true;
 		updateColumns();
 		sendPing();
 		pingTimer = window.setInterval(sendPing, PING_INTERVAL_MS);
@@ -194,6 +196,7 @@ function connect(): void {
 	ws.addEventListener("close", () => {
 		wsDot.classList.remove("connected");
 		wsDot.classList.remove("ping-good", "ping-warn", "ping-poor");
+		refreshBtn.hidden = false;
 		clearInterval(pingTimer);
 		pingHistory.length = 0;
 		latencyMs = -1;
@@ -1259,6 +1262,7 @@ try {
 			Image,
 			Mic,
 			Search,
+			RefreshCw,
 			Send,
 			Settings,
 			Signal,
@@ -1422,6 +1426,18 @@ sessionModal.addEventListener("click", (event) => {
 	if (event.target === sessionModal) {
 		closeSessionModal();
 	}
+});
+
+document
+	.getElementById("wormholing-refresh")!
+	.addEventListener("click", (e) => {
+		e.preventDefault();
+		location.reload();
+	});
+
+const refreshBtn = document.getElementById("refresh-btn") as HTMLButtonElement;
+refreshBtn.addEventListener("click", () => {
+	location.reload();
 });
 
 sessionCreateBtn.addEventListener("click", async () => {
