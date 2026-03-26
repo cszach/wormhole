@@ -2,6 +2,10 @@
 
 A mobile terminal client with Claude Code superpowers.
 
+<p align="center">
+  <img src="screenshot.png" alt="Wormhole screenshot" width="300" />
+</p>
+
 Wormhole turns your phone into a remote for your terminal. Dictate commands,
 snap photos, hear responses read aloud — all streamed live over your network.
 When it detects Claude Code, it unlocks a tailored mobile experience with
