@@ -165,7 +165,8 @@ let lastCapture = "";
 let lastChangeMs = Date.now();
 let stableSent = false;
 const STABLE_THRESHOLD_MS = 2000;
-const POLL_INTERVAL_MS = 500;
+const POLL_INTERVAL_MS = 250;
+const HEARTBEAT_INTERVAL_MS = 15000;
 
 function broadcast(message: ServerMessage): void {
 	const data = JSON.stringify(message);
@@ -213,7 +214,30 @@ setInterval(() => {
 	pollTmux();
 }, POLL_INTERVAL_MS);
 
+// Heartbeat: ping all clients, terminate unresponsive ones
+setInterval(() => {
+	for (const client of wss.clients) {
+		const ws = client as WebSocket & { isAlive?: boolean };
+
+		if (ws.isAlive === false) {
+			ws.terminate();
+
+			continue;
+		}
+
+		ws.isAlive = false;
+		ws.ping();
+	}
+}, HEARTBEAT_INTERVAL_MS);
+
 wss.on("connection", (ws) => {
+	const sock = ws as WebSocket & { isAlive?: boolean };
+	sock.isAlive = true;
+
+	ws.on("pong", () => {
+		sock.isAlive = true;
+	});
+
 	// Send current session name and output on connect
 	ws.send(JSON.stringify({ type: "session", session: activeSession }));
 

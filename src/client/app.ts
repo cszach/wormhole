@@ -92,7 +92,7 @@ function connect(): void {
 		wsDot.classList.remove("connected");
 		setTimeout(() => {
 			connect();
-		}, 2000);
+		}, 500);
 	});
 }
 
