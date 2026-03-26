@@ -10,10 +10,9 @@ import {
 	Ellipsis,
 	Image,
 	Mic,
+	Search,
 	Send,
 	Settings,
-	Volume2,
-	VolumeOff,
 	X
 } from "lucide";
 
@@ -33,7 +32,7 @@ const output = document.getElementById("output") as HTMLElement;
 const textInput = document.getElementById("text-input") as HTMLTextAreaElement;
 const sendBtn = document.getElementById("send-btn") as HTMLButtonElement;
 const micBtn = document.getElementById("mic-btn") as HTMLButtonElement;
-const ttsToggle = document.getElementById("tts-toggle") as HTMLButtonElement;
+const ttsToggle = document.getElementById("tts-toggle") as HTMLInputElement;
 const imageInput = document.getElementById("image-input") as HTMLInputElement;
 const imagePreviews = document.getElementById("image-previews") as HTMLElement;
 const settingsBtn = document.getElementById(
@@ -499,9 +498,8 @@ function stopRecording(): void {
 
 // --- TTS ---
 
-ttsToggle.addEventListener("click", () => {
-	ttsEnabled = !ttsEnabled;
-	ttsToggle.classList.toggle("active", ttsEnabled);
+ttsToggle.addEventListener("change", () => {
+	ttsEnabled = ttsToggle.checked;
 
 	if (!ttsEnabled) {
 		speechSynthesis.cancel();
@@ -611,6 +609,7 @@ function openSettings(): void {
 	ttsModeSelect.value = localStorage.getItem("wormhole-tts-mode") ?? "summary";
 	ttsRateInput.value = String(ttsRate);
 	ttsRateValue.textContent = ttsRate.toFixed(1) + "x";
+	ttsToggle.checked = ttsEnabled;
 	renderSkillChips();
 }
 
@@ -1021,10 +1020,9 @@ try {
 			Ellipsis,
 			Image,
 			Mic,
+			Search,
 			Send,
 			Settings,
-			Volume2,
-			VolumeOff,
 			X
 		}
 	});
@@ -1200,6 +1198,146 @@ sessionCreateBtn.addEventListener("click", async () => {
 sessionNewName.addEventListener("keydown", (e) => {
 	if (e.key === "Enter") {
 		sessionCreateBtn.click();
+	}
+});
+
+// --- Search ---
+
+const searchBtn = document.getElementById("search-btn") as HTMLButtonElement;
+const searchBar = document.getElementById("search-bar") as HTMLElement;
+const searchInput = document.getElementById("search-input") as HTMLInputElement;
+const searchCount = document.getElementById("search-count") as HTMLElement;
+const searchPrev = document.getElementById("search-prev") as HTMLButtonElement;
+const searchNext = document.getElementById("search-next") as HTMLButtonElement;
+
+let searchMatches: Element[] = [];
+let searchIndex = -1;
+
+function clearSearch(): void {
+	const marks = output.querySelectorAll("mark.search-hit");
+
+	for (const m of Array.from(marks)) {
+		const text = document.createTextNode(m.textContent ?? "");
+		m.parentNode?.replaceChild(text, m);
+	}
+
+	output.normalize();
+	searchMatches = [];
+	searchIndex = -1;
+	searchCount.textContent = "";
+}
+
+function doSearch(query: string): void {
+	clearSearch();
+
+	if (!query) {
+		return;
+	}
+
+	const walker = document.createTreeWalker(output, NodeFilter.SHOW_TEXT);
+	const textNodes: Text[] = [];
+
+	let node: Text | null;
+
+	while ((node = walker.nextNode() as Text | null)) {
+		textNodes.push(node);
+	}
+
+	const lowerQuery = query.toLowerCase();
+
+	for (const textNode of textNodes) {
+		const text = textNode.textContent ?? "";
+		const lower = text.toLowerCase();
+		let idx = lower.indexOf(lowerQuery);
+
+		if (idx === -1) {
+			continue;
+		}
+
+		const frag = document.createDocumentFragment();
+		let lastIdx = 0;
+
+		while (idx !== -1) {
+			if (idx > lastIdx) {
+				frag.appendChild(document.createTextNode(text.slice(lastIdx, idx)));
+			}
+
+			const mark = document.createElement("mark");
+			mark.className = "search-hit";
+			mark.textContent = text.slice(idx, idx + query.length);
+			frag.appendChild(mark);
+			lastIdx = idx + query.length;
+			idx = lower.indexOf(lowerQuery, lastIdx);
+		}
+
+		if (lastIdx < text.length) {
+			frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+		}
+
+		textNode.parentNode?.replaceChild(frag, textNode);
+	}
+
+	searchMatches = Array.from(output.querySelectorAll("mark.search-hit"));
+
+	if (searchMatches.length > 0) {
+		searchIndex = 0;
+		searchMatches[0].classList.add("search-active");
+		searchMatches[0].scrollIntoView({ block: "center" });
+		searchCount.textContent = `1/${searchMatches.length}`;
+	} else {
+		searchCount.textContent = "0";
+	}
+}
+
+function navigateSearch(dir: number): void {
+	if (searchMatches.length === 0) {
+		return;
+	}
+
+	searchMatches[searchIndex].classList.remove("search-active");
+	searchIndex =
+		(searchIndex + dir + searchMatches.length) % searchMatches.length;
+	searchMatches[searchIndex].classList.add("search-active");
+	searchMatches[searchIndex].scrollIntoView({ block: "center" });
+	searchCount.textContent = `${searchIndex + 1}/${searchMatches.length}`;
+}
+
+function openSearch(): void {
+	searchBar.hidden = false;
+	searchInput.value = "";
+	searchInput.focus();
+}
+
+function closeSearch(): void {
+	searchBar.hidden = true;
+	clearSearch();
+}
+
+searchBtn.addEventListener("click", () => {
+	if (searchBar.hidden) {
+		openSearch();
+	} else {
+		closeSearch();
+	}
+});
+
+searchInput.addEventListener("input", () => {
+	doSearch(searchInput.value);
+});
+
+searchPrev.addEventListener("click", () => {
+	navigateSearch(-1);
+});
+
+searchNext.addEventListener("click", () => {
+	navigateSearch(1);
+});
+
+searchInput.addEventListener("keydown", (e) => {
+	if (e.key === "Escape") {
+		closeSearch();
+	} else if (e.key === "Enter") {
+		navigateSearch(e.shiftKey ? -1 : 1);
 	}
 });
 

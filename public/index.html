@@ -28,19 +28,39 @@
 				<span class="session-hint">Tap to switch</span>
 			</button>
 			<div class="header-right">
+				<button
+					id="search-btn"
+					title="Search output"
+					aria-label="Search output"
+				>
+					<i data-lucide="search" aria-hidden="true"></i>
+				</button>
 				<button id="settings-btn" title="Settings" aria-label="Settings">
 					<i data-lucide="settings" aria-hidden="true"></i>
 				</button>
-				<button
-					id="tts-toggle"
-					title="Toggle text-to-speech"
-					aria-label="Toggle text-to-speech"
-				>
-					<i data-lucide="volume-off" class="tts-off" aria-hidden="true"></i>
-					<i data-lucide="volume-2" class="tts-on" aria-hidden="true"></i>
-				</button>
 			</div>
 		</header>
+
+		<!-- Search bar -->
+		<div id="search-bar" class="search-bar" hidden>
+			<input
+				type="text"
+				id="search-input"
+				class="search-input"
+				placeholder="Search output..."
+				autocomplete="off"
+				autocorrect="off"
+				autocapitalize="off"
+				spellcheck="false"
+			/>
+			<span id="search-count" class="search-count"></span>
+			<button id="search-prev" class="search-nav" aria-label="Previous match">
+				<i data-lucide="chevron-up" aria-hidden="true"></i>
+			</button>
+			<button id="search-next" class="search-nav" aria-label="Next match">
+				<i data-lucide="chevron-down" aria-hidden="true"></i>
+			</button>
+		</div>
 
 		<!-- Session modal -->
 		<div id="session-modal" class="modal-backdrop" hidden>
@@ -92,6 +112,14 @@
 
 					<div class="settings-section">
 						<h3>Text-to-Speech</h3>
+						<label class="settings-row">
+							<span class="settings-label">Enabled</span>
+							<input
+								type="checkbox"
+								id="tts-toggle"
+								class="settings-checkbox"
+							/>
+						</label>
 						<label class="settings-row">
 							<span class="settings-label">Reads</span>
 							<select id="tts-mode" class="settings-select">
