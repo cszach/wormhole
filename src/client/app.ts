@@ -297,6 +297,7 @@ function send(): void {
 	textInput.value = "";
 	textInput.style.height = "auto";
 	prevInputLen = 0;
+	clearDraft();
 	clearImages();
 
 	if (!inClaudeCode) {
@@ -467,10 +468,42 @@ modInput.addEventListener("keydown", (event) => {
 
 // Auto-resize textarea
 
+const DRAFT_KEY = "wormhole-draft";
+const DRAFT_DEBOUNCE_MS = 500;
+let draftTimer = 0;
+
+function saveDraft(): void {
+	clearTimeout(draftTimer);
+	draftTimer = window.setTimeout(() => {
+		const val = textInput.value;
+		if (val) {
+			localStorage.setItem(DRAFT_KEY, val);
+		} else {
+			localStorage.removeItem(DRAFT_KEY);
+		}
+	}, DRAFT_DEBOUNCE_MS);
+}
+
+function clearDraft(): void {
+	clearTimeout(draftTimer);
+	localStorage.removeItem(DRAFT_KEY);
+}
+
+function restoreDraft(): void {
+	const draft = localStorage.getItem(DRAFT_KEY);
+	if (draft && !textInput.value) {
+		textInput.value = draft;
+		textInput.style.height = "auto";
+		textInput.style.height = Math.min(textInput.scrollHeight, 120) + "px";
+		syncFooterPadding();
+	}
+}
+
 textInput.addEventListener("input", () => {
 	textInput.style.height = "auto";
 	textInput.style.height = Math.min(textInput.scrollHeight, 120) + "px";
 	syncFooterPadding();
+	saveDraft();
 });
 
 imageInput.addEventListener("change", async () => {
@@ -1278,6 +1311,9 @@ try {
 } catch (err) {
 	console.error("clearImages failed:", err);
 }
+
+// Restore draft
+restoreDraft();
 
 // Restore column settings
 const savedAutoCols = localStorage.getItem("wormhole-auto-cols");
