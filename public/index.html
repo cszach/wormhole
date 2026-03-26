@@ -186,9 +186,30 @@
 							autocorrect="off"
 							autocapitalize="off"
 							spellcheck="false"
+							enterkeyhint="done"
 						/>
 						<p class="settings-hint">
 							Added skills appear in the command palette.
+						</p>
+					</div>
+
+					<div class="settings-section">
+						<h3>Snippets</h3>
+						<div id="snippets-list" class="snippets-list"></div>
+						<input
+							type="text"
+							id="snippets-add"
+							class="settings-input"
+							placeholder="Add snippet..."
+							autocomplete="off"
+							autocorrect="off"
+							autocapitalize="off"
+							spellcheck="false"
+							enterkeyhint="done"
+						/>
+						<p class="settings-hint">
+							Saved commands appear in the command palette. You can also
+							highlight text in the output to save it.
 						</p>
 					</div>
 				</div>
@@ -218,6 +239,15 @@
 				<div class="cmd-body" id="cmd-list"></div>
 			</div>
 		</div>
+
+		<button
+			id="save-snippet-btn"
+			class="save-snippet-btn"
+			title="Save as snippet"
+			hidden
+		>
+			Save snippet
+		</button>
 
 		<button
 			id="scroll-btn"
@@ -463,6 +493,15 @@
 						/>
 						<i data-lucide="image" aria-hidden="true"></i>
 					</label>
+					<button
+						id="snippets-btn"
+						class="snippets-btn"
+						title="Snippets"
+						aria-label="Snippets"
+						hidden
+					>
+						<i data-lucide="bookmark" aria-hidden="true"></i>
+					</button>
 
 					<textarea
 						id="text-input"

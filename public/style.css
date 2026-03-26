@@ -421,13 +421,16 @@ main {
 	font-family: var(--mono);
 	font-size: 12px;
 	line-height: 1.75;
-	white-space: pre;
 	overflow-x: auto;
 	color: var(--text-secondary);
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior: contain;
 	position: relative;
 	z-index: 1;
+}
+
+main > div {
+	white-space: pre;
 }
 
 /* Scroll to bottom */
@@ -467,6 +470,63 @@ main {
 .scroll-btn svg {
 	width: 18px;
 	height: 18px;
+}
+
+/* Save snippet button */
+
+.save-snippet-btn {
+	position: fixed;
+	bottom: 0;
+	left: 16px;
+	z-index: 9;
+	padding: 8px 14px;
+	border-radius: 20px;
+	background: var(--accent);
+	border: none;
+	color: #000;
+	font-family: var(--sans);
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.save-snippet-btn:active {
+	opacity: 0.8;
+}
+
+/* Snippet list in settings */
+
+.snippets-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	max-height: 200px;
+	overflow-y: auto;
+	margin-bottom: 8px;
+}
+
+.snippet-item {
+	display: flex;
+	align-items: center;
+	padding: 6px 4px;
+	border-radius: var(--radius-md);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.snippet-item-text {
+	flex: 1;
+	font-family: var(--mono);
+	font-size: 11px;
+	color: var(--text-secondary);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0 6px;
+}
+
+.save-snippet-btn[hidden] {
+	display: none;
 }
 
 /* Footer / composer */
@@ -743,9 +803,40 @@ footer {
 	background: var(--bg-glass-hover);
 }
 
-#image-btn.disabled {
-	opacity: 0.25;
-	pointer-events: none;
+#image-btn.disabled,
+#image-btn[hidden] {
+	display: none;
+}
+
+.snippets-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 8px;
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+	cursor: pointer;
+	flex-shrink: 0;
+	transition:
+		color var(--ease),
+		background var(--ease);
+}
+
+.snippets-btn:active {
+	color: var(--accent);
+	background: var(--bg-glass-hover);
+}
+
+.snippets-btn[hidden] {
+	display: none;
+}
+
+.snippets-btn svg {
+	width: 18px;
+	height: 18px;
 }
 
 #text-input {
@@ -1381,6 +1472,13 @@ main::-webkit-scrollbar-thumb:hover {
 	font-size: 13px;
 	text-align: left;
 	margin-bottom: 6px;
+	overflow: hidden;
+}
+
+.cmd-item span:first-child {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .cmd-item:active {

@@ -1,27 +1,30 @@
 import { execFile } from "node:child_process";
 
-export function sendKeys(session: string, text: string): Promise<void> {
-	const clean = text.replace(/[\r\n]+/g, " ");
-
+function exec(cmd: string, args: string[]): Promise<void> {
 	return new Promise((resolve, reject) => {
-		// Send text literally (-l) to avoid interpreting special keys
-		execFile("tmux", ["send-keys", "-t", session, "-l", clean], (error) => {
+		execFile(cmd, args, (error) => {
 			if (error) {
 				reject(error);
-
-				return;
+			} else {
+				resolve();
 			}
-
-			// Send Enter as a separate keystroke
-			execFile("tmux", ["send-keys", "-t", session, "Enter"], (enterError) => {
-				if (enterError) {
-					reject(enterError);
-				} else {
-					resolve();
-				}
-			});
 		});
 	});
+}
+
+export async function sendKeys(session: string, text: string): Promise<void> {
+	const isMultiline = /\r?\n/.test(text.trim());
+
+	if (isMultiline) {
+		// Use tmux paste buffer to preserve newlines
+		await exec("tmux", ["set-buffer", text]);
+		await exec("tmux", ["paste-buffer", "-t", session]);
+		await exec("tmux", ["send-keys", "-t", session, "Enter"]);
+	} else {
+		// Single line: send literally + Enter
+		await exec("tmux", ["send-keys", "-t", session, "-l", text]);
+		await exec("tmux", ["send-keys", "-t", session, "Enter"]);
+	}
 }
 
 const ALLOWED_KEYS = new Set([
