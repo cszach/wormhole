@@ -406,6 +406,45 @@ main {
 	z-index: 1;
 }
 
+/* Scroll to bottom */
+
+.scroll-btn {
+	position: fixed;
+	bottom: 0;
+	right: 16px;
+	z-index: 9;
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	color: var(--text-muted);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	cursor: pointer;
+	transition:
+		color var(--ease),
+		transform var(--ease);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.scroll-btn:active {
+	color: var(--accent);
+	transform: scale(0.9);
+}
+
+.scroll-btn[hidden] {
+	display: none;
+}
+
+.scroll-btn svg {
+	width: 18px;
+	height: 18px;
+}
+
 /* Footer / composer */
 
 footer {

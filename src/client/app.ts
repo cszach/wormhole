@@ -137,12 +137,21 @@ function renderOutput(content: string): void {
 	}
 }
 
+const scrollBtn = document.getElementById("scroll-btn") as HTMLButtonElement;
+
 output.addEventListener("scroll", () => {
 	const threshold = 50;
 	const distanceFromBottom =
 		output.scrollHeight - output.scrollTop - output.clientHeight;
 
 	autoScroll = distanceFromBottom < threshold;
+	scrollBtn.hidden = autoScroll;
+});
+
+scrollBtn.addEventListener("click", () => {
+	output.scrollTop = output.scrollHeight;
+	autoScroll = true;
+	scrollBtn.hidden = true;
 });
 
 // --- Send message ---
@@ -210,6 +219,7 @@ const footer = document.querySelector("footer") as HTMLElement;
 
 function syncFooterPadding(): void {
 	output.style.paddingBottom = footer.offsetHeight + 8 + "px";
+	scrollBtn.style.bottom = footer.offsetHeight + 12 + "px";
 }
 
 let inputFocusedBeforeExpand = false;

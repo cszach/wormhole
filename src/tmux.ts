@@ -110,7 +110,7 @@ export function capturePane(session: string): Promise<string> {
 				if (error) {
 					reject(error);
 				} else {
-					resolve(stdout);
+					resolve(stdout.replace(/\n+$/, "\n"));
 				}
 			}
 		);
