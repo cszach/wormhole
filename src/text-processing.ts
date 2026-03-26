@@ -185,57 +185,37 @@ export function extractSummary(text: string): string {
 
 	// Collect the last prose block (consecutive non-code lines)
 	const proseLines: string[] = [];
-	let i = endIdx;
 
-	while (i >= 0) {
+	function isNonProse(line: string, trimmed: string): boolean {
+		if (!trimmed) {
+			return true;
+		}
+
+		if (/^\s{4,}\S/.test(line) || /^\t/.test(line)) {
+			return true;
+		}
+
+		if (/^[+-]{3}\s|^@@\s|^[+-]\s/.test(trimmed)) {
+			return true;
+		}
+
+		return (
+			/^(src|public|node_modules)\//.test(trimmed) ||
+			/\.\w{1,4}:\d+/.test(trimmed)
+		);
+	}
+
+	for (let i = endIdx; i >= 0; i--) {
 		const line = lines[i];
 		const trimmed = line.trim();
 
-		// Stop at blank line (paragraph boundary)
-		if (!trimmed) {
+		if (isNonProse(line, trimmed)) {
 			if (proseLines.length > 0) {
 				break;
 			}
-
-			i--;
-			continue;
+		} else {
+			proseLines.unshift(trimmed);
 		}
-
-		// Skip code-like lines (indented 4+ spaces, tabs, or common code patterns)
-		if (/^\s{4,}\S/.test(line) || /^\t/.test(line)) {
-			if (proseLines.length > 0) {
-				break;
-			}
-
-			i--;
-			continue;
-		}
-
-		// Skip diff lines
-		if (/^[+-]{3}\s|^@@\s|^[+-]\s/.test(trimmed)) {
-			if (proseLines.length > 0) {
-				break;
-			}
-
-			i--;
-			continue;
-		}
-
-		// Skip file paths
-		if (
-			/^(src|public|node_modules)\//.test(trimmed) ||
-			/\.\w{1,4}:\d+/.test(trimmed)
-		) {
-			if (proseLines.length > 0) {
-				break;
-			}
-
-			i--;
-			continue;
-		}
-
-		proseLines.unshift(trimmed);
-		i--;
 	}
 
 	return proseLines.join(" ").trim();

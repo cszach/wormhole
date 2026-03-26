@@ -1,6 +1,7 @@
 import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
+import sonarjsPlugin from "eslint-plugin-sonarjs";
 
 export default tseslint.config(
 	{
@@ -10,7 +11,8 @@ export default tseslint.config(
 	prettierConfig,
 	{
 		plugins: {
-			import: importPlugin
+			import: importPlugin,
+			sonarjs: sonarjsPlugin
 		},
 		rules: {
 			// General
@@ -117,7 +119,24 @@ export default tseslint.config(
 					selector: "ExportDefaultDeclaration",
 					message: "Use named exports. Never use default exports."
 				}
-			]
+			],
+
+			// SonarJS
+
+			"sonarjs/cognitive-complexity": ["warn", 30],
+			"sonarjs/cyclomatic-complexity": "off",
+			"sonarjs/nested-control-flow": "warn",
+			"sonarjs/no-identical-functions": "warn",
+			"sonarjs/no-duplicated-branches": "warn",
+			"sonarjs/no-collapsible-if": "warn",
+			"sonarjs/no-redundant-jump": "warn",
+			"sonarjs/no-unused-collection": "warn",
+			"sonarjs/no-ignored-exceptions": "warn",
+			"sonarjs/no-nested-conditional": "warn",
+			"sonarjs/prefer-single-boolean-return": "warn",
+			"sonarjs/pseudo-random": "warn",
+			"sonarjs/no-reference-error": "off",
+			"sonarjs/too-many-break-or-continue-in-loop": "warn"
 		}
 	},
 	{

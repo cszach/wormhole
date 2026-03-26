@@ -61,7 +61,7 @@ function isAllowedKey(key: string): boolean {
 
 	if (
 		mods.length > 0 &&
-		mods.every((m) => m === "C" || m === "M" || m === "S") &&
+		mods.every((mod) => mod === "C" || mod === "M" || mod === "S") &&
 		ALLOWED_KEYS.has(base)
 	) {
 		return true;
@@ -133,14 +133,14 @@ export function listSessions(): Promise<string[]> {
 						stdout
 							.trim()
 							.split("\n")
-							.filter((s) => s.length > 0)
+							.filter((entry) => entry.length > 0)
 							.sort((a, b) => {
-								const ta = parseInt(a.split(":")[0], 10);
-								const tb = parseInt(b.split(":")[0], 10);
+								const createdA = parseInt(a.split(":")[0], 10);
+								const createdB = parseInt(b.split(":")[0], 10);
 
-								return ta - tb;
+								return createdA - createdB;
 							})
-							.map((s) => s.substring(s.indexOf(":") + 1))
+							.map((entry) => entry.substring(entry.indexOf(":") + 1))
 					);
 				}
 			}

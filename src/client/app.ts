@@ -58,7 +58,7 @@ let recognition: SpeechRecognition | null = null;
 let isRecording = false;
 let rawOutput = "";
 
-// --- WebSocket ---
+const RECONNECT_DELAY_MS = 500;
 
 function connect(): void {
 	const protocol = location.protocol === "https:" ? "wss:" : "ws:";
@@ -92,11 +92,9 @@ function connect(): void {
 		wsDot.classList.remove("connected");
 		setTimeout(() => {
 			connect();
-		}, 500);
+		}, RECONNECT_DELAY_MS);
 	});
 }
-
-// --- Output rendering ---
 
 let rerunSearch: () => void = () => {};
 
@@ -151,11 +149,11 @@ function renderOutput(content: string): void {
 const scrollBtn = document.getElementById("scroll-btn") as HTMLButtonElement;
 
 output.addEventListener("scroll", () => {
-	const threshold = 50;
+	const thresholdPx = 50;
 	const distanceFromBottom =
 		output.scrollHeight - output.scrollTop - output.clientHeight;
 
-	autoScroll = distanceFromBottom < threshold;
+	autoScroll = distanceFromBottom < thresholdPx;
 	scrollBtn.hidden = autoScroll;
 });
 
@@ -164,8 +162,6 @@ scrollBtn.addEventListener("click", () => {
 	autoScroll = true;
 	scrollBtn.hidden = true;
 });
-
-// --- Send message ---
 
 function send(): void {
 	if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -200,8 +196,6 @@ sendBtn.addEventListener("click", () => {
 // Enter inserts newline (default textarea behavior).
 // Send only via the send button.
 
-// --- Key buttons ---
-
 for (const btn of Array.from(
 	document.querySelectorAll<HTMLButtonElement>(
 		".key-btn[data-key], .key-btn[data-raw]"
@@ -223,8 +217,6 @@ for (const btn of Array.from(
 		}
 	});
 }
-
-// --- Extra keys toggle (per layout) ---
 
 const footer = document.querySelector("footer") as HTMLElement;
 
@@ -261,8 +253,6 @@ for (const expandBtn of Array.from(
 	});
 }
 
-// --- Sticky modifier buttons ---
-
 const modOverlay = document.getElementById("mod-overlay") as HTMLElement;
 const modComboLabel = document.getElementById("mod-combo-label") as HTMLElement;
 const modInput = document.getElementById("mod-input") as HTMLInputElement;
@@ -270,18 +260,18 @@ const modCancel = document.getElementById("mod-cancel") as HTMLButtonElement;
 const activeMods = new Set<string>();
 
 function updateModLabel(): void {
-	const parts = Array.from(activeMods).map((m) => {
-		if (m === "C") {
+	const parts = Array.from(activeMods).map((mod) => {
+		if (mod === "C") {
 			return "Ctrl";
 		}
-		if (m === "M") {
+		if (mod === "M") {
 			return "Alt";
 		}
-		if (m === "S") {
+		if (mod === "S") {
 			return "Shift";
 		}
 
-		return m;
+		return mod;
 	});
 
 	modComboLabel.textContent = parts.join(" + ") + " +";
@@ -353,8 +343,8 @@ modCancel.addEventListener("click", () => {
 	closeModOverlay();
 });
 
-modInput.addEventListener("keydown", (e) => {
-	if (e.key === "Escape") {
+modInput.addEventListener("keydown", (event) => {
+	if (event.key === "Escape") {
 		closeModOverlay();
 	}
 });
@@ -366,8 +356,6 @@ textInput.addEventListener("input", () => {
 	textInput.style.height = Math.min(textInput.scrollHeight, 120) + "px";
 	syncFooterPadding();
 });
-
-// --- Image upload ---
 
 imageInput.addEventListener("change", async () => {
 	const { files } = imageInput;
@@ -444,8 +432,6 @@ function clearImages(): void {
 	syncFooterPadding();
 }
 
-// --- Voice dictation (Web Speech API) ---
-
 function initSpeechRecognition(): void {
 	const SpeechRecognition =
 		window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -462,7 +448,7 @@ function initSpeechRecognition(): void {
 	recognition.interimResults = false;
 	recognition.lang = "en-US";
 
-	recognition.addEventListener("result", (event) => {
+	recognition.addEventListener("result", ((event: SpeechRecognitionEvent) => {
 		const { transcript } = event.results[0][0];
 
 		if (textInput.value && !textInput.value.endsWith(" ")) {
@@ -472,7 +458,7 @@ function initSpeechRecognition(): void {
 		textInput.value += transcript;
 		textInput.style.height = "auto";
 		textInput.style.height = Math.min(textInput.scrollHeight, 120) + "px";
-	});
+	}) as EventListener);
 
 	recognition.addEventListener("end", () => {
 		if (isRecording) {
@@ -508,8 +494,6 @@ function stopRecording(): void {
 	micBtn.classList.remove("recording");
 	recognition?.stop();
 }
-
-// --- TTS ---
 
 ttsToggle.addEventListener("change", () => {
 	ttsEnabled = ttsToggle.checked;
@@ -547,8 +531,6 @@ function speakLatest(): void {
 	speechSynthesis.speak(utterance);
 }
 
-// --- Theme system ---
-
 const savedThemeId = localStorage.getItem("wormhole-theme");
 const initialTheme =
 	(savedThemeId && getTheme(savedThemeId)) || getDefaultTheme();
@@ -574,8 +556,6 @@ function applyTheme(id: string): void {
 	localStorage.setItem("wormhole-theme", theme.id);
 	renderThemeList();
 }
-
-// --- Settings panel ---
 
 const ttsModeSelect = document.getElementById("tts-mode") as HTMLSelectElement;
 const ttsRateInput = document.getElementById("tts-rate") as HTMLInputElement;
@@ -811,8 +791,6 @@ skillsAdd.addEventListener("keydown", (event) => {
 	}
 });
 
-// --- Snippets ---
-
 function getSnippets(): string[] {
 	try {
 		return JSON.parse(localStorage.getItem("wormhole-snippets") ?? "[]");
@@ -882,8 +860,6 @@ snippetsAdd.addEventListener("keydown", (event) => {
 	}
 });
 
-// --- Selection save button ---
-
 const saveSnippetBtn = document.getElementById(
 	"save-snippet-btn"
 ) as HTMLButtonElement;
@@ -930,8 +906,6 @@ saveSnippetBtn.addEventListener("click", () => {
 		saveSnippetBtn.hidden = true;
 	}
 });
-
-// --- Command palette ---
 
 type Command = {
 	name: string;
@@ -981,11 +955,12 @@ function renderCommandList(filter: string): void {
 	const allCommands = cmdSnippetsOnly
 		? getSnippetCommands()
 		: [...BUILTIN_COMMANDS, ...getSkillCommands(), ...getSnippetCommands()];
-	const q = filter.toLowerCase();
-	const filtered = q
+	const lowerFilter = filter.toLowerCase();
+	const filtered = lowerFilter
 		? allCommands.filter(
 				(c) =>
-					c.name.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q)
+					c.name.toLowerCase().includes(lowerFilter) ||
+					c.desc.toLowerCase().includes(lowerFilter)
 			)
 		: allCommands;
 
@@ -1136,6 +1111,7 @@ colsSlider.addEventListener("change", () => {
 });
 
 // Recalculate on resize when auto is enabled (debounced)
+const RESIZE_DEBOUNCE_MS = 1000;
 let resizeTimer = 0;
 
 window.addEventListener("resize", () => {
@@ -1143,16 +1119,14 @@ window.addEventListener("resize", () => {
 		clearTimeout(resizeTimer);
 		resizeTimer = window.setTimeout(() => {
 			updateColumns();
-		}, 1000);
+		}, RESIZE_DEBOUNCE_MS);
 	}
 });
 
-// --- Init ---
-
 try {
 	shaderEngine = initShader(canvas, initialTheme);
-} catch (e) {
-	console.error("initShader failed:", e);
+} catch (err) {
+	console.error("initShader failed:", err);
 }
 
 applyAccentColor(activeAccent);
@@ -1176,14 +1150,14 @@ try {
 			X
 		}
 	});
-} catch (e) {
-	console.error("createIcons failed:", e);
+} catch (err) {
+	console.error("createIcons failed:", err);
 }
 
 try {
 	clearImages();
-} catch (e) {
-	console.error("clearImages failed:", e);
+} catch (err) {
+	console.error("clearImages failed:", err);
 }
 
 // Restore column settings
@@ -1199,8 +1173,6 @@ if (savedAutoCols === "false") {
 	autoColsCheckbox.checked = true;
 	colsRow.classList.add("disabled");
 }
-
-// --- Session modal ---
 
 const sessionBtn = document.getElementById("session-btn") as HTMLButtonElement;
 const sessionModal = document.getElementById("session-modal") as HTMLElement;
@@ -1257,8 +1229,8 @@ function renderSessionList(sessions: string[]): void {
 		del.title = "Delete session";
 		del.disabled = !canDelete;
 
-		del.addEventListener("click", async (e) => {
-			e.stopPropagation();
+		del.addEventListener("click", async (event) => {
+			event.stopPropagation();
 
 			try {
 				const res = await fetch("/api/sessions/" + encodeURIComponent(name), {
@@ -1303,8 +1275,8 @@ sessionBtn.addEventListener("click", () => {
 	openSessionModal();
 });
 
-sessionModal.addEventListener("click", (e) => {
-	if (e.target === sessionModal) {
+sessionModal.addEventListener("click", (event) => {
+	if (event.target === sessionModal) {
 		closeSessionModal();
 	}
 });
@@ -1345,13 +1317,11 @@ sessionCreateBtn.addEventListener("click", async () => {
 	}
 });
 
-sessionNewName.addEventListener("keydown", (e) => {
-	if (e.key === "Enter") {
+sessionNewName.addEventListener("keydown", (event) => {
+	if (event.key === "Enter") {
 		sessionCreateBtn.click();
 	}
 });
-
-// --- Search ---
 
 const searchBtn = document.getElementById("search-btn") as HTMLButtonElement;
 const searchBar = document.getElementById("search-bar") as HTMLElement;
@@ -1489,11 +1459,11 @@ searchNext.addEventListener("click", () => {
 	navigateSearch(1);
 });
 
-searchInput.addEventListener("keydown", (e) => {
-	if (e.key === "Escape") {
+searchInput.addEventListener("keydown", (event) => {
+	if (event.key === "Escape") {
 		closeSearch();
-	} else if (e.key === "Enter") {
-		navigateSearch(e.shiftKey ? -1 : 1);
+	} else if (event.key === "Enter") {
+		navigateSearch(event.shiftKey ? -1 : 1);
 	}
 });
 
@@ -1505,51 +1475,3 @@ syncKeyLayout();
 syncFooterPadding();
 connect();
 initSpeechRecognition();
-
-// Declare Web Speech API types for TypeScript
-
-declare global {
-	type SpeechRecognition = {
-		continuous: boolean;
-		interimResults: boolean;
-		lang: string;
-		start(): void;
-		stop(): void;
-		addEventListener(
-			type: string,
-			listener: (event: SpeechRecognitionEvent) => void
-		): void;
-	};
-
-	type SpeechRecognitionEvent = {
-		resultIndex: number;
-		results: SpeechRecognitionResultList;
-	};
-
-	type SpeechRecognitionResultList = {
-		length: number;
-		[index: number]: SpeechRecognitionResult;
-	};
-
-	type SpeechRecognitionResult = {
-		isFinal: boolean;
-		[index: number]: SpeechRecognitionAlternative;
-	};
-
-	type SpeechRecognitionAlternative = {
-		transcript: string;
-		confidence: number;
-	};
-
-	var SpeechRecognition: {
-		new (): SpeechRecognition;
-	};
-	var webkitSpeechRecognition: {
-		new (): SpeechRecognition;
-	};
-
-	type Window = {
-		SpeechRecognition?: typeof SpeechRecognition;
-		webkitSpeechRecognition?: typeof webkitSpeechRecognition;
-	};
-}

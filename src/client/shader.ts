@@ -26,28 +26,28 @@ export function initShader(
 	gl.getExtension("OES_standard_derivatives");
 
 	function compile(type: number, src: string): WebGLShader | null {
-		const s = gl!.createShader(type);
+		const shader = gl!.createShader(type);
 
-		if (!s) {
+		if (!shader) {
 			return null;
 		}
 
-		gl!.shaderSource(s, src);
-		gl!.compileShader(s);
+		gl!.shaderSource(shader, src);
+		gl!.compileShader(shader);
 
-		if (!gl!.getShaderParameter(s, gl!.COMPILE_STATUS)) {
-			console.error("Shader compile:", gl!.getShaderInfoLog(s));
-			gl!.deleteShader(s);
+		if (!gl!.getShaderParameter(shader, gl!.COMPILE_STATUS)) {
+			console.error("Shader compile:", gl!.getShaderInfoLog(shader));
+			gl!.deleteShader(shader);
 
 			return null;
 		}
 
-		return s;
+		return shader;
 	}
 
-	const vs = compile(gl.VERTEX_SHADER, VERT);
+	const vertShader = compile(gl.VERTEX_SHADER, VERT);
 
-	if (!vs) {
+	if (!vertShader) {
 		return null;
 	}
 
@@ -61,14 +61,14 @@ export function initShader(
 	);
 
 	let prog: WebGLProgram | null = null;
-	let uT: WebGLUniformLocation | null = null;
-	let uRes: WebGLUniformLocation | null = null;
+	let uTime: WebGLUniformLocation | null = null;
+	let uResolution: WebGLUniformLocation | null = null;
 	let animId = 0;
 
 	function buildProgram(frag: string): boolean {
-		const fs = compile(gl!.FRAGMENT_SHADER, frag);
+		const fragShader = compile(gl!.FRAGMENT_SHADER, frag);
 
-		if (!fs) {
+		if (!fragShader) {
 			return false;
 		}
 
@@ -77,8 +77,8 @@ export function initShader(
 		}
 
 		prog = gl!.createProgram()!;
-		gl!.attachShader(prog, vs!);
-		gl!.attachShader(prog, fs);
+		gl!.attachShader(prog, vertShader!);
+		gl!.attachShader(prog, fragShader);
 		gl!.linkProgram(prog);
 
 		if (!gl!.getProgramParameter(prog, gl!.LINK_STATUS)) {
@@ -93,8 +93,8 @@ export function initShader(
 		gl!.enableVertexAttribArray(aPos);
 		gl!.vertexAttribPointer(aPos, 2, gl!.FLOAT, false, 0, 0);
 
-		uT = gl!.getUniformLocation(prog, "u_t");
-		uRes = gl!.getUniformLocation(prog, "u_res");
+		uTime = gl!.getUniformLocation(prog, "u_t");
+		uResolution = gl!.getUniformLocation(prog, "u_res");
 
 		return true;
 	}
@@ -114,8 +114,8 @@ export function initShader(
 		}
 
 		function frame(ms: number): void {
-			gl!.uniform1f(uT, ms * 0.001);
-			gl!.uniform2f(uRes, canvas.width, canvas.height);
+			gl!.uniform1f(uTime, ms * 0.001);
+			gl!.uniform2f(uResolution, canvas.width, canvas.height);
 			gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
 			animId = requestAnimationFrame(frame);
 		}

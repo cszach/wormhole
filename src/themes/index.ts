@@ -9,7 +9,7 @@ export type { Theme };
 export const themes: Theme[] = [starryNight, aurora, nebula, topography];
 
 export function getTheme(id: string): Theme | undefined {
-	return themes.find((t) => t.id === id);
+	return themes.find((theme) => theme.id === id);
 }
 
 export function getDefaultTheme(): Theme {

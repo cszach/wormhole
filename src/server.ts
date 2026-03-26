@@ -72,8 +72,6 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
 	res.json({ path: filePath });
 });
 
-// --- Session management ---
-
 const SESSION_NAME_RE = /^[^.:]+$/;
 const SESSION_MAX_LEN = 20;
 
@@ -145,7 +143,7 @@ app.delete("/api/sessions/:name", async (req, res) => {
 
 		// If we deleted the active session, switch to another one
 		if (name === activeSession) {
-			const remaining = sessions.filter((s) => s !== name);
+			const remaining = sessions.filter((session) => session !== name);
 			activeSession = remaining[0];
 			lastCapture = "";
 			stableSent = false;
@@ -157,8 +155,6 @@ app.delete("/api/sessions/:name", async (req, res) => {
 		res.status(500).json({ error: "Failed to delete session" });
 	}
 });
-
-// --- Tmux polling ---
 
 let activeSession = "";
 let lastCapture = "";
@@ -250,15 +246,11 @@ wss.on("connection", (ws) => {
 			const message = JSON.parse(String(raw));
 
 			if (message.type === "send") {
-				let { text } = message;
+				const images = (message.imagePaths ?? [])
+					.map((p: string) => ` [Image: ${p}]`)
+					.join("");
 
-				if (message.imagePaths && message.imagePaths.length > 0) {
-					for (const p of message.imagePaths) {
-						text += ` [Image: ${p}]`;
-					}
-				}
-
-				await sendKeys(activeSession, text);
+				await sendKeys(activeSession, message.text + images);
 			}
 
 			if (message.type === "key" && message.key) {
