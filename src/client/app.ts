@@ -22,6 +22,15 @@ import {
 import { isClaudeCode, getTTSText } from "@/text-processing.js";
 import { getDefaultTheme, getTheme, themes } from "@/themes/index.js";
 
+import {
+	initVault,
+	updateVaultWs,
+	getVaultCommands,
+	isVaultUnlocked,
+	isVaultSecure,
+	unlockWithPassword,
+	getClipClearMs
+} from "./vault.js";
 import { initShader } from "./shader.js";
 
 type ServerMessage =
@@ -30,7 +39,9 @@ type ServerMessage =
 	| { type: "session"; session: string }
 	| { type: "pong"; ts: number }
 	| { type: "bg-stable"; session: string }
-	| { type: "bg-clear"; session: string };
+	| { type: "bg-clear"; session: string }
+	| { type: "vault-inject-ack"; success: boolean }
+	| { type: "vault-clipboard-ack"; success: boolean };
 
 const PING_INTERVAL_MS = 15000;
 const PING_HISTORY_SIZE = 3;
@@ -89,6 +100,22 @@ const wormholingHint = document.getElementById(
 let wormholingTimer = 0;
 const WORMHOLING_HINT_MS = 8000;
 
+const toastEl = document.getElementById("toast") as HTMLElement;
+let toastTimer = 0;
+
+function showToast(message: string): void {
+	clearTimeout(toastTimer);
+	toastEl.textContent = message;
+	toastEl.hidden = false;
+	requestAnimationFrame(() => toastEl.classList.add("visible"));
+	toastTimer = window.setTimeout(() => {
+		toastEl.classList.remove("visible");
+		setTimeout(() => {
+			toastEl.hidden = true;
+		}, 200);
+	}, 2000);
+}
+
 const readySessions = new Set<string>();
 
 function updateSessionHint(): void {
@@ -143,7 +170,7 @@ function connect(): void {
 
 	ws.addEventListener("open", () => {
 		wsDot.classList.add("connected");
-		refreshBtn.hidden = true;
+		updateVaultWs(ws);
 		updateColumns();
 		sendPing();
 		pingTimer = window.setInterval(sendPing, PING_INTERVAL_MS);
@@ -196,7 +223,6 @@ function connect(): void {
 	ws.addEventListener("close", () => {
 		wsDot.classList.remove("connected");
 		wsDot.classList.remove("ping-good", "ping-warn", "ping-poor");
-		refreshBtn.hidden = false;
 		clearInterval(pingTimer);
 		pingHistory.length = 0;
 		latencyMs = -1;
@@ -338,9 +364,12 @@ for (const btn of Array.from(
 const footer = document.querySelector("footer") as HTMLElement;
 
 function syncFooterPadding(): void {
-	output.style.paddingBottom = footer.offsetHeight + 8 + "px";
-	scrollBtn.style.bottom = footer.offsetHeight + 12 + "px";
-	saveSnippetBtn.style.bottom = footer.offsetHeight + 12 + "px";
+	requestAnimationFrame(() => {
+		output.style.paddingBottom = footer.offsetHeight + 16 + "px";
+		scrollBtn.style.bottom = footer.offsetHeight + 16 + "px";
+		saveSnippetBtn.style.bottom = footer.offsetHeight + 12 + "px";
+		toastEl.style.bottom = footer.offsetHeight + 12 + "px";
+	});
 }
 
 let inputFocusedBeforeExpand = false;
@@ -1102,6 +1131,7 @@ let cmdSnippetsOnly = false;
 function renderCommandList(filter: string): void {
 	cmdList.innerHTML = "";
 
+	const vaultCmds = getVaultCommands();
 	const allCommands = cmdSnippetsOnly
 		? getSnippetCommands()
 		: [...BUILTIN_COMMANDS, ...getSkillCommands(), ...getSnippetCommands()];
@@ -1113,6 +1143,10 @@ function renderCommandList(filter: string): void {
 					c.desc.toLowerCase().includes(lowerFilter)
 			)
 		: allCommands;
+
+	const filteredVault = lowerFilter
+		? vaultCmds.filter((v) => v.label.toLowerCase().includes(lowerFilter))
+		: vaultCmds;
 
 	let currentSection = "";
 
@@ -1150,7 +1184,96 @@ function renderCommandList(filter: string): void {
 		cmdList.appendChild(btn);
 	}
 
-	if (filtered.length === 0) {
+	if (!cmdSnippetsOnly && isVaultSecure() && !isVaultUnlocked()) {
+		const vaultLabel = document.createElement("div");
+		vaultLabel.className = "cmd-section-label";
+		vaultLabel.textContent = "Vault";
+		cmdList.appendChild(vaultLabel);
+
+		const unlockRow = document.createElement("div");
+		unlockRow.className = "cmd-vault-unlock";
+
+		const pwInput = document.createElement("input");
+		pwInput.type = "password";
+		pwInput.className = "cmd-vault-password";
+		pwInput.placeholder = "Master password\u2026";
+		pwInput.setAttribute("aria-label", "Master password");
+		pwInput.autocomplete = "off";
+
+		const unlockBtn = document.createElement("button");
+		unlockBtn.className = "cmd-vault-unlock-btn";
+		unlockBtn.textContent = "Unlock";
+
+		const doUnlock = async () => {
+			if (!pwInput.value) {return;}
+			const ok = await unlockWithPassword(pwInput.value);
+			if (ok) {
+				renderCommandList(filter);
+			} else {
+				pwInput.value = "";
+				pwInput.placeholder = "Wrong password";
+			}
+		};
+
+		unlockBtn.addEventListener("click", doUnlock);
+		pwInput.addEventListener("keydown", (e) => {
+			if (e.key === "Enter") {doUnlock();}
+		});
+
+		unlockRow.append(pwInput, unlockBtn);
+		cmdList.appendChild(unlockRow);
+	}
+
+	if (filteredVault.length > 0) {
+		const vaultLabel = document.createElement("div");
+		vaultLabel.className = "cmd-section-label";
+		vaultLabel.textContent = "Vault";
+		cmdList.appendChild(vaultLabel);
+
+		for (const vcmd of filteredVault) {
+			const row = document.createElement("div");
+			row.className = "cmd-vault-item";
+
+			const name = document.createElement("span");
+			name.className = "cmd-vault-label";
+			name.textContent = vcmd.label;
+
+			const actions = document.createElement("div");
+			actions.className = "cmd-vault-actions";
+
+			const termBtn = document.createElement("button");
+			termBtn.className = "cmd-vault-btn";
+			termBtn.title = "Paste to terminal";
+			termBtn.setAttribute("aria-label", "Paste to terminal");
+			termBtn.innerHTML =
+				'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>';
+			termBtn.addEventListener("click", () => {
+				vcmd.onTerminal();
+				closeCmdPalette();
+				showToast("Pasted to terminal");
+			});
+
+			const clipBtn = document.createElement("button");
+			clipBtn.className = "cmd-vault-btn";
+			clipBtn.title = "Copy to remote clipboard";
+			clipBtn.setAttribute("aria-label", "Copy to remote clipboard");
+			clipBtn.innerHTML =
+				'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+			clipBtn.addEventListener("click", () => {
+				vcmd.onClipboard();
+				closeCmdPalette();
+				const clearSec = getClipClearMs() / 1000;
+				const clearLabel = clearSec > 0 ? ` \u2014 ${clearSec}s` : "";
+				showToast(`Copied to remote clipboard${clearLabel}`);
+			});
+
+			actions.append(termBtn, clipBtn);
+			row.append(name, actions);
+			cmdList.appendChild(row);
+		}
+	}
+
+	if (filtered.length === 0 && filteredVault.length === 0) {
 		const empty = document.createElement("div");
 		empty.className = "cmd-section-label";
 		empty.textContent = "No commands found";
@@ -1314,6 +1437,7 @@ try {
 
 // Restore draft
 restoreDraft();
+initVault(ws);
 
 // Restore column settings
 const savedAutoCols = localStorage.getItem("wormhole-auto-cols");

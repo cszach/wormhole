@@ -34,6 +34,8 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
 - **Context-aware keys** — Claude Code layout (Shift+Tab, Ctrl+O, Ctrl+C) vs
   terminal layout (Home, End, PgUp, PgDn, sticky Ctrl/Alt/Shift modifiers)
 - **Snippets** — save and recall commands from a palette
+- **Password vault** — encrypted credential storage with terminal paste and
+  remote clipboard injection ([security details](docs/VAULT.md))
 - **Themes** — animated GLSL shader backgrounds (Starry Night, Aurora, Nebula,
   Topography)
 - **Customizable** — accent color, TTS voice/speed, terminal column width

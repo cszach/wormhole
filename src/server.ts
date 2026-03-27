@@ -1,8 +1,10 @@
 import "dotenv/config";
 import { createServer } from "node:http";
 import { createServer as createHTTPSServer } from "node:https";
+import { spawn } from "node:child_process";
 import path from "node:path";
 import fs from "node:fs";
+import os from "node:os";
 
 import express from "express";
 import { WebSocketServer, WebSocket } from "ws";
@@ -16,13 +18,19 @@ import {
 	capturePane,
 	listSessions,
 	createSession,
-	killSession
+	killSession,
+	setBuffer,
+	pasteBuffer,
+	deleteBuffer
 } from "./tmux.js";
 
 const PORT = Number(process.env.PORT ?? 5173);
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? "./uploads";
 const TLS_CERT = process.env.TLS_CERT ?? "";
 const TLS_KEY = process.env.TLS_KEY ?? "";
+const VAULT_FILE = path.resolve(
+	process.env.VAULT_FILE ?? ".wormhole-vault.enc"
+);
 
 const uploadDir = path.resolve(UPLOAD_DIR);
 
@@ -161,12 +169,66 @@ app.delete("/api/sessions/:name", async (req, res) => {
 	}
 });
 
+const CLIPBOARD_CLEAR_MS = 30000;
+let clipboardTimer: ReturnType<typeof setTimeout> | null = null;
+
+function setClipboard(value: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		const cmd = os.platform() === "darwin" ? "pbcopy" : "xclip";
+		const args = os.platform() === "darwin" ? [] : ["-selection", "clipboard"];
+		const proc = spawn(cmd, args, { stdio: ["pipe", "ignore", "ignore"] });
+
+		proc.stdin.write(value);
+		proc.stdin.end();
+
+		proc.on("close", (code) => {
+			if (code === 0) {resolve();}
+			else {reject(new Error(`${cmd} exited with code ${code}`));}
+		});
+
+		proc.on("error", reject);
+	});
+}
+
+function clearClipboard(): Promise<void> {
+	return setClipboard("");
+}
+
+app.get("/api/vault", (_req, res) => {
+	if (!fs.existsSync(VAULT_FILE)) {
+		res.status(404).json({ error: "No vault" });
+
+		return;
+	}
+
+	const data = fs.readFileSync(VAULT_FILE);
+	res.set("Content-Type", "application/octet-stream");
+	res.send(data);
+});
+
+app.put(
+	"/api/vault",
+	express.raw({ type: "application/octet-stream", limit: "1mb" }),
+	(req, res) => {
+		fs.writeFileSync(VAULT_FILE, req.body as Buffer);
+		res.status(204).end();
+	}
+);
+
+app.delete("/api/vault", (_req, res) => {
+	if (fs.existsSync(VAULT_FILE)) {
+		fs.unlinkSync(VAULT_FILE);
+	}
+
+	res.status(204).end();
+});
+
 type SessionState = {
 	lastCapture: string;
 	lastChangeMs: number;
 	stableSent: boolean;
 	hasChanged: boolean;
-}
+};
 
 let activeSession = "";
 let lastCapture = "";
@@ -226,13 +288,17 @@ setInterval(() => {
 }, POLL_INTERVAL_MS);
 
 async function pollBackgroundSessions(): Promise<void> {
-	if (!activeSession) {return;}
+	if (!activeSession) {
+		return;
+	}
 
 	try {
 		const sessions = await listSessions();
 
 		for (const name of sessions) {
-			if (name === activeSession) {continue;}
+			if (name === activeSession) {
+				continue;
+			}
 
 			const content = await capturePane(name);
 			const isBlank = content.trim().length === 0;
@@ -329,6 +395,49 @@ wss.on("connection", (ws) => {
 
 			if (message.type === "ping" && message.ts) {
 				ws.send(JSON.stringify({ type: "pong", ts: message.ts }));
+			}
+
+			if (message.type === "vault-inject" && message.value) {
+				try {
+					await setBuffer(message.value);
+
+					try {
+						await pasteBuffer(activeSession);
+					} finally {
+						await deleteBuffer();
+					}
+
+					ws.send(JSON.stringify({ type: "vault-inject-ack", success: true }));
+				} catch {
+					ws.send(JSON.stringify({ type: "vault-inject-ack", success: false }));
+				}
+			}
+
+			if (message.type === "vault-clipboard" && message.value) {
+				try {
+					if (clipboardTimer) {clearTimeout(clipboardTimer);}
+					await setClipboard(message.value);
+					const clearMs = Number(message.clearMs) || CLIPBOARD_CLEAR_MS;
+					if (clearMs > 0) {
+						clipboardTimer = setTimeout(() => {
+							clearClipboard().catch(() => {});
+							clipboardTimer = null;
+						}, clearMs);
+					}
+					ws.send(
+						JSON.stringify({
+							type: "vault-clipboard-ack",
+							success: true
+						})
+					);
+				} catch {
+					ws.send(
+						JSON.stringify({
+							type: "vault-clipboard-ack",
+							success: false
+						})
+					);
+				}
 			}
 
 			if (message.type === "switch" && message.session) {

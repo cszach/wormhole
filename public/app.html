@@ -286,6 +286,127 @@
 							highlight text in the output to save it.
 						</p>
 					</div>
+
+					<div class="settings-section" id="vault-section">
+						<h3>Password Vault</h3>
+						<div id="vault-locked">
+							<p id="vault-https-warning" class="vault-warning" hidden>
+								Vault requires a secure connection (HTTPS).
+							</p>
+							<input
+								type="password"
+								id="vault-password"
+								class="settings-input"
+								placeholder="Master password…"
+								aria-label="Master password"
+								autocomplete="off"
+								enterkeyhint="done"
+							/>
+							<button id="vault-unlock" class="vault-btn">Unlock</button>
+							<button id="vault-reset" class="vault-btn vault-btn--danger">
+								Reset vault
+							</button>
+							<p id="vault-error" class="vault-error" hidden></p>
+						</div>
+						<div id="vault-unlocked" hidden>
+							<div id="vault-list" class="vault-list"></div>
+							<div class="vault-add-form">
+								<input
+									type="text"
+									id="vault-add-label"
+									class="settings-input"
+									placeholder="Label…"
+									aria-label="Credential label"
+									autocomplete="off"
+								/>
+								<input
+									type="password"
+									id="vault-add-password"
+									class="settings-input"
+									placeholder="Password…"
+									aria-label="Password"
+									autocomplete="off"
+								/>
+								<button id="vault-add-btn" class="vault-btn">
+									Add credential
+								</button>
+							</div>
+							<label class="settings-row">
+								<span class="settings-label">Auto-lock</span>
+								<select id="vault-timeout" class="settings-select">
+									<option value="60000">1 minute</option>
+									<option value="300000" selected>5 minutes</option>
+									<option value="600000">10 minutes</option>
+									<option value="1800000">30 minutes</option>
+									<option value="0">Never</option>
+								</select>
+							</label>
+							<label class="settings-row">
+								<span class="settings-label">Clipboard clear</span>
+								<select id="vault-clip-timeout" class="settings-select">
+									<option value="10000">10 seconds</option>
+									<option value="30000" selected>30 seconds</option>
+									<option value="60000">1 minute</option>
+									<option value="300000">5 minutes</option>
+									<option value="0">Never</option>
+								</select>
+							</label>
+							<button id="vault-lock" class="vault-btn vault-btn--secondary">
+								Lock vault
+							</button>
+						</div>
+						<p class="settings-hint">
+							Encrypted at rest and in transit.
+							<a href="#" id="vault-learn-more">Learn more.</a>
+						</p>
+
+						<!-- Vault info modal -->
+						<div id="vault-info-modal" class="modal-backdrop" hidden>
+							<div class="modal">
+								<div class="modal-title-row">
+									<h2 class="modal-title">Password Vault</h2>
+								</div>
+								<div class="vault-info-body">
+									<p>
+										Passwords are encrypted with
+										<strong>AES-256-GCM</strong> using a key derived from your
+										master password (<strong>PBKDF2</strong>, 600k iterations).
+										The server only stores an encrypted blob.
+									</p>
+									<h4>Two injection modes</h4>
+									<p>
+										<strong>Terminal paste</strong> injects directly into tmux.
+										Claude never sees the value.
+									</p>
+									<p>
+										<strong>Remote clipboard</strong> copies to the server's
+										clipboard for browser fields. Auto-clears after timeout.
+									</p>
+									<h4>Browser login with Claude</h4>
+									<ol class="vault-info-steps">
+										<li>
+											Tell Claude your username and ask it to focus the password
+											field
+										</li>
+										<li>
+											Tap the
+											<strong>clipboard icon</strong> on your credential in the
+											command palette
+										</li>
+										<li>Tell Claude to press Ctrl+V and submit</li>
+									</ol>
+									<h4>Requires HTTPS</h4>
+									<p>
+										The vault refuses to unlock over plain HTTP to protect
+										credentials in transit.
+									</p>
+									<button id="vault-info-close" class="vault-btn">
+										Got it
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -329,7 +450,6 @@
 			class="refresh-btn"
 			title="Refresh connection"
 			aria-label="Refresh connection"
-			hidden
 		>
 			<i data-lucide="refresh-cw" aria-hidden="true"></i>
 		</button>
@@ -343,6 +463,8 @@
 		>
 			<i data-lucide="chevron-down" aria-hidden="true"></i>
 		</button>
+
+		<div id="toast" class="toast" hidden></div>
 
 		<footer>
 			<div id="image-previews"></div>

@@ -160,6 +160,18 @@ export function createSession(name: string): Promise<void> {
 	});
 }
 
+export function setBuffer(value: string): Promise<void> {
+	return exec("tmux", ["set-buffer", "--", value]);
+}
+
+export function pasteBuffer(session: string): Promise<void> {
+	return exec("tmux", ["paste-buffer", "-t", session]);
+}
+
+export function deleteBuffer(): Promise<void> {
+	return exec("tmux", ["delete-buffer"]);
+}
+
 export function killSession(name: string): Promise<void> {
 	return new Promise((resolve, reject) => {
 		execFile("tmux", ["kill-session", "-t", name], (error) => {
