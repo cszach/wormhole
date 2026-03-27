@@ -278,6 +278,7 @@ function renderOutput(content: string): void {
 	output.innerHTML = lines.map((l) => `<div>${l || "&nbsp;"}</div>`).join("");
 
 	rerunSearch();
+	syncFooterPadding();
 
 	if (autoScroll) {
 		output.scrollTop = output.scrollHeight;
@@ -364,13 +365,13 @@ for (const btn of Array.from(
 const footer = document.querySelector("footer") as HTMLElement;
 
 function syncFooterPadding(): void {
-	requestAnimationFrame(() => {
-		output.style.paddingBottom = footer.offsetHeight + 16 + "px";
-		scrollBtn.style.bottom = footer.offsetHeight + 16 + "px";
-		saveSnippetBtn.style.bottom = footer.offsetHeight + 12 + "px";
-		toastEl.style.bottom = footer.offsetHeight + 12 + "px";
-	});
+	const h = footer.offsetHeight;
+	scrollBtn.style.bottom = h + 16 + "px";
+	saveSnippetBtn.style.bottom = h + 12 + "px";
+	toastEl.style.bottom = h + 12 + "px";
 }
+
+new ResizeObserver(() => syncFooterPadding()).observe(footer);
 
 let inputFocusedBeforeExpand = false;
 
@@ -1205,7 +1206,9 @@ function renderCommandList(filter: string): void {
 		unlockBtn.textContent = "Unlock";
 
 		const doUnlock = async () => {
-			if (!pwInput.value) {return;}
+			if (!pwInput.value) {
+				return;
+			}
 			const ok = await unlockWithPassword(pwInput.value);
 			if (ok) {
 				renderCommandList(filter);
@@ -1217,7 +1220,9 @@ function renderCommandList(filter: string): void {
 
 		unlockBtn.addEventListener("click", doUnlock);
 		pwInput.addEventListener("keydown", (e) => {
-			if (e.key === "Enter") {doUnlock();}
+			if (e.key === "Enter") {
+				doUnlock();
+			}
 		});
 
 		unlockRow.append(pwInput, unlockBtn);
@@ -1794,3 +1799,9 @@ syncKeyLayout();
 syncFooterPadding();
 connect();
 initSpeechRecognition();
+
+document.addEventListener("visibilitychange", () => {
+	if (!document.hidden) {
+		syncFooterPadding();
+	}
+});
