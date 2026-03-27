@@ -11,6 +11,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 
 import type { ServerMessage } from "./types.js";
+import { isValidSessionName } from "./validation.js";
 import {
 	sendKeys,
 	sendRawKey,
@@ -83,25 +84,6 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
 	const filePath = path.resolve(req.file.path);
 	res.json({ path: filePath });
 });
-
-const SESSION_NAME_RE = /^[^.:]+$/;
-const SESSION_MAX_LEN = 20;
-
-function isValidSessionName(name: string): string | null {
-	if (!name || name.trim().length === 0) {
-		return "Session name cannot be empty";
-	}
-
-	if (name.length > SESSION_MAX_LEN) {
-		return `Session name must be ${SESSION_MAX_LEN} characters or fewer`;
-	}
-
-	if (!SESSION_NAME_RE.test(name)) {
-		return "Session name cannot contain . or :";
-	}
-
-	return null;
-}
 
 app.get("/api/sessions", async (_req, res) => {
 	const sessions = await listSessions();
@@ -182,8 +164,11 @@ function setClipboard(value: string): Promise<void> {
 		proc.stdin.end();
 
 		proc.on("close", (code) => {
-			if (code === 0) {resolve();}
-			else {reject(new Error(`${cmd} exited with code ${code}`));}
+			if (code === 0) {
+				resolve();
+			} else {
+				reject(new Error(`${cmd} exited with code ${code}`));
+			}
 		});
 
 		proc.on("error", reject);
@@ -415,7 +400,9 @@ wss.on("connection", (ws) => {
 
 			if (message.type === "vault-clipboard" && message.value) {
 				try {
-					if (clipboardTimer) {clearTimeout(clipboardTimer);}
+					if (clipboardTimer) {
+						clearTimeout(clipboardTimer);
+					}
 					await setClipboard(message.value);
 					const clearMs = Number(message.clearMs) || CLIPBOARD_CLEAR_MS;
 					if (clearMs > 0) {
