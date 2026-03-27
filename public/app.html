@@ -269,6 +269,33 @@
 					<div class="settings-section">
 						<h3>Snippets</h3>
 						<div id="snippets-list" class="snippets-list"></div>
+						<div id="snippet-edit-modal" class="modal-backdrop" hidden>
+							<div class="modal">
+								<div class="modal-title-row">
+									<h2 class="modal-title">Edit Snippet</h2>
+								</div>
+								<textarea
+									id="snippet-edit-input"
+									class="snippet-edit-textarea"
+									rows="4"
+									spellcheck="false"
+									autocomplete="off"
+									autocorrect="off"
+									autocapitalize="off"
+								></textarea>
+								<div class="snippet-edit-actions">
+									<button id="snippet-edit-cancel" class="snippet-edit-btn">
+										Cancel
+									</button>
+									<button
+										id="snippet-edit-save"
+										class="snippet-edit-btn snippet-edit-btn--primary"
+									>
+										Save
+									</button>
+								</div>
+							</div>
+						</div>
 						<input
 							type="text"
 							id="snippets-add"

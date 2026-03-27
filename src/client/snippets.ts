@@ -1,4 +1,13 @@
-import { snippetsList, snippetsAdd, saveSnippetBtn, output } from "./dom.js";
+import {
+	snippetsList,
+	snippetsAdd,
+	saveSnippetBtn,
+	output,
+	snippetEditModal,
+	snippetEditInput,
+	snippetEditCancel,
+	snippetEditSave
+} from "./dom.js";
 import type { Command } from "./skills.js";
 
 function getSnippets(): string[] {
@@ -22,17 +31,60 @@ export function addSnippet(text: string): void {
 	}
 }
 
+let editingIndex = -1;
+
+function openEditModal(index: number): void {
+	const snippets = getSnippets();
+	if (index < 0 || index >= snippets.length) {
+		return;
+	}
+
+	editingIndex = index;
+	snippetEditInput.value = snippets[index];
+	snippetEditModal.hidden = false;
+	snippetEditInput.focus();
+}
+
+function closeEditModal(): void {
+	snippetEditModal.hidden = true;
+	editingIndex = -1;
+}
+
+function saveEdit(): void {
+	const newValue = snippetEditInput.value.trim();
+	if (!newValue || editingIndex < 0) {
+		closeEditModal();
+		return;
+	}
+
+	const snippets = getSnippets();
+	if (editingIndex < snippets.length) {
+		snippets[editingIndex] = newValue;
+		saveSnippets(snippets);
+		renderSnippetList();
+	}
+
+	closeEditModal();
+}
+
 export function renderSnippetList(): void {
 	snippetsList.innerHTML = "";
 
-	for (const snippet of getSnippets()) {
+	const allSnippets = getSnippets();
+
+	for (let i = 0; i < allSnippets.length; i++) {
+		const snippet = allSnippets[i];
 		const row = document.createElement("div");
 		row.className = "snippet-item";
 
-		const label = document.createElement("span");
+		const label = document.createElement("button");
 		label.className = "snippet-item-text";
 		label.textContent = snippet.replace(/\n/g, " ");
 		label.title = snippet;
+
+		label.addEventListener("click", () => {
+			openEditModal(i);
+		});
 
 		const del = document.createElement("button");
 		del.className = "session-delete";
@@ -117,6 +169,21 @@ export function setupSnippetHandlers(): void {
 			addSnippet(text);
 			sel?.removeAllRanges();
 			saveSnippetBtn.hidden = true;
+		}
+	});
+
+	snippetEditCancel.addEventListener("click", closeEditModal);
+	snippetEditSave.addEventListener("click", saveEdit);
+
+	snippetEditModal.addEventListener("click", (e) => {
+		if (e.target === snippetEditModal) {
+			closeEditModal();
+		}
+	});
+
+	snippetEditInput.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") {
+			closeEditModal();
 		}
 	});
 }

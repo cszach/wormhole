@@ -154,3 +154,15 @@ export const refreshBtn = document.getElementById(
 export const wormholingRefresh = document.getElementById(
 	"wormholing-refresh"
 ) as HTMLElement;
+export const snippetEditModal = document.getElementById(
+	"snippet-edit-modal"
+) as HTMLElement;
+export const snippetEditInput = document.getElementById(
+	"snippet-edit-input"
+) as HTMLTextAreaElement;
+export const snippetEditCancel = document.getElementById(
+	"snippet-edit-cancel"
+) as HTMLButtonElement;
+export const snippetEditSave = document.getElementById(
+	"snippet-edit-save"
+) as HTMLButtonElement;
