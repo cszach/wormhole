@@ -28,17 +28,19 @@ Dictate prompts with your phone's microphone. Responses can be read aloud
 in full or summary mode, with configurable voice and speed. Requires
 [HTTPS](../tls-setup/).
 
-## Image attachments
+## File attachments
 
-Attach photos from your camera or gallery. Multiple images can be sent in
-a single message. Images are uploaded to the server and their paths are
-included in the message to Claude.
+Attach photos from your camera or gallery with a short tap on the image
+button. For any file type, long-press to open the power menu and choose
+Attach files. Multiple files can be sent in a single message. Files are
+uploaded to the server and their paths are included in the message to
+Claude.
 
 ## Command palette
 
 A searchable palette for built-in Claude Code commands, custom skills,
-saved snippets, and password vault credentials. Opens automatically when
-you type `/` in Claude Code mode. See [Command Palette](../command-palette/).
+and saved snippets. Opens automatically when you type `/` in Claude Code
+mode. See [Command Palette](../command-palette/).
 
 ## Multi-session
 
@@ -49,13 +51,15 @@ background session has new activity, a notification badge appears. See
 ## Password vault
 
 An encrypted credential store for injecting passwords into the terminal or
-the server's clipboard without exposing them to Claude. See
+the server's clipboard without exposing them to Claude. Access the vault
+from the power menu (long-press the image or snippets button). See
 [Password Vault](../vault/).
 
 ## Snippets
 
 Save frequently used commands or text blocks and recall them from the
-command palette or the snippets button. See [Snippets](../snippets/).
+command palette or the snippets button. Tap a snippet to edit it in a
+modal. See [Snippets](../snippets/).
 
 ## Output search
 
@@ -72,6 +76,18 @@ Topography — plus configurable accent colors. See
 
 Your unsent message is saved to local storage as you type, so you don't
 lose it if the page refreshes.
+
+## File browser
+
+Browse files on the server in a full-screen drawer with syntax
+highlighting, search, and breadcrumb navigation. Open it from the power
+menu.
+
+## Power menu
+
+Long-press the image button (in Claude Code mode) or the snippets button
+(in terminal mode) to open the power menu. It offers three options:
+Attach files, Password Vault, and File Browser.
 
 ## Connection indicator
 

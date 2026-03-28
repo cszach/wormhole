@@ -8,7 +8,7 @@ next: { text: "Snippets", href: "snippets" }
 # Command Palette
 
 The command palette gives you quick access to Claude Code commands, custom
-skills, saved snippets, and vault credentials.
+skills, and saved snippets.
 
 ## Opening the palette
 
@@ -43,17 +43,7 @@ selected, they are inserted into the text input for you to send.
 Saved text blocks appear in the palette. Selecting a snippet fills the
 text input with its content. See [Snippets](../snippets/).
 
-### Vault credentials
-
-If the [password vault](../vault/) is unlocked, your credentials appear
-with two action buttons:
-
-- **Terminal icon** — paste directly into tmux
-- **Monitor icon** — copy to the server's system clipboard
-
-If the vault is locked, an inline unlock form appears in the palette.
-
 ## Search
 
 Type in the search field to filter across all sections. The filter matches
-against command names, descriptions, and vault credential labels.
+against command names and descriptions.

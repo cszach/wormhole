@@ -31,8 +31,9 @@ or 127.0.0.1). It will not unlock over plain HTTP.
 
 ## Managing credentials
 
-Open settings and scroll to the Vault section. Enter your master password
-to unlock.
+Open the vault drawer from the power menu (long-press the image button in
+Claude Code mode or the snippets button in terminal mode). Enter your
+master password to unlock.
 
 - **Add** — fill in the label and password fields, then tap Add
 - **Delete** — tap the **x** button next to a credential
@@ -40,8 +41,7 @@ to unlock.
 
 ## Two injection modes
 
-Each credential in the [command palette](../command-palette/) offers two
-actions:
+Each credential in the vault drawer offers two actions:
 
 ### Terminal paste
 

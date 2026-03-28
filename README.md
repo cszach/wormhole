@@ -27,15 +27,22 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
 ## Features
 
 - **Voice** — dictate prompts, hear responses read aloud (full or summary mode)
-- **Images** — attach from camera or gallery, multiple at once
+- **File attachments** — attach images from camera or gallery, or any file type
+  via the power menu
+- **File browser** — browse server files with syntax highlighting, search, and
+  breadcrumb navigation
+- **Power menu** — long-press the image or snippets button for quick access to
+  file attachment, password vault, and file browser
 - **Live terminal** — ANSI colors, auto-scroll, output search
 - **Multi-session** — switch between tmux sessions, create and delete from the
   app
 - **Context-aware keys** — Claude Code layout (Shift+Tab, Ctrl+O, Ctrl+C) vs
   terminal layout (Home, End, PgUp, PgDn, sticky Ctrl/Alt/Shift modifiers)
-- **Snippets** — save and recall commands from a palette
+- **Snippets** — save and recall commands from a palette, editable via
+  tap-to-edit modal
 - **Password vault** — encrypted credential storage with terminal paste and
-  remote clipboard injection ([security details](https://cszach.github.io/wormhole/docs/vault))
+  remote clipboard injection, accessed via the power menu
+  ([security details](https://cszach.github.io/wormhole/docs/vault))
 - **Themes** — animated GLSL shader backgrounds (Starry Night, Aurora, Nebula,
   Topography)
 - **Customizable** — accent color, TTS voice/speed, terminal column width
@@ -74,12 +81,13 @@ TLS_KEY=/home/you/.local/share/tailscale/key.pem
 
 All configuration is via a `.env` file in the project root. Available variables:
 
-| Variable     | Default     | Description             |
-| ------------ | ----------- | ----------------------- |
-| `PORT`       | `5173`      | Server port             |
-| `UPLOAD_DIR` | `./uploads` | Image upload directory  |
-| `TLS_CERT`   |             | Path to TLS certificate |
-| `TLS_KEY`    |             | Path to TLS private key |
+| Variable     | Default     | Description                     |
+| ------------ | ----------- | ------------------------------- |
+| `PORT`       | `5173`      | Server port                     |
+| `UPLOAD_DIR` | `./uploads` | File upload directory           |
+| `FILE_ROOT`  | cwd         | Root directory for file browser |
+| `TLS_CERT`   |             | Path to TLS certificate         |
+| `TLS_KEY`    |             | Path to TLS private key         |
 
 ## Testing
 

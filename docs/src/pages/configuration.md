@@ -11,13 +11,14 @@ All configuration is via a `.env` file in the project root.
 
 ## Environment variables
 
-| Variable     | Default               | Description                  |
-| ------------ | --------------------- | ---------------------------- |
-| `PORT`       | `5173`                | Server port                  |
-| `UPLOAD_DIR` | `./uploads`           | Image upload directory       |
-| `TLS_CERT`   |                       | Path to TLS certificate file |
-| `TLS_KEY`    |                       | Path to TLS private key file |
-| `VAULT_FILE` | `.wormhole-vault.enc` | Path to encrypted vault blob |
+| Variable     | Default               | Description                     |
+| ------------ | --------------------- | ------------------------------- |
+| `PORT`       | `5173`                | Server port                     |
+| `UPLOAD_DIR` | `./uploads`           | File upload directory           |
+| `FILE_ROOT`  | cwd                   | Root directory for file browser |
+| `TLS_CERT`   |                       | Path to TLS certificate file    |
+| `TLS_KEY`    |                       | Path to TLS private key file    |
+| `VAULT_FILE` | `.wormhole-vault.enc` | Path to encrypted vault blob    |
 
 ## Example `.env`
 

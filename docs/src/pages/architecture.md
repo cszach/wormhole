@@ -33,10 +33,13 @@ Key modules:
 | -------------------- | ---------------------------------------------- |
 | `connection.ts`      | WebSocket lifecycle, message dispatch          |
 | `render.ts`          | ANSI-to-HTML terminal output                   |
-| `input.ts`           | Message sending, key buttons, image upload     |
-| `command-palette.ts` | Searchable command/skill/snippet/vault palette |
+| `input.ts`           | Message sending, key buttons, file upload      |
+| `command-palette.ts` | Searchable command/skill/snippet palette       |
 | `vault.ts`           | Vault state, unlock/lock, credential actions   |
 | `vault-crypto.ts`    | AES-256-GCM encryption via Web Crypto API      |
+| `vault-drawer.ts`    | Full-screen vault drawer UI                    |
+| `file-browser.ts`    | Full-screen file browser with syntax highlight |
+| `power-menu.ts`      | Long-press power menu (files, vault, browser)  |
 | `state.ts`           | Shared mutable state across modules            |
 | `dom.ts`             | Centralized DOM element references             |
 
@@ -81,7 +84,7 @@ Messages are JSON objects with a `type` field.
 
 | Type              | Description                         |
 | ----------------- | ----------------------------------- |
-| `send`            | Send text (and optional images)     |
+| `send`            | Send text and optional file paths   |
 | `key`             | Send a key press                    |
 | `resize`          | Set terminal column width           |
 | `ping`            | Latency measurement                 |

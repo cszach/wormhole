@@ -22,7 +22,9 @@ Appears when Claude Code is running. Includes:
 | Escape    | Cancel / back |
 | Enter     | Confirm       |
 
-The image attachment button is available in this mode.
+The image button is available in this mode. Short tap opens the image
+picker; long-press opens the power menu (Attach files, Password Vault,
+File Browser).
 
 ## Terminal layout
 
@@ -37,7 +39,8 @@ Appears when Claude Code is not active. Includes:
 | Tab        | Tab character     |
 | Arrow keys | Navigation        |
 
-The snippets button is available in this mode.
+The snippets button is available in this mode. Long-press it to open
+the power menu (Attach files, Password Vault, File Browser).
 
 ## Modifier overlay
 
