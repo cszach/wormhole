@@ -3,8 +3,9 @@ import {
 	textInput,
 	sendBtn,
 	imageInput,
+	fileInput,
 	imageBtn,
-	imagePreviews,
+	filePreviews,
 	modOverlay,
 	modComboLabel,
 	modInput,
@@ -45,52 +46,76 @@ export function restoreDraft(): void {
 	}
 }
 
-// --- Image upload ---
+// --- File upload ---
 
-let attachedImagePaths: string[] = [];
+let attachedFilePaths: string[] = [];
 
-function addPreviewThumbnail(serverPath: string, blobUrl: string): void {
+const REMOVE_SVG =
+	'<svg viewBox="0 0 16 16" width="10" height="10" fill="none"' +
+	' stroke="currentColor" stroke-width="2.5">' +
+	'<line x1="4" y1="4" x2="12" y2="12"/>' +
+	'<line x1="12" y1="4" x2="4" y2="12"/></svg>';
+
+function addPreviewItem(
+	serverPath: string,
+	file: File,
+	blobUrl: string | null
+): void {
 	const wrapper = document.createElement("div");
 	wrapper.className = "preview-thumb";
 
-	const img = document.createElement("img");
-	img.src = blobUrl;
-	img.alt = "Attached image";
-	img.width = 52;
-	img.height = 52;
+	if (file.type.startsWith("image/") && blobUrl) {
+		const img = document.createElement("img");
+		img.src = blobUrl;
+		img.alt = "Attached image";
+		img.width = 52;
+		img.height = 52;
+		wrapper.appendChild(img);
+	} else {
+		const fileEl = document.createElement("div");
+		fileEl.className = "preview-file";
+		fileEl.innerHTML =
+			'<svg viewBox="0 0 24 24" width="16" height="16" fill="none"' +
+			' stroke="currentColor" stroke-width="2" stroke-linecap="round"' +
+			' stroke-linejoin="round">' +
+			'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+			'<polyline points="14 2 14 8 20 8"/></svg>';
+		const name = document.createElement("span");
+		name.className = "preview-file-name";
+		name.textContent = file.name;
+		name.title = file.name;
+		fileEl.appendChild(name);
+		wrapper.appendChild(fileEl);
+	}
 
 	const removeBtn = document.createElement("button");
 	removeBtn.className = "remove-thumb";
-	removeBtn.title = "Remove image";
-	removeBtn.setAttribute("aria-label", "Remove image");
-	removeBtn.innerHTML =
-		'<svg viewBox="0 0 16 16" width="10" height="10" fill="none"' +
-		' stroke="currentColor" stroke-width="2.5">' +
-		'<line x1="4" y1="4" x2="12" y2="12"/>' +
-		'<line x1="12" y1="4" x2="4" y2="12"/></svg>';
+	removeBtn.title = "Remove file";
+	removeBtn.setAttribute("aria-label", "Remove file");
+	removeBtn.innerHTML = REMOVE_SVG;
 
 	removeBtn.addEventListener("click", () => {
-		attachedImagePaths = attachedImagePaths.filter((p) => p !== serverPath);
-
-		URL.revokeObjectURL(blobUrl);
+		attachedFilePaths = attachedFilePaths.filter((p) => p !== serverPath);
+		if (blobUrl) {
+			URL.revokeObjectURL(blobUrl);
+		}
 		wrapper.remove();
 		syncFooterPadding();
 	});
 
-	wrapper.appendChild(img);
 	wrapper.appendChild(removeBtn);
-	imagePreviews.appendChild(wrapper);
+	filePreviews.appendChild(wrapper);
 	syncFooterPadding();
 }
 
-export function clearImages(): void {
-	attachedImagePaths = [];
+export function clearFiles(): void {
+	attachedFilePaths = [];
 
-	for (const img of Array.from(imagePreviews.querySelectorAll("img"))) {
+	for (const img of Array.from(filePreviews.querySelectorAll("img"))) {
 		URL.revokeObjectURL(img.src);
 	}
 
-	imagePreviews.innerHTML = "";
+	filePreviews.innerHTML = "";
 	syncFooterPadding();
 }
 
@@ -103,7 +128,7 @@ export function send(): void {
 
 	const text = textInput.value.trim();
 
-	if (!text && attachedImagePaths.length === 0) {
+	if (!text && attachedFilePaths.length === 0) {
 		return;
 	}
 
@@ -111,7 +136,7 @@ export function send(): void {
 		JSON.stringify({
 			type: "send",
 			text,
-			imagePaths: attachedImagePaths.length > 0 ? attachedImagePaths : undefined
+			filePaths: attachedFilePaths.length > 0 ? attachedFilePaths : undefined
 		})
 	);
 
@@ -119,7 +144,7 @@ export function send(): void {
 	textInput.style.height = "auto";
 	state.prevInputLen = 0;
 	clearDraft();
-	clearImages();
+	clearFiles();
 
 	if (!state.inClaudeCode) {
 		textInput.focus();
@@ -209,13 +234,14 @@ export function setupInputHandlers(): void {
 		saveDraft();
 	});
 
-	// Image upload
+	// Image button short tap opens image picker
 	imageBtn.addEventListener("click", () => {
 		imageInput.click();
 	});
 
-	imageInput.addEventListener("change", async () => {
-		const { files } = imageInput;
+	// Shared upload handler for both inputs
+	async function handleFileUpload(input: HTMLInputElement): Promise<void> {
+		const { files } = input;
 
 		if (!files || files.length === 0) {
 			return;
@@ -223,7 +249,7 @@ export function setupInputHandlers(): void {
 
 		for (const file of Array.from(files)) {
 			const formData = new FormData();
-			formData.append("image", file);
+			formData.append("file", file);
 
 			try {
 				const response = await fetch("/api/upload", {
@@ -232,17 +258,22 @@ export function setupInputHandlers(): void {
 				});
 
 				const data = await response.json();
-				const blobUrl = URL.createObjectURL(file);
+				const blobUrl = file.type.startsWith("image/")
+					? URL.createObjectURL(file)
+					: null;
 
-				attachedImagePaths.push(data.path);
-				addPreviewThumbnail(data.path, blobUrl);
+				attachedFilePaths.push(data.path);
+				addPreviewItem(data.path, file, blobUrl);
 			} catch {
 				// Upload failed silently
 			}
 		}
 
-		imageInput.value = "";
-	});
+		input.value = "";
+	}
+
+	imageInput.addEventListener("change", () => handleFileUpload(imageInput));
+	fileInput.addEventListener("change", () => handleFileUpload(fileInput));
 
 	// Modifier key buttons
 	for (const modBtn of Array.from(

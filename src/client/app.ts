@@ -28,7 +28,7 @@ import {
 	setupFooterObserver,
 	setupKeyExpand
 } from "./layout.js";
-import { setupInputHandlers, restoreDraft, clearImages } from "./input.js";
+import { setupInputHandlers, restoreDraft, clearFiles } from "./input.js";
 import { initSpeechRecognition, setupTtsSettings } from "./speech.js";
 import { setupSettingsHandlers } from "./settings.js";
 import { setupSkillHandlers } from "./skills.js";
@@ -39,6 +39,9 @@ import { setupSessionHandlers } from "./sessions.js";
 import { setupSearchHandlers } from "./search.js";
 import { connect } from "./connection.js";
 import { initVault } from "./vault.js";
+import { setupPowerMenu } from "./power-menu.js";
+import { setupFileBrowser } from "./file-browser.js";
+import { setupVaultDrawer } from "./vault-drawer.js";
 
 // Initialize shader + theme
 initTheme();
@@ -72,9 +75,9 @@ try {
 
 // Clear stale image previews
 try {
-	clearImages();
+	clearFiles();
 } catch (err) {
-	console.error("clearImages failed:", err);
+	console.error("clearFiles failed:", err);
 }
 
 // Restore draft text
@@ -99,6 +102,9 @@ setupCommandPalette();
 setupColumnHandlers();
 setupSessionHandlers();
 setupSearchHandlers();
+setupPowerMenu();
+setupFileBrowser();
+setupVaultDrawer();
 
 // Snippets button opens palette in snippets-only mode
 snippetsBtn.addEventListener("click", () => {

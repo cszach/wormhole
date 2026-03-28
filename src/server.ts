@@ -32,6 +32,7 @@ const TLS_KEY = process.env.TLS_KEY ?? "";
 const VAULT_FILE = path.resolve(
 	process.env.VAULT_FILE ?? ".wormhole-vault.enc"
 );
+const FILE_ROOT = path.resolve(process.env.FILE_ROOT ?? ".");
 
 const uploadDir = path.resolve(UPLOAD_DIR);
 
@@ -74,7 +75,7 @@ app.get("/app", (_req, res) => {
 	res.sendFile(path.resolve("public/app.html"));
 });
 
-app.post("/api/upload", upload.single("image"), (req, res) => {
+app.post("/api/upload", upload.single("file"), (req, res) => {
 	if (!req.file) {
 		res.status(400).json({ error: "No file uploaded" });
 
@@ -237,6 +238,326 @@ app.delete("/api/vault", (_req, res) => {
 	}
 
 	res.status(204).end();
+});
+
+// --- File browser API ---
+
+const BINARY_EXTENSIONS = new Set([
+	".png",
+	".jpg",
+	".jpeg",
+	".gif",
+	".webp",
+	".ico",
+	".bmp",
+	".tiff",
+	".mp4",
+	".webm",
+	".avi",
+	".mov",
+	".mp3",
+	".ogg",
+	".wav",
+	".flac",
+	".pdf",
+	".zip",
+	".tar",
+	".gz",
+	".bz2",
+	".xz",
+	".7z",
+	".rar",
+	".exe",
+	".dll",
+	".so",
+	".dylib",
+	".bin",
+	".woff",
+	".woff2",
+	".ttf",
+	".otf",
+	".eot",
+	".sqlite",
+	".db"
+]);
+
+const MIME_TYPES: Record<string, string> = {
+	".png": "image/png",
+	".jpg": "image/jpeg",
+	".jpeg": "image/jpeg",
+	".gif": "image/gif",
+	".svg": "image/svg+xml",
+	".webp": "image/webp",
+	".ico": "image/x-icon",
+	".mp4": "video/mp4",
+	".webm": "video/webm",
+	".mp3": "audio/mpeg",
+	".ogg": "audio/ogg",
+	".wav": "audio/wav",
+	".pdf": "application/pdf",
+	".json": "application/json",
+	".xml": "text/xml",
+	".html": "text/html",
+	".css": "text/css"
+};
+
+function isBinaryFile(filePath: string): boolean {
+	const ext = path.extname(filePath).toLowerCase();
+
+	if (BINARY_EXTENSIONS.has(ext)) {
+		return true;
+	}
+
+	if (MIME_TYPES[ext]) {
+		return false;
+	}
+
+	// Read first 8KB and check for null bytes
+	const fd = fs.openSync(filePath, "r");
+	const buf = Buffer.alloc(8192);
+	const bytesRead = fs.readSync(fd, buf, 0, 8192, 0);
+	fs.closeSync(fd);
+
+	for (let i = 0; i < bytesRead; i++) {
+		if (buf[i] === 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function getMimeType(filePath: string): string {
+	const ext = path.extname(filePath).toLowerCase();
+
+	if (MIME_TYPES[ext]) {
+		return MIME_TYPES[ext];
+	}
+
+	if (isBinaryFile(filePath)) {
+		return "application/octet-stream";
+	}
+
+	return "text/plain";
+}
+
+function resolveFilePath(relativePath: string): string | null {
+	if (relativePath.includes("\0")) {
+		return null;
+	}
+
+	let resolved: string;
+
+	try {
+		resolved = path.resolve(FILE_ROOT, relativePath);
+	} catch {
+		return null;
+	}
+
+	if (!fs.existsSync(resolved)) {
+		return null;
+	}
+
+	let real: string;
+
+	try {
+		real = fs.realpathSync(resolved);
+	} catch {
+		return null;
+	}
+
+	const root = fs.realpathSync(FILE_ROOT);
+
+	if (real !== root && !real.startsWith(root + path.sep)) {
+		return null;
+	}
+
+	return real;
+}
+
+app.get("/api/files/list", (req, res) => {
+	const dir = String(req.query.dir ?? ".");
+	const resolved = resolveFilePath(dir);
+
+	if (!resolved) {
+		res.status(403).json({ error: "Access denied" });
+		return;
+	}
+
+	let stat: fs.Stats;
+
+	try {
+		stat = fs.statSync(resolved);
+	} catch {
+		res.status(404).json({ error: "Not found" });
+		return;
+	}
+
+	if (!stat.isDirectory()) {
+		res.status(400).json({ error: "Not a directory" });
+		return;
+	}
+
+	const entries = [];
+
+	for (const name of fs.readdirSync(resolved)) {
+		try {
+			const entryPath = path.join(resolved, name);
+			const entryStat = fs.statSync(entryPath);
+			entries.push({
+				name,
+				type: entryStat.isDirectory() ? "directory" : "file",
+				size: entryStat.size,
+				modified: entryStat.mtime.toISOString()
+			});
+		} catch {
+			// Skip entries we can't stat (broken symlinks, permission errors)
+		}
+	}
+
+	entries.sort((a, b) => {
+		if (a.type !== b.type) {
+			return a.type === "directory" ? -1 : 1;
+		}
+		return a.name.localeCompare(b.name);
+	});
+
+	res.json({ entries });
+});
+
+const TREE_CAP = 10000;
+
+app.get("/api/files/tree", (req, res) => {
+	const ignoreParam = String(req.query.ignore ?? ".git");
+	const ignoreSet = new Set(
+		ignoreParam
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean)
+	);
+
+	type TreeEntry = {
+		path: string;
+		type: "file" | "directory";
+		size: number;
+	};
+
+	const entries: TreeEntry[] = [];
+	let truncated = false;
+	const root = fs.realpathSync(FILE_ROOT);
+
+	function walk(dir: string, rel: string): void {
+		if (truncated) {
+			return;
+		}
+
+		let names: string[];
+
+		try {
+			names = fs.readdirSync(dir);
+		} catch {
+			return;
+		}
+
+		for (const name of names) {
+			if (ignoreSet.has(name)) {
+				continue;
+			}
+
+			if (entries.length >= TREE_CAP) {
+				truncated = true;
+				return;
+			}
+
+			const full = path.join(dir, name);
+			const entryRel = rel ? rel + "/" + name : name;
+
+			let stat: fs.Stats;
+
+			try {
+				stat = fs.statSync(full);
+			} catch {
+				continue;
+			}
+
+			if (stat.isDirectory()) {
+				walk(full, entryRel);
+			} else if (stat.isFile()) {
+				entries.push({
+					path: entryRel,
+					type: "file",
+					size: stat.size
+				});
+			}
+		}
+	}
+
+	walk(root, "");
+
+	entries.sort((a, b) => a.path.localeCompare(b.path));
+
+	res.json({ entries, truncated });
+});
+
+app.get("/api/files/read", (req, res) => {
+	const filePath = String(req.query.path ?? "");
+	const resolved = resolveFilePath(filePath);
+
+	if (!resolved) {
+		res.status(403).json({ error: "Access denied" });
+		return;
+	}
+
+	let stat: fs.Stats;
+
+	try {
+		stat = fs.statSync(resolved);
+	} catch {
+		res.status(404).json({ error: "Not found" });
+		return;
+	}
+
+	if (!stat.isFile()) {
+		res.status(400).json({ error: "Not a file" });
+		return;
+	}
+
+	const mime = getMimeType(resolved);
+	const isText = mime.startsWith("text/") || mime === "application/json";
+	res.set("Content-Type", mime + (isText ? "; charset=utf-8" : ""));
+	res.set("X-Content-Type-Options", "nosniff");
+	fs.createReadStream(resolved).pipe(res);
+});
+
+app.get("/api/files/download", (req, res) => {
+	const filePath = String(req.query.path ?? "");
+	const resolved = resolveFilePath(filePath);
+
+	if (!resolved) {
+		res.status(403).json({ error: "Access denied" });
+		return;
+	}
+
+	let stat: fs.Stats;
+
+	try {
+		stat = fs.statSync(resolved);
+	} catch {
+		res.status(404).json({ error: "Not found" });
+		return;
+	}
+
+	if (!stat.isFile()) {
+		res.status(400).json({ error: "Not a file" });
+		return;
+	}
+
+	const mime = getMimeType(resolved);
+	const basename = path.basename(resolved);
+	res.set("Content-Type", mime);
+	res.set("Content-Disposition", `attachment; filename="${basename}"`);
+	res.set("X-Content-Type-Options", "nosniff");
+	fs.createReadStream(resolved).pipe(res);
 });
 
 type SessionState = {
@@ -429,11 +750,11 @@ wss.on("connection", (ws) => {
 			const message = JSON.parse(String(raw));
 
 			if (message.type === "send") {
-				const images = (message.imagePaths ?? [])
-					.map((p: string) => ` [Image: ${p}]`)
+				const files = (message.filePaths ?? [])
+					.map((p: string) => ` [File: ${p}]`)
 					.join("");
 
-				await sendKeys(activeSession, message.text + images);
+				await sendKeys(activeSession, message.text + files);
 			}
 
 			if (message.type === "key" && message.key) {

@@ -26,8 +26,11 @@ export const ttsToggle = document.getElementById(
 export const imageInput = document.getElementById(
 	"image-input"
 ) as HTMLInputElement;
-export const imagePreviews = document.getElementById(
-	"image-previews"
+export const fileInput = document.getElementById(
+	"file-input"
+) as HTMLInputElement;
+export const filePreviews = document.getElementById(
+	"file-previews"
 ) as HTMLElement;
 export const settingsBtn = document.getElementById(
 	"settings-btn"
@@ -171,3 +174,78 @@ export const snippetEditCancel = document.getElementById(
 export const snippetEditSave = document.getElementById(
 	"snippet-edit-save"
 ) as HTMLButtonElement;
+export const vdPanel = document.getElementById("vault-drawer") as HTMLElement;
+export const vdBackdrop = vdPanel.querySelector(".fb-backdrop") as HTMLElement;
+export const vdClose = document.getElementById("vd-close") as HTMLButtonElement;
+export const vdLocked = document.getElementById("vd-locked") as HTMLElement;
+export const vdUnlocked = document.getElementById("vd-unlocked") as HTMLElement;
+export const vdPassword = document.getElementById(
+	"vd-password"
+) as HTMLInputElement;
+export const vdUnlockBtn = document.getElementById(
+	"vd-unlock"
+) as HTMLButtonElement;
+export const vdResetBtn = document.getElementById(
+	"vd-reset"
+) as HTMLButtonElement;
+export const vdHttpsWarning = document.getElementById(
+	"vd-https-warning"
+) as HTMLElement;
+export const vdList = document.getElementById("vd-list") as HTMLElement;
+export const vdSearch = document.getElementById(
+	"vd-search"
+) as HTMLInputElement;
+export const vdAddToggle = document.getElementById(
+	"vd-add-toggle"
+) as HTMLButtonElement;
+export const vdAddModal = document.getElementById(
+	"vd-add-modal"
+) as HTMLElement;
+export const vdAddCancel = document.getElementById(
+	"vd-add-cancel"
+) as HTMLButtonElement;
+export const vdAddLabel = document.getElementById(
+	"vd-add-label"
+) as HTMLInputElement;
+export const vdAddPassword = document.getElementById(
+	"vd-add-password"
+) as HTMLInputElement;
+export const vdAddBtn = document.getElementById(
+	"vd-add-btn"
+) as HTMLButtonElement;
+export const vdLockBtn = document.getElementById(
+	"vd-lock"
+) as HTMLButtonElement;
+export const powerMenu = document.getElementById("power-menu") as HTMLElement;
+export const powerAttach = document.getElementById(
+	"power-attach"
+) as HTMLButtonElement;
+export const powerVault = document.getElementById(
+	"power-vault"
+) as HTMLButtonElement;
+export const powerBrowse = document.getElementById(
+	"power-browse"
+) as HTMLButtonElement;
+export const fbPanel = document.getElementById("file-browser") as HTMLElement;
+export const fbBackdrop = fbPanel.querySelector(".fb-backdrop") as HTMLElement;
+export const fbClose = document.getElementById("fb-close") as HTMLButtonElement;
+export const fbSearch = document.getElementById(
+	"fb-search"
+) as HTMLInputElement;
+export const fbRefresh = document.getElementById(
+	"fb-refresh"
+) as HTMLButtonElement;
+export const fbBreadcrumb = document.getElementById(
+	"fb-breadcrumb"
+) as HTMLElement;
+export const fbList = document.getElementById("fb-list") as HTMLElement;
+export const fbPreview = document.getElementById("fb-preview") as HTMLElement;
+export const fbPreviewBack = document.getElementById(
+	"fb-preview-back"
+) as HTMLButtonElement;
+export const fbPreviewContent = document.getElementById(
+	"fb-preview-content"
+) as HTMLElement;
+export const fbDownload = document.getElementById(
+	"fb-download"
+) as HTMLAnchorElement;

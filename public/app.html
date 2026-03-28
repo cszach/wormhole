@@ -33,6 +33,7 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="/style.css" />
+		<link rel="stylesheet" href="/hljs-theme.css" />
 	</head>
 	<body>
 		<canvas id="bg-shader" width="800" height="600"></canvas>
@@ -346,137 +347,6 @@
 							highlight text in the output to save it.
 						</p>
 					</div>
-
-					<div class="settings-section" id="vault-section">
-						<h3>Password Vault</h3>
-						<div id="vault-locked">
-							<p id="vault-https-warning" class="vault-warning" hidden>
-								Vault requires a secure connection (HTTPS).
-							</p>
-							<input
-								type="password"
-								id="vault-password"
-								class="settings-input"
-								placeholder="Master password…"
-								aria-label="Master password"
-								autocomplete="new-password"
-								enterkeyhint="done"
-							/>
-							<button type="button" id="vault-unlock" class="vault-btn">
-								Unlock
-							</button>
-							<button
-								type="button"
-								id="vault-reset"
-								class="vault-btn vault-btn--danger"
-							>
-								Reset vault
-							</button>
-							<p id="vault-error" class="vault-error" hidden></p>
-						</div>
-						<div id="vault-unlocked" hidden>
-							<div id="vault-list" class="vault-list"></div>
-							<div class="vault-add-form">
-								<input
-									type="text"
-									id="vault-add-label"
-									class="settings-input"
-									placeholder="Label…"
-									aria-label="Credential label"
-									autocomplete="off"
-								/>
-								<input
-									type="password"
-									id="vault-add-password"
-									class="settings-input"
-									placeholder="Password…"
-									aria-label="Password"
-									autocomplete="new-password"
-								/>
-								<button type="button" id="vault-add-btn" class="vault-btn">
-									Add credential
-								</button>
-							</div>
-							<label class="settings-row">
-								<span class="settings-label">Auto-lock</span>
-								<select id="vault-timeout" class="settings-select">
-									<option value="60000">1 minute</option>
-									<option value="300000" selected>5 minutes</option>
-									<option value="600000">10 minutes</option>
-									<option value="1800000">30 minutes</option>
-									<option value="0">Never</option>
-								</select>
-							</label>
-							<label class="settings-row">
-								<span class="settings-label">Clipboard clear</span>
-								<select id="vault-clip-timeout" class="settings-select">
-									<option value="10000">10 seconds</option>
-									<option value="30000" selected>30 seconds</option>
-									<option value="60000">1 minute</option>
-									<option value="300000">5 minutes</option>
-									<option value="0">Never</option>
-								</select>
-							</label>
-							<button
-								type="button"
-								id="vault-lock"
-								class="vault-btn vault-btn--secondary"
-							>
-								Lock vault
-							</button>
-						</div>
-						<p class="settings-hint">
-							Encrypted at rest and in transit.
-							<a href="#" id="vault-learn-more">Learn more.</a>
-						</p>
-
-						<!-- Vault info modal -->
-						<div id="vault-info-modal" class="modal-backdrop" hidden>
-							<div class="modal">
-								<div class="modal-title-row">
-									<h2 class="modal-title">Password Vault</h2>
-								</div>
-								<div class="vault-info-body">
-									<p>
-										Passwords are encrypted with
-										<strong>AES-256-GCM</strong> using a key derived from your
-										master password (<strong>PBKDF2</strong>, 600k iterations).
-										The server only stores an encrypted blob.
-									</p>
-									<h4>Two injection modes</h4>
-									<p>
-										<strong>Terminal paste</strong> injects directly into tmux.
-										Claude never sees the value.
-									</p>
-									<p>
-										<strong>Remote clipboard</strong> copies to the server's
-										clipboard for browser fields. Auto-clears after timeout.
-									</p>
-									<h4>Browser login with Claude</h4>
-									<ol class="vault-info-steps">
-										<li>
-											Tell Claude your username and ask it to focus the password
-											field
-										</li>
-										<li>
-											Tap the
-											<strong>clipboard icon</strong> on your credential in the
-											command palette
-										</li>
-										<li>Tell Claude to press Ctrl+V and submit</li>
-									</ol>
-									<h4>Requires HTTPS</h4>
-									<p>
-										The vault refuses to unlock over plain HTTP to protect
-										credentials in transit.
-									</p>
-									<button type="button" id="vault-info-close" class="vault-btn">
-										Got it
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -539,8 +409,241 @@
 
 		<div id="toast" class="toast" hidden></div>
 
+		<!-- Power menu -->
+		<div id="power-menu" class="modal-backdrop" hidden>
+			<div class="modal">
+				<div class="modal-title-row">
+					<h2 class="modal-title">Actions</h2>
+				</div>
+				<div class="power-menu-list">
+					<button type="button" id="power-attach" class="power-menu-item">
+						<span class="power-menu-icon">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+								/>
+							</svg>
+						</span>
+						<span>Attach files</span>
+					</button>
+					<button type="button" id="power-vault" class="power-menu-item">
+						<span class="power-menu-icon">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+								<path d="M7 11V7a5 5 0 0 1 10 0v4" />
+							</svg>
+						</span>
+						<span>Password Vault</span>
+					</button>
+					<button type="button" id="power-browse" class="power-menu-item">
+						<span class="power-menu-icon">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+								/>
+							</svg>
+						</span>
+						<span>File Browser</span>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Vault drawer -->
+		<div id="vault-drawer" class="file-browser" hidden>
+			<div class="fb-backdrop"></div>
+			<div class="fb-drawer">
+				<div class="fb-header">
+					<h2>Vault</h2>
+					<input
+						type="text"
+						id="vd-search"
+						class="vd-search"
+						placeholder="Search…"
+						aria-label="Search credentials"
+						autocomplete="off"
+						autocorrect="off"
+						autocapitalize="off"
+						spellcheck="false"
+						disabled
+					/>
+					<button
+						type="button"
+						id="vd-add-toggle"
+						class="vd-header-btn"
+						title="Add credential"
+						aria-label="Add credential"
+						disabled
+					>
+						<svg
+							viewBox="0 0 24 24"
+							width="18"
+							height="18"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<line x1="12" y1="5" x2="12" y2="19" />
+							<line x1="5" y1="12" x2="19" y2="12" />
+						</svg>
+					</button>
+					<button
+						type="button"
+						id="vd-close"
+						class="vd-header-btn"
+						aria-label="Close vault"
+					>
+						<i data-lucide="x" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="vd-add-modal" class="modal-backdrop" hidden>
+					<div class="modal">
+						<div class="modal-title-row">
+							<h2 class="modal-title">Add Credential</h2>
+						</div>
+						<input
+							type="text"
+							id="vd-add-label"
+							class="settings-input vd-input"
+							placeholder="Label…"
+							aria-label="Credential label"
+							autocomplete="off"
+						/>
+						<input
+							type="password"
+							id="vd-add-password"
+							class="settings-input vd-input"
+							placeholder="Password…"
+							aria-label="Password"
+							autocomplete="new-password"
+						/>
+						<div class="snippet-edit-actions">
+							<button type="button" id="vd-add-cancel" class="snippet-edit-btn">
+								Cancel
+							</button>
+							<button
+								type="button"
+								id="vd-add-btn"
+								class="snippet-edit-btn snippet-edit-btn--primary"
+							>
+								Add
+							</button>
+						</div>
+					</div>
+				</div>
+				<div id="vd-body" class="fb-list">
+					<div id="vd-locked" class="vd-locked">
+						<p id="vd-https-warning" class="vd-message" hidden>
+							Vault requires HTTPS.
+						</p>
+						<input
+							type="password"
+							id="vd-password"
+							class="settings-input vd-input"
+							placeholder="Master password…"
+							aria-label="Master password"
+							autocomplete="new-password"
+							enterkeyhint="done"
+						/>
+						<button type="button" id="vd-unlock" class="settings-btn">
+							Unlock
+						</button>
+						<button
+							type="button"
+							id="vd-reset"
+							class="settings-btn vd-reset-btn"
+						>
+							Reset vault
+						</button>
+					</div>
+					<div id="vd-unlocked" hidden>
+						<div id="vd-list" class="vd-list"></div>
+						<button type="button" id="vd-lock" class="settings-btn">
+							Lock
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- File browser -->
+		<div id="file-browser" class="file-browser" hidden>
+			<div class="fb-backdrop"></div>
+			<div class="fb-drawer">
+				<div class="fb-header">
+					<h2>Files</h2>
+					<input
+						type="text"
+						id="fb-search"
+						class="vd-search"
+						placeholder="Search…"
+						aria-label="Search files"
+						autocomplete="off"
+						autocorrect="off"
+						autocapitalize="off"
+						spellcheck="false"
+					/>
+					<button
+						type="button"
+						id="fb-refresh"
+						class="vd-header-btn"
+						title="Refresh"
+						aria-label="Refresh file tree"
+					>
+						<i data-lucide="refresh-cw" aria-hidden="true"></i>
+					</button>
+					<button
+						type="button"
+						id="fb-close"
+						class="vd-header-btn"
+						aria-label="Close file browser"
+					>
+						<i data-lucide="x" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="fb-breadcrumb" class="fb-breadcrumb"></div>
+				<div id="fb-list" class="fb-list"></div>
+				<div id="fb-preview" class="fb-preview" hidden>
+					<div class="fb-preview-header">
+						<button type="button" id="fb-preview-back" class="fb-preview-back">
+							<i data-lucide="chevron-left" aria-hidden="true"></i>
+							Back
+						</button>
+						<a id="fb-download" class="fb-download" href="#" download>
+							<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
+							Download
+						</a>
+					</div>
+					<div id="fb-preview-content" class="fb-preview-content"></div>
+				</div>
+			</div>
+		</div>
+
 		<footer>
-			<div id="image-previews"></div>
+			<div id="file-previews"></div>
 
 			<!-- Modifier combo overlay -->
 			<div id="mod-overlay" class="mod-overlay" hidden>
@@ -824,6 +927,7 @@
 						multiple
 						hidden
 					/>
+					<input type="file" id="file-input" multiple hidden />
 					<button
 						type="button"
 						id="image-btn"

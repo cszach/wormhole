@@ -1,7 +1,7 @@
 export type ClientMessage = {
 	type: "send";
 	text: string;
-	imagePaths?: string[];
+	filePaths?: string[];
 };
 
 export type VaultCredential = {

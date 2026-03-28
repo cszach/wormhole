@@ -4,7 +4,7 @@
 	"description": "Mobile terminal client with Claude Code superpowers",
 	"type": "module",
 	"scripts": {
-		"build": "esbuild src/client/app.ts src/client/landing.ts --bundle --outdir=public --format=iife --target=es2020 --alias:@=./src",
+		"build": "esbuild src/client/app.ts src/client/landing.ts --bundle --outdir=public --format=iife --target=es2020 --alias:@=./src && cp node_modules/highlight.js/styles/github-dark.min.css public/hljs-theme.css",
 		"docs:build": "astro build --root docs",
 		"docs:dev": "astro dev --root docs",
 		"dev": "npm run build && tsx src/server.ts",
@@ -29,6 +29,7 @@
 		"ansi_up": "^6.0.6",
 		"dotenv": "^17.3.1",
 		"express": "^5.2.1",
+		"highlight.js": "^11.11.1",
 		"lucide": "^1.6.0",
 		"multer": "^2.1.1",
 		"ws": "^8.20.0"

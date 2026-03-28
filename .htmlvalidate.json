@@ -1,6 +1,8 @@
 {
 	"extends": ["html-validate:recommended"],
 	"rules": {
-		"no-inline-style": ["error", { "allowedProperties": ["--angle"] }]
+		"no-inline-style": ["error", { "allowedProperties": ["--angle"] }],
+		"void-style": "off",
+		"doctype-style": "off"
 	}
 }
