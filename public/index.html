@@ -737,6 +737,18 @@ TLS_KEY=/path/to/key.pem</code>
 
 			updateProtocolBtn();
 
+			input.addEventListener("paste", (e) => {
+				const text = (e.clipboardData || window.clipboardData).getData("text");
+				const match = text.match(/^(https?:\/\/)(.+)/);
+				if (match) {
+					e.preventDefault();
+					protocol = match[1];
+					localStorage.setItem("wormhole-protocol", protocol);
+					updateProtocolBtn();
+					input.value = match[2].replace(/\/+$/, "");
+				}
+			});
+
 			function getRecent() {
 				try {
 					return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
