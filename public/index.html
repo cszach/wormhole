@@ -784,7 +784,8 @@ TLS_KEY=/path/to/key.pem</code>
 			function navigateFromInput() {
 				const addr = input.value.trim();
 				if (!addr) return;
-				const url = protocol + addr.replace(/\/+$/, "");
+				const base = addr.replace(/\/+$/, "").replace(/\/app$/, "");
+				const url = protocol + base + "/app";
 				navigate(url);
 			}
 
@@ -859,7 +860,7 @@ TLS_KEY=/path/to/key.pem</code>
 
 					const span = document.createElement("span");
 					span.className = "recent-address";
-					span.textContent = addr;
+					span.textContent = addr.replace(/\/app\/?$/, "");
 
 					const removeBtn = document.createElement("button");
 					removeBtn.className = "recent-remove";
