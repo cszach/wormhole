@@ -9,7 +9,7 @@
 		"docs:dev": "astro dev --root docs",
 		"dev": "npm run build && tsx src/server.ts",
 		"typecheck": "tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.client.json",
-		"lint": "eslint .",
+		"lint": "eslint src",
 		"format": "prettier --write .",
 		"test": "vitest run",
 		"prepare": "husky"

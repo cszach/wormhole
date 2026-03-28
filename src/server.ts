@@ -246,6 +246,41 @@ type SessionState = {
 	hasChanged: boolean;
 };
 
+async function handleVaultInject(value: string): Promise<boolean> {
+	try {
+		await setBuffer(value);
+		try {
+			await pasteBuffer(activeSession);
+		} finally {
+			await deleteBuffer();
+		}
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+async function handleVaultClipboard(
+	value: string,
+	clearMs: number
+): Promise<boolean> {
+	try {
+		if (clipboardTimer) {
+			clearTimeout(clipboardTimer);
+		}
+		await setClipboard(value);
+		if (clearMs > 0) {
+			clipboardTimer = setTimeout(() => {
+				clearClipboard().catch(() => {});
+				clipboardTimer = null;
+			}, clearMs);
+		}
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 let activeSession = "";
 let lastCapture = "";
 let lastChangeMs = Date.now();
@@ -414,48 +449,16 @@ wss.on("connection", (ws) => {
 			}
 
 			if (message.type === "vault-inject" && message.value) {
-				try {
-					await setBuffer(message.value);
-
-					try {
-						await pasteBuffer(activeSession);
-					} finally {
-						await deleteBuffer();
-					}
-
-					ws.send(JSON.stringify({ type: "vault-inject-ack", success: true }));
-				} catch {
-					ws.send(JSON.stringify({ type: "vault-inject-ack", success: false }));
-				}
+				const success = await handleVaultInject(message.value);
+				ws.send(JSON.stringify({ type: "vault-inject-ack", success }));
 			}
 
 			if (message.type === "vault-clipboard" && message.value) {
-				try {
-					if (clipboardTimer) {
-						clearTimeout(clipboardTimer);
-					}
-					await setClipboard(message.value);
-					const clearMs = Number(message.clearMs) || CLIPBOARD_CLEAR_MS;
-					if (clearMs > 0) {
-						clipboardTimer = setTimeout(() => {
-							clearClipboard().catch(() => {});
-							clipboardTimer = null;
-						}, clearMs);
-					}
-					ws.send(
-						JSON.stringify({
-							type: "vault-clipboard-ack",
-							success: true
-						})
-					);
-				} catch {
-					ws.send(
-						JSON.stringify({
-							type: "vault-clipboard-ack",
-							success: false
-						})
-					);
-				}
+				const success = await handleVaultClipboard(
+					message.value,
+					Number(message.clearMs) || CLIPBOARD_CLEAR_MS
+				);
+				ws.send(JSON.stringify({ type: "vault-clipboard-ack", success }));
 			}
 
 			if (message.type === "switch" && message.session) {

@@ -77,10 +77,9 @@ async function syncSkills(): Promise<void> {
 			renderSkillChips();
 		}
 
+		const label = added > 1 ? "skills" : "skill";
 		skillsSync.textContent =
-			added > 0
-				? `Synced ${added} new skill${added > 1 ? "s" : ""}`
-				: "Already up to date";
+			added > 0 ? `Synced ${added} new ${label}` : "Already up to date";
 	} catch {
 		skillsSync.textContent = "Sync failed";
 	}
