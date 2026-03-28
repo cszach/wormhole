@@ -1,4 +1,4 @@
-import { skillsChips, skillsAdd } from "./dom.js";
+import { skillsChips, skillsAdd, skillsSync } from "./dom.js";
 
 export type Command = {
 	name: string;
@@ -54,7 +54,46 @@ export function getSkillCommands(): Command[] {
 	}));
 }
 
+async function syncSkills(): Promise<void> {
+	skillsSync.disabled = true;
+	skillsSync.textContent = "Syncing\u2026";
+
+	try {
+		const res = await fetch("/api/skills");
+		const data = await res.json();
+		const remote: string[] = data.skills ?? [];
+		const local = getSkills();
+		let added = 0;
+
+		for (const skill of remote) {
+			if (!local.includes(skill)) {
+				local.push(skill);
+				added++;
+			}
+		}
+
+		if (added > 0) {
+			saveSkills(local);
+			renderSkillChips();
+		}
+
+		skillsSync.textContent =
+			added > 0
+				? `Synced ${added} new skill${added > 1 ? "s" : ""}`
+				: "Already up to date";
+	} catch {
+		skillsSync.textContent = "Sync failed";
+	}
+
+	setTimeout(() => {
+		skillsSync.textContent = "Sync from Claude Code";
+		skillsSync.disabled = false;
+	}, 2000);
+}
+
 export function setupSkillHandlers(): void {
+	skillsSync.addEventListener("click", syncSkills);
+
 	skillsAdd.addEventListener("keydown", (event) => {
 		if (event.key === "Enter") {
 			event.preventDefault();

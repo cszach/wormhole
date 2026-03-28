@@ -1627,6 +1627,35 @@ main::-webkit-scrollbar-thumb:hover {
 	color: var(--danger);
 }
 
+.settings-btn {
+	display: block;
+	width: 100%;
+	font-family: var(--mono);
+	font-size: 12px;
+	padding: var(--space-2) 14px;
+	margin-top: var(--space-2);
+	border-radius: var(--radius-md);
+	border: 1px solid var(--border-glass);
+	background: var(--bg-glass);
+	color: var(--text-secondary);
+	cursor: pointer;
+	transition:
+		color var(--ease),
+		border-color var(--ease),
+		background var(--ease);
+}
+
+.settings-btn:hover {
+	color: var(--accent);
+	border-color: var(--accent);
+	background: var(--accent-dim);
+}
+
+.settings-btn:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+
 .settings-hint {
 	font-family: var(--sans);
 	font-size: var(--text-xs);

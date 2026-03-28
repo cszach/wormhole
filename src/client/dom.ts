@@ -82,6 +82,9 @@ export const skillsChips = document.getElementById(
 export const skillsAdd = document.getElementById(
 	"skills-add"
 ) as HTMLInputElement;
+export const skillsSync = document.getElementById(
+	"skills-sync"
+) as HTMLButtonElement;
 export const snippetsList = document.getElementById(
 	"snippets-list"
 ) as HTMLElement;

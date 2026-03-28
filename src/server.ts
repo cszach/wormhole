@@ -151,6 +151,37 @@ app.delete("/api/sessions/:name", async (req, res) => {
 	}
 });
 
+app.get("/api/skills", (_req, res) => {
+	const skills: string[] = [];
+	const dirs = [
+		path.join(os.homedir(), ".claude", "skills"),
+		path.resolve(".claude", "skills")
+	];
+
+	for (const dir of dirs) {
+		if (!fs.existsSync(dir)) {
+			continue;
+		}
+
+		for (const name of fs.readdirSync(dir)) {
+			const file = path.join(dir, name, "SKILL.md");
+
+			if (!fs.existsSync(file)) {
+				continue;
+			}
+
+			const content = fs.readFileSync(file, "utf-8");
+			const match = content.match(/^---\s*\n[\s\S]*?^name:\s*(.+)/m);
+
+			if (match) {
+				skills.push(match[1].trim());
+			}
+		}
+	}
+
+	res.json({ skills: [...new Set(skills)] });
+});
+
 const CLIPBOARD_CLEAR_MS = 30000;
 let clipboardTimer: ReturnType<typeof setTimeout> | null = null;
 
