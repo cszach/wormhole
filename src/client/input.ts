@@ -3,6 +3,7 @@ import {
 	textInput,
 	sendBtn,
 	imageInput,
+	imageBtn,
 	imagePreviews,
 	modOverlay,
 	modComboLabel,
@@ -209,6 +210,10 @@ export function setupInputHandlers(): void {
 	});
 
 	// Image upload
+	imageBtn.addEventListener("click", () => {
+		imageInput.click();
+	});
+
 	imageInput.addEventListener("change", async () => {
 		const { files } = imageInput;
 

@@ -18,6 +18,9 @@
 		"*.{ts,mjs}": [
 			"eslint --fix"
 		],
+		"*.html": [
+			"html-validate"
+		],
 		"*.{ts,mjs,json,css,html,md}": [
 			"prettier --write"
 		]
@@ -41,6 +44,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-sonarjs": "^4.0.2",
+		"html-validate": "^10.9.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.4.0",
 		"prettier": "^3.8.1",

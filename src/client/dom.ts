@@ -44,7 +44,9 @@ export const settingsBackdrop = settingsPanel.querySelector(
 export const themeList = document.getElementById("theme-list") as HTMLElement;
 export const ccKeys = document.getElementById("cc-keys") as HTMLElement;
 export const termKeys = document.getElementById("term-keys") as HTMLElement;
-export const imageBtn = document.getElementById("image-btn") as HTMLElement;
+export const imageBtn = document.getElementById(
+	"image-btn"
+) as HTMLButtonElement;
 export const snippetsBtn = document.getElementById(
 	"snippets-btn"
 ) as HTMLButtonElement;

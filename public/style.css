@@ -140,8 +140,10 @@ header {
 	border-radius: var(--radius-sm);
 }
 
-.search-nav:hover {
-	color: var(--text-primary);
+@media (hover: hover) {
+	.search-nav:hover {
+		color: var(--text-primary);
+	}
 }
 
 .search-nav:active {
@@ -359,8 +361,10 @@ mark.search-active {
 		border-color var(--ease);
 }
 
-.session-item:hover {
-	background: rgba(255, 255, 255, 0.05);
+@media (hover: hover) {
+	.session-item:hover {
+		background: rgba(255, 255, 255, 0.05);
+	}
 }
 
 .session-item.active {
@@ -402,9 +406,11 @@ mark.search-active {
 		color var(--ease);
 }
 
-.session-delete:hover {
-	opacity: 1;
-	color: var(--danger);
+@media (hover: hover) {
+	.session-delete:hover {
+		opacity: 1;
+		color: var(--danger);
+	}
 }
 
 .session-delete:disabled {
@@ -435,8 +441,10 @@ mark.search-active {
 	white-space: nowrap;
 }
 
-.session-create-btn:hover {
-	opacity: 0.9;
+@media (hover: hover) {
+	.session-create-btn:hover {
+		opacity: 0.9;
+	}
 }
 
 .session-create-btn:active {
@@ -570,6 +578,7 @@ main > div {
 		transparent 100%
 	);
 	transform-origin: 0 0;
+	transform: rotate(var(--angle, 0deg));
 	opacity: 0.15;
 }
 
@@ -623,8 +632,10 @@ main > div {
 	text-decoration: none;
 }
 
-.wormholing-hint a:hover {
-	text-decoration: underline;
+@media (hover: hover) {
+	.wormholing-hint a:hover {
+		text-decoration: underline;
+	}
 }
 
 @keyframes fade-in {
@@ -731,8 +742,10 @@ main > div {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.save-snippet-btn:hover {
-	opacity: 0.9;
+@media (hover: hover) {
+	.save-snippet-btn:hover {
+		opacity: 0.9;
+	}
 }
 
 .save-snippet-btn:active {
@@ -897,8 +910,10 @@ footer {
 	outline-offset: 2px;
 }
 
-.key-btn:hover {
-	color: var(--text-primary);
+@media (hover: hover) {
+	.key-btn:hover {
+		color: var(--text-primary);
+	}
 }
 
 .key-btn:active {
@@ -1094,8 +1109,10 @@ footer {
 		background var(--ease);
 }
 
-#image-btn:hover {
-	color: var(--text-primary);
+@media (hover: hover) {
+	#image-btn:hover {
+		color: var(--text-primary);
+	}
 }
 
 #image-btn:active {
@@ -1125,8 +1142,10 @@ footer {
 		background var(--ease);
 }
 
-.snippets-btn:hover {
-	color: var(--text-primary);
+@media (hover: hover) {
+	.snippets-btn:hover {
+		color: var(--text-primary);
+	}
 }
 
 .snippets-btn:active {
@@ -1197,8 +1216,10 @@ footer {
 	outline-offset: 2px;
 }
 
-#mic-btn:hover {
-	color: var(--text-primary);
+@media (hover: hover) {
+	#mic-btn:hover {
+		color: var(--text-primary);
+	}
 }
 
 #mic-btn:active {
@@ -1247,8 +1268,10 @@ footer {
 	outline-offset: 2px;
 }
 
-#send-btn:hover {
-	color: var(--accent);
+@media (hover: hover) {
+	#send-btn:hover {
+		color: var(--accent);
+	}
 }
 
 #send-btn:active {
@@ -1405,8 +1428,10 @@ main::-webkit-scrollbar-thumb:hover {
 	font-size: 14px;
 }
 
-.theme-option:hover {
-	border-color: rgba(255, 255, 255, 0.2);
+@media (hover: hover) {
+	.theme-option:hover {
+		border-color: rgba(255, 255, 255, 0.2);
+	}
 }
 
 .theme-option:active {
@@ -1455,8 +1480,10 @@ main::-webkit-scrollbar-thumb:hover {
 	background: none;
 }
 
-.color-swatch:hover {
-	transform: scale(1.15);
+@media (hover: hover) {
+	.color-swatch:hover {
+		transform: scale(1.15);
+	}
 }
 
 .color-swatch:active {
@@ -1645,10 +1672,12 @@ main::-webkit-scrollbar-thumb:hover {
 		background var(--ease);
 }
 
-.settings-btn:hover {
-	color: var(--accent);
-	border-color: var(--accent);
-	background: var(--accent-dim);
+@media (hover: hover) {
+	.settings-btn:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		background: var(--accent-dim);
+	}
 }
 
 .settings-btn:disabled {
@@ -1714,13 +1743,17 @@ main::-webkit-scrollbar-thumb:hover {
 		background var(--ease);
 }
 
-.vault-item-btn:hover {
-	color: var(--text-primary);
-	background: rgba(255, 255, 255, 0.06);
+@media (hover: hover) {
+	.vault-item-btn:hover {
+		color: var(--text-primary);
+		background: rgba(255, 255, 255, 0.06);
+	}
 }
 
-.vault-item-btn--danger:hover {
-	color: var(--danger);
+@media (hover: hover) {
+	.vault-item-btn--danger:hover {
+		color: var(--danger);
+	}
 }
 
 #vault-locked .settings-input {
@@ -1992,8 +2025,10 @@ main::-webkit-scrollbar-thumb:hover {
 	white-space: nowrap;
 }
 
-.cmd-item:hover {
-	border-color: rgba(255, 255, 255, 0.15);
+@media (hover: hover) {
+	.cmd-item:hover {
+		border-color: rgba(255, 255, 255, 0.15);
+	}
 }
 
 .cmd-item:active {
@@ -2097,8 +2132,10 @@ main::-webkit-scrollbar-thumb:hover {
 	transition: background var(--ease);
 }
 
-.cmd-vault-item:hover {
-	background: rgba(255, 255, 255, 0.04);
+@media (hover: hover) {
+	.cmd-vault-item:hover {
+		background: rgba(255, 255, 255, 0.04);
+	}
 }
 
 .cmd-vault-label {
@@ -2133,9 +2170,11 @@ main::-webkit-scrollbar-thumb:hover {
 		background var(--ease);
 }
 
-.cmd-vault-btn:hover {
-	color: var(--text-primary);
-	background: rgba(255, 255, 255, 0.08);
+@media (hover: hover) {
+	.cmd-vault-btn:hover {
+		color: var(--text-primary);
+		background: rgba(255, 255, 255, 0.08);
+	}
 }
 
 .cmd-vault-btn:active {
@@ -2163,9 +2202,11 @@ main::-webkit-scrollbar-thumb:hover {
 	-webkit-backdrop-filter: var(--blur-light);
 }
 
-#search-btn:hover,
-#settings-btn:hover {
-	color: var(--text-primary);
+@media (hover: hover) {
+	#search-btn:hover,
+	#settings-btn:hover {
+		color: var(--text-primary);
+	}
 }
 
 #search-btn:active,

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" style="color-scheme: dark">
+<html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta
@@ -41,22 +41,33 @@
 			<div class="header-left">
 				<a href="/" class="header-title">Wormhole</a>
 			</div>
-			<button id="session-btn" class="session-btn" title="Switch session">
-				<div class="session-top">
+			<button
+				type="button"
+				id="session-btn"
+				class="session-btn"
+				title="Switch session"
+			>
+				<span class="session-top">
 					<span id="session-name" class="session-name">claude</span>
 					<span id="ws-dot" class="ws-dot"></span>
-				</div>
+				</span>
 				<span id="session-hint" class="session-hint">Tap to switch</span>
 			</button>
 			<div class="header-right">
 				<button
+					type="button"
 					id="search-btn"
 					title="Search output"
 					aria-label="Search output"
 				>
 					<i data-lucide="search" aria-hidden="true"></i>
 				</button>
-				<button id="settings-btn" title="Settings" aria-label="Settings">
+				<button
+					type="button"
+					id="settings-btn"
+					title="Settings"
+					aria-label="Settings"
+				>
 					<i data-lucide="settings" aria-hidden="true"></i>
 				</button>
 			</div>
@@ -76,10 +87,20 @@
 				spellcheck="false"
 			/>
 			<span id="search-count" class="search-count"></span>
-			<button id="search-prev" class="search-nav" aria-label="Previous match">
+			<button
+				type="button"
+				id="search-prev"
+				class="search-nav"
+				aria-label="Previous match"
+			>
 				<i data-lucide="chevron-up" aria-hidden="true"></i>
 			</button>
-			<button id="search-next" class="search-nav" aria-label="Next match">
+			<button
+				type="button"
+				id="search-next"
+				class="search-nav"
+				aria-label="Next match"
+			>
 				<i data-lucide="chevron-down" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -108,7 +129,11 @@
 						autocapitalize="off"
 						spellcheck="false"
 					/>
-					<button id="session-create-btn" class="session-create-btn">
+					<button
+						type="button"
+						id="session-create-btn"
+						class="session-create-btn"
+					>
 						Create
 					</button>
 				</div>
@@ -127,30 +152,30 @@
 				<div class="wormholing-ring"></div>
 				<div class="wormholing-ring"></div>
 				<div class="wormholing-spokes">
-					<div class="wormholing-spoke" style="transform: rotate(0deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(15deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(30deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(45deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(60deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(75deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(90deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(105deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(120deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(135deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(150deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(165deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(180deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(195deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(210deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(225deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(240deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(255deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(270deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(285deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(300deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(315deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(330deg)"></div>
-					<div class="wormholing-spoke" style="transform: rotate(345deg)"></div>
+					<div class="wormholing-spoke" style="--angle: 0deg"></div>
+					<div class="wormholing-spoke" style="--angle: 15deg"></div>
+					<div class="wormholing-spoke" style="--angle: 30deg"></div>
+					<div class="wormholing-spoke" style="--angle: 45deg"></div>
+					<div class="wormholing-spoke" style="--angle: 60deg"></div>
+					<div class="wormholing-spoke" style="--angle: 75deg"></div>
+					<div class="wormholing-spoke" style="--angle: 90deg"></div>
+					<div class="wormholing-spoke" style="--angle: 105deg"></div>
+					<div class="wormholing-spoke" style="--angle: 120deg"></div>
+					<div class="wormholing-spoke" style="--angle: 135deg"></div>
+					<div class="wormholing-spoke" style="--angle: 150deg"></div>
+					<div class="wormholing-spoke" style="--angle: 165deg"></div>
+					<div class="wormholing-spoke" style="--angle: 180deg"></div>
+					<div class="wormholing-spoke" style="--angle: 195deg"></div>
+					<div class="wormholing-spoke" style="--angle: 210deg"></div>
+					<div class="wormholing-spoke" style="--angle: 225deg"></div>
+					<div class="wormholing-spoke" style="--angle: 240deg"></div>
+					<div class="wormholing-spoke" style="--angle: 255deg"></div>
+					<div class="wormholing-spoke" style="--angle: 270deg"></div>
+					<div class="wormholing-spoke" style="--angle: 285deg"></div>
+					<div class="wormholing-spoke" style="--angle: 300deg"></div>
+					<div class="wormholing-spoke" style="--angle: 315deg"></div>
+					<div class="wormholing-spoke" style="--angle: 330deg"></div>
+					<div class="wormholing-spoke" style="--angle: 345deg"></div>
 				</div>
 			</div>
 			<span class="wormholing-text">Wormholing</span>
@@ -167,7 +192,7 @@
 			<div class="settings-drawer">
 				<div class="settings-header">
 					<h2>Settings</h2>
-					<button id="settings-close" aria-label="Close settings">
+					<button type="button" id="settings-close" aria-label="Close settings">
 						<i data-lucide="x" aria-hidden="true"></i>
 					</button>
 				</div>
@@ -261,7 +286,7 @@
 							spellcheck="false"
 							enterkeyhint="done"
 						/>
-						<button id="skills-sync" class="settings-btn">
+						<button type="button" id="skills-sync" class="settings-btn">
 							Sync from Claude Code
 						</button>
 						<p class="settings-hint">
@@ -287,10 +312,15 @@
 									autocapitalize="off"
 								></textarea>
 								<div class="snippet-edit-actions">
-									<button id="snippet-edit-cancel" class="snippet-edit-btn">
+									<button
+										type="button"
+										id="snippet-edit-cancel"
+										class="snippet-edit-btn"
+									>
 										Cancel
 									</button>
 									<button
+										type="button"
 										id="snippet-edit-save"
 										class="snippet-edit-btn snippet-edit-btn--primary"
 									>
@@ -329,11 +359,17 @@
 								class="settings-input"
 								placeholder="Master password…"
 								aria-label="Master password"
-								autocomplete="off"
+								autocomplete="new-password"
 								enterkeyhint="done"
 							/>
-							<button id="vault-unlock" class="vault-btn">Unlock</button>
-							<button id="vault-reset" class="vault-btn vault-btn--danger">
+							<button type="button" id="vault-unlock" class="vault-btn">
+								Unlock
+							</button>
+							<button
+								type="button"
+								id="vault-reset"
+								class="vault-btn vault-btn--danger"
+							>
 								Reset vault
 							</button>
 							<p id="vault-error" class="vault-error" hidden></p>
@@ -355,9 +391,9 @@
 									class="settings-input"
 									placeholder="Password…"
 									aria-label="Password"
-									autocomplete="off"
+									autocomplete="new-password"
 								/>
-								<button id="vault-add-btn" class="vault-btn">
+								<button type="button" id="vault-add-btn" class="vault-btn">
 									Add credential
 								</button>
 							</div>
@@ -381,7 +417,11 @@
 									<option value="0">Never</option>
 								</select>
 							</label>
-							<button id="vault-lock" class="vault-btn vault-btn--secondary">
+							<button
+								type="button"
+								id="vault-lock"
+								class="vault-btn vault-btn--secondary"
+							>
 								Lock vault
 							</button>
 						</div>
@@ -430,7 +470,7 @@
 										The vault refuses to unlock over plain HTTP to protect
 										credentials in transit.
 									</p>
-									<button id="vault-info-close" class="vault-btn">
+									<button type="button" id="vault-info-close" class="vault-btn">
 										Got it
 									</button>
 								</div>
@@ -458,7 +498,7 @@
 						autocapitalize="off"
 						spellcheck="false"
 					/>
-					<button id="cmd-close" aria-label="Close commands">
+					<button type="button" id="cmd-close" aria-label="Close commands">
 						<i data-lucide="x" aria-hidden="true"></i>
 					</button>
 				</div>
@@ -467,6 +507,7 @@
 		</div>
 
 		<button
+			type="button"
 			id="save-snippet-btn"
 			class="save-snippet-btn"
 			title="Save as snippet"
@@ -476,6 +517,7 @@
 		</button>
 
 		<button
+			type="button"
 			id="refresh-btn"
 			class="refresh-btn"
 			title="Refresh connection"
@@ -485,6 +527,7 @@
 		</button>
 
 		<button
+			type="button"
 			id="scroll-btn"
 			class="scroll-btn"
 			title="Scroll to bottom"
@@ -514,6 +557,7 @@
 					spellcheck="false"
 				/>
 				<button
+					type="button"
 					id="mod-cancel"
 					class="key-btn key-btn--label mod-cancel"
 					aria-label="Cancel modifier"
@@ -526,6 +570,7 @@
 			<div id="cc-keys" class="key-layout" hidden>
 				<div class="key-row">
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Up"
 						title="Up arrow"
@@ -534,6 +579,7 @@
 						<i data-lucide="chevron-up" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Down"
 						title="Down arrow"
@@ -541,11 +587,17 @@
 					>
 						<i data-lucide="chevron-down" aria-hidden="true"></i>
 					</button>
-					<button class="key-btn key-btn--label" data-key="Enter" title="Enter">
+					<button
+						type="button"
+						class="key-btn key-btn--label"
+						data-key="Enter"
+						title="Enter"
+					>
 						<i data-lucide="corner-down-left" aria-hidden="true"></i>
 						<span>Enter</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label key-btn--esc"
 						data-key="Escape"
 						title="Interrupt"
@@ -554,6 +606,7 @@
 						<span>Esc</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label key-btn--grow"
 						data-raw="BTab"
 						title="Shift+Tab"
@@ -562,6 +615,7 @@
 						<span>Shift+Tab</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn keys-expand"
 						title="More keys"
 						aria-label="More keys"
@@ -572,6 +626,7 @@
 
 				<div class="key-row key-row--extra" hidden>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Left"
 						title="Left arrow"
@@ -580,6 +635,7 @@
 						<i data-lucide="chevron-left" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Right"
 						title="Right arrow"
@@ -587,11 +643,17 @@
 					>
 						<i data-lucide="chevron-right" aria-hidden="true"></i>
 					</button>
-					<button class="key-btn key-btn--label" data-key="Tab" title="Tab">
+					<button
+						type="button"
+						class="key-btn key-btn--label"
+						data-key="Tab"
+						title="Tab"
+					>
 						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
 						<span>Tab</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label"
 						data-raw="C-o"
 						title="Ctrl+O (expand)"
@@ -599,6 +661,7 @@
 						<span>Ctrl+O</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label key-btn--esc"
 						data-raw="C-c"
 						title="Ctrl+C (kill)"
@@ -606,6 +669,7 @@
 						<span>Ctrl+C</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label"
 						data-raw="C-d"
 						title="Ctrl+D (EOF)"
@@ -618,10 +682,17 @@
 			<!-- Terminal key layout -->
 			<div id="term-keys" class="key-layout">
 				<div class="key-row">
-					<button class="key-btn" data-key="Up" title="Up" aria-label="Up">
+					<button
+						type="button"
+						class="key-btn"
+						data-key="Up"
+						title="Up"
+						aria-label="Up"
+					>
 						<i data-lucide="chevron-up" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Down"
 						title="Down"
@@ -630,6 +701,7 @@
 						<i data-lucide="chevron-down" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Left"
 						title="Left"
@@ -638,6 +710,7 @@
 						<i data-lucide="chevron-left" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Right"
 						title="Right"
@@ -646,6 +719,7 @@
 						<i data-lucide="chevron-right" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn"
 						data-key="Enter"
 						title="Enter"
@@ -654,6 +728,7 @@
 						<i data-lucide="corner-down-left" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--esc"
 						data-key="Escape"
 						title="Escape"
@@ -662,6 +737,7 @@
 						<i data-lucide="x" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label key-btn--mod"
 						data-mod="C"
 						title="Ctrl modifier"
@@ -669,6 +745,7 @@
 						<span>Ctrl</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn keys-expand"
 						title="More keys"
 						aria-label="More keys"
@@ -678,13 +755,24 @@
 				</div>
 
 				<div class="key-row key-row--extra" hidden>
-					<button class="key-btn key-btn--label" data-key="Home" title="Home">
+					<button
+						type="button"
+						class="key-btn key-btn--label"
+						data-key="Home"
+						title="Home"
+					>
 						<span>Home</span>
 					</button>
-					<button class="key-btn key-btn--label" data-key="End" title="End">
+					<button
+						type="button"
+						class="key-btn key-btn--label"
+						data-key="End"
+						title="End"
+					>
 						<span>End</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label"
 						data-key="PgUp"
 						title="Page Up"
@@ -692,16 +780,24 @@
 						<span>PgUp</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label"
 						data-key="PgDn"
 						title="Page Down"
 					>
 						<span>PgDn</span>
 					</button>
-					<button class="key-btn" data-key="Tab" title="Tab" aria-label="Tab">
+					<button
+						type="button"
+						class="key-btn"
+						data-key="Tab"
+						title="Tab"
+						aria-label="Tab"
+					>
 						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label key-btn--mod"
 						data-mod="M"
 						title="Alt modifier"
@@ -709,6 +805,7 @@
 						<span>Alt</span>
 					</button>
 					<button
+						type="button"
 						class="key-btn key-btn--label key-btn--mod"
 						data-mod="S"
 						title="Shift modifier"
@@ -720,22 +817,23 @@
 
 			<div class="composer">
 				<div class="composer-inner">
-					<label
+					<input
+						type="file"
+						id="image-input"
+						accept="image/*"
+						multiple
+						hidden
+					/>
+					<button
+						type="button"
 						id="image-btn"
 						title="Attach image"
-						role="button"
 						aria-label="Attach image"
 					>
-						<input
-							type="file"
-							id="image-input"
-							accept="image/*"
-							multiple
-							hidden
-						/>
 						<i data-lucide="image" aria-hidden="true"></i>
-					</label>
+					</button>
 					<button
+						type="button"
 						id="snippets-btn"
 						class="snippets-btn"
 						title="Snippets"
@@ -754,6 +852,7 @@
 					></textarea>
 
 					<button
+						type="button"
 						id="mic-btn"
 						title="Voice dictation"
 						aria-label="Voice dictation"
@@ -761,7 +860,12 @@
 						<i data-lucide="mic" aria-hidden="true"></i>
 					</button>
 
-					<button id="send-btn" title="Send message" aria-label="Send message">
+					<button
+						type="button"
+						id="send-btn"
+						title="Send message"
+						aria-label="Send message"
+					>
 						<i data-lucide="send" aria-hidden="true"></i>
 					</button>
 				</div>

@@ -5,6 +5,10 @@
  * Imported by: style.css, index.html, docs/src/styles/tokens.css
  */
 
+html {
+	color-scheme: dark;
+}
+
 :root {
 	/* Colors */
 	--bg-void: #050507;
