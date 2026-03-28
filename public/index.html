@@ -26,6 +26,7 @@
 			href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600&display=swap"
 			rel="stylesheet"
 		/>
+		<link rel="stylesheet" href="design.css" />
 		<style>
 			*,
 			*::before,
@@ -35,23 +36,6 @@
 				box-sizing: border-box;
 			}
 
-			:root {
-				--bg-void: #050507;
-				--bg-glass: rgba(14, 14, 16, 0.45);
-				--bg-glass-hover: rgba(255, 255, 255, 0.035);
-				--border-glass: rgba(255, 255, 255, 0.07);
-				--border-glow: rgba(255, 255, 255, 0.15);
-				--text-primary: #eeeeee;
-				--text-secondary: #a0a0a0;
-				--text-muted: #585858;
-				--accent: #8fb8c9;
-				--serif: "Instrument Serif", Georgia, serif;
-				--sans: "Space Grotesk", system-ui, sans-serif;
-				--radius-lg: 16px;
-				--radius-xl: 24px;
-				--ease: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-			}
-
 			html,
 			body {
 				height: 100%;
@@ -59,7 +43,7 @@
 				background: var(--bg-void);
 				color: var(--text-primary);
 				font-family: var(--sans);
-				font-size: 15px;
+				font-size: var(--text-base);
 				overflow: hidden;
 				-webkit-font-smoothing: antialiased;
 			}
@@ -124,8 +108,38 @@
 			.subtitle {
 				font-size: 15px;
 				color: var(--text-secondary);
-				margin-bottom: 40px;
-				letter-spacing: 0.02em;
+				margin-bottom: 20px;
+				letter-spacing: var(--tracking-tight);
+			}
+
+			.landing-links {
+				display: flex;
+				gap: 16px;
+				justify-content: center;
+				margin-bottom: 36px;
+			}
+
+			.landing-links a {
+				font-family: var(--mono);
+				font-size: 12px;
+				color: var(--text-secondary);
+				text-decoration: none;
+				padding: 6px 14px;
+				border-radius: var(--radius-xl);
+				border: 1px solid var(--border-glass);
+				background: var(--bg-glass);
+				backdrop-filter: var(--blur-light);
+				-webkit-backdrop-filter: var(--blur-light);
+				transition:
+					color var(--ease),
+					border-color var(--ease),
+					background var(--ease);
+			}
+
+			.landing-links a:hover {
+				color: var(--accent);
+				border-color: var(--accent);
+				background: var(--accent-dim);
 			}
 
 			/* Setup button */
@@ -336,8 +350,8 @@
 				background: var(--bg-glass);
 				border: 1px solid var(--border-glass);
 				border-radius: var(--radius-xl);
-				backdrop-filter: blur(40px) saturate(1.6);
-				-webkit-backdrop-filter: blur(40px) saturate(1.6);
+				backdrop-filter: var(--blur-heavy);
+				-webkit-backdrop-filter: var(--blur-heavy);
 				overflow: hidden;
 				transition:
 					border-color var(--ease),
@@ -421,7 +435,7 @@
 				font-size: 11px;
 				color: var(--text-muted);
 				text-transform: uppercase;
-				letter-spacing: 0.1em;
+				letter-spacing: var(--tracking-wider);
 				margin-bottom: 8px;
 				padding-left: 24px;
 			}
@@ -431,8 +445,8 @@
 				background: var(--bg-glass);
 				border: 1px solid var(--border-glass);
 				border-radius: var(--radius-lg);
-				backdrop-filter: blur(40px) saturate(1.6);
-				-webkit-backdrop-filter: blur(40px) saturate(1.6);
+				backdrop-filter: var(--blur-heavy);
+				-webkit-backdrop-filter: var(--blur-heavy);
 				overflow: hidden;
 			}
 
@@ -545,6 +559,11 @@
 					?
 				</button>
 			</p>
+
+			<div class="landing-links">
+				<a href="/docs/getting-started">Docs</a>
+				<a href="https://github.com/cszach/wormhole">GitHub</a>
+			</div>
 
 			<!-- Setup modal -->
 			<div id="setup-modal" class="modal-backdrop" hidden>

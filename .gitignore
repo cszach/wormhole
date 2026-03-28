@@ -2,5 +2,7 @@ node_modules/
 dist/
 uploads/
 public/app.js
+public/docs
 .env
 *.wormhole-vault.enc
+docs/.astro

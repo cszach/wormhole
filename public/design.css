@@ -1,0 +1,77 @@
+/*
+ * Wormhole Design Language
+ *
+ * Single source of truth for all design tokens.
+ * Imported by: style.css, index.html, docs/src/styles/tokens.css
+ */
+
+:root {
+	/* Colors */
+	--bg-void: #050507;
+	--bg-dream: rgba(10, 10, 12, 0.5);
+	--bg-glass: rgba(14, 14, 16, 0.45);
+	--bg-glass-solid: rgba(18, 18, 20, 0.65);
+	--bg-glass-hover: rgba(255, 255, 255, 0.035);
+	--border-glass: rgba(255, 255, 255, 0.07);
+	--border-glow: rgba(255, 255, 255, 0.15);
+	--text-primary: #eeeeee;
+	--text-secondary: #a0a0a0;
+	--text-muted: #585858;
+	--accent: #8fb8c9;
+	--accent-warm: #c9917a;
+	--accent-dim: rgba(143, 184, 201, 0.08);
+	--danger: #e5484d;
+
+	/* Typography — families */
+	--serif: "Instrument Serif", Georgia, serif;
+	--sans: "Space Grotesk", system-ui, sans-serif;
+	--mono: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
+
+	/* Typography — scale */
+	--text-2xs: 9px;
+	--text-xs: 11px;
+	--text-sm: 13px;
+	--text-base: 15px;
+	--text-lg: 20px;
+	--text-xl: 32px;
+
+	/* Typography — tracking */
+	--tracking-tight: 0.02em;
+	--tracking-normal: 0.04em;
+	--tracking-wide: 0.06em;
+	--tracking-wider: 0.1em;
+
+	/* Spacing — 4px base scale */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-7: 32px;
+	--space-8: 40px;
+	--space-9: 48px;
+
+	/* Border radius */
+	--radius-xs: 4px;
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
+	--radius-xl: 24px;
+	--radius-full: 9999px;
+
+	/* Glass blur levels */
+	--blur-heavy: blur(40px) saturate(1.6) brightness(1.1);
+	--blur-medium: blur(20px);
+	--blur-light: blur(12px);
+	--blur-subtle: blur(4px);
+
+	/* Shadows */
+	--shadow-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	--shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.2);
+	--shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.4);
+	--shadow-float: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+	/* Animation */
+	--ease: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -29,6 +29,8 @@ jobs:
 
       - run: npm run build
 
+      - run: DOCS_BASE=/wormhole/docs npm run docs:build
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public

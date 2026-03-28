@@ -35,7 +35,7 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
   terminal layout (Home, End, PgUp, PgDn, sticky Ctrl/Alt/Shift modifiers)
 - **Snippets** — save and recall commands from a palette
 - **Password vault** — encrypted credential storage with terminal paste and
-  remote clipboard injection ([security details](docs/VAULT.md))
+  remote clipboard injection ([security details](https://cszach.github.io/wormhole/docs/vault))
 - **Themes** — animated GLSL shader backgrounds (Starry Night, Aurora, Nebula,
   Topography)
 - **Customizable** — accent color, TTS voice/speed, terminal column width

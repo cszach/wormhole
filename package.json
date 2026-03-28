@@ -5,6 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"build": "esbuild src/client/app.ts src/client/landing.ts --bundle --outdir=public --format=iife --target=es2020 --alias:@=./src",
+		"docs:build": "astro build --root docs",
+		"docs:dev": "astro dev --root docs",
 		"dev": "npm run build && tsx src/server.ts",
 		"typecheck": "tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.client.json",
 		"lint": "eslint .",
@@ -29,9 +31,11 @@
 		"ws": "^8.20.0"
 	},
 	"devDependencies": {
+		"@astrojs/markdown-remark": "^7.1.0",
 		"@types/express": "^5.0.6",
 		"@types/multer": "^2.1.0",
 		"@types/ws": "^8.18.1",
+		"astro": "^6.1.1",
 		"esbuild": "^0.27.4",
 		"eslint": "^9.39.4",
 		"eslint-config-prettier": "^10.1.8",

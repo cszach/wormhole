@@ -1,0 +1,20 @@
+---
+const { prev, next } = Astro.props;
+---
+
+{(prev || next) && (
+	<nav class="page-nav">
+		{prev ? (
+			<a href={prev.href}>
+				<span class="page-nav-label">&larr; Previous</span>
+				<span class="page-nav-title">{prev.text}</span>
+			</a>
+		) : <span />}
+		{next ? (
+			<a href={next.href}>
+				<span class="page-nav-label">Next &rarr;</span>
+				<span class="page-nav-title">{next.text}</span>
+			</a>
+		) : <span />}
+	</nav>
+)}

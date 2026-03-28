@@ -1,0 +1,47 @@
+/*
+ * Docs surface — imports shared design tokens, adds docs-specific overrides.
+ */
+
+@import url("../../../public/design.css");
+
+html {
+	background: var(--bg-void);
+	color: var(--text-primary);
+	font-family: var(--sans);
+	font-size: var(--text-base);
+	-webkit-font-smoothing: antialiased;
+	scroll-behavior: smooth;
+}
+
+body {
+	min-height: 100vh;
+	min-height: 100dvh;
+	background: var(--bg-void);
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+::selection {
+	background: var(--accent-dim);
+	color: var(--text-primary);
+}
+
+::-webkit-scrollbar {
+	width: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 3px;
+}
