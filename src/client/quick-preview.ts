@@ -8,6 +8,7 @@ import {
 	qpClose,
 	qpContent
 } from "./dom.js";
+import { renderMarkdown } from "./markdown.js";
 
 const IMAGE_EXTENSIONS = new Set([
 	".png",
@@ -90,12 +91,20 @@ export async function openQuickPreview(filePath: string): Promise<void> {
 		}
 
 		const text = await res.text();
-		const pre = document.createElement("pre");
-		const code = document.createElement("code");
-		code.textContent = text;
-		hljs.highlightElement(code);
-		pre.appendChild(code);
-		qpContent.appendChild(pre);
+
+		if (ext === ".md") {
+			const div = document.createElement("div");
+			div.className = "md-rendered";
+			div.innerHTML = renderMarkdown(text, filePath);
+			qpContent.appendChild(div);
+		} else {
+			const pre = document.createElement("pre");
+			const code = document.createElement("code");
+			code.textContent = text;
+			hljs.highlightElement(code);
+			pre.appendChild(code);
+			qpContent.appendChild(pre);
+		}
 	} catch {
 		qpContent.innerHTML = '<div class="fb-unknown">Failed to load file</div>';
 	}

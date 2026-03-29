@@ -13,6 +13,7 @@ import {
 	fbPreviewContent,
 	fbDownload
 } from "./dom.js";
+import { renderMarkdown } from "./markdown.js";
 
 type TreeEntry = {
 	path: string;
@@ -346,18 +347,20 @@ async function openPreview(entry: DirEntry): Promise<void> {
 		}
 
 		const text = await res.text();
-		const pre = document.createElement("pre");
 
 		if (ext === ".md") {
-			pre.innerHTML = renderMarkdown(text);
+			const div = document.createElement("div");
+			div.className = "md-rendered";
+			div.innerHTML = renderMarkdown(text, entry.path);
+			fbPreviewContent.appendChild(div);
 		} else {
+			const pre = document.createElement("pre");
 			const code = document.createElement("code");
 			code.textContent = text;
 			hljs.highlightElement(code);
 			pre.appendChild(code);
+			fbPreviewContent.appendChild(pre);
 		}
-
-		fbPreviewContent.appendChild(pre);
 	} catch {
 		fbPreviewContent.innerHTML =
 			'<div class="fb-unknown">Failed to load file</div>';
@@ -367,18 +370,6 @@ async function openPreview(entry: DirEntry): Promise<void> {
 function closePreview(): void {
 	fbPreview.hidden = true;
 	fbPreviewContent.innerHTML = "";
-}
-
-function renderMarkdown(text: string): string {
-	return text
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/^### (.+)$/gm, "<strong>$1</strong>")
-		.replace(/^## (.+)$/gm, "<strong>$1</strong>")
-		.replace(/^# (.+)$/gm, "<strong>$1</strong>")
-		.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-		.replace(/`(.+?)`/g, "<code>$1</code>");
 }
 
 export function isKnownPath(filePath: string): boolean {
