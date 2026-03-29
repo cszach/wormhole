@@ -9,6 +9,8 @@ import {
 	fbBreadcrumb,
 	fbList,
 	fbPreview,
+	fbPreviewPath,
+	fbPreviewSub,
 	fbPreviewBack,
 	fbPreviewContent,
 	fbDownload
@@ -292,6 +294,8 @@ async function openPreview(entry: DirEntry): Promise<void> {
 		"/api/files/download?path=" + encodeURIComponent(entry.path);
 	const ext = getExtension(entry.name);
 
+	fbPreviewPath.textContent = entry.path;
+	fbPreviewSub.textContent = formatSize(entry.size);
 	fbDownload.href = downloadUrl;
 	fbPreviewContent.innerHTML = "";
 	fbPreview.hidden = false;

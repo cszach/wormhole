@@ -218,7 +218,8 @@ export const vdLockBtn = document.getElementById(
 ) as HTMLButtonElement;
 export const qpPanel = document.getElementById("quick-preview") as HTMLElement;
 export const qpBackdrop = qpPanel.querySelector(".fb-backdrop") as HTMLElement;
-export const qpTitle = document.getElementById("qp-title") as HTMLElement;
+export const qpPath = document.getElementById("qp-path") as HTMLElement;
+export const qpSub = document.getElementById("qp-sub") as HTMLElement;
 export const qpDownload = document.getElementById(
 	"qp-download"
 ) as HTMLAnchorElement;
@@ -248,6 +249,12 @@ export const fbBreadcrumb = document.getElementById(
 ) as HTMLElement;
 export const fbList = document.getElementById("fb-list") as HTMLElement;
 export const fbPreview = document.getElementById("fb-preview") as HTMLElement;
+export const fbPreviewPath = document.getElementById(
+	"fb-preview-path"
+) as HTMLElement;
+export const fbPreviewSub = document.getElementById(
+	"fb-preview-sub"
+) as HTMLElement;
 export const fbPreviewBack = document.getElementById(
 	"fb-preview-back"
 ) as HTMLButtonElement;

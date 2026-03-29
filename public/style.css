@@ -1976,58 +1976,93 @@ main::-webkit-scrollbar-thumb:hover {
 	display: none;
 }
 
-.fb-preview-header {
+/* File viewer header (shared by quick preview and file browser preview) */
+
+.fv-header {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: var(--space-3) var(--space-5);
+	gap: var(--space-2);
+	padding: 0 var(--space-5);
+	height: 56px;
 	border-bottom: 1px solid var(--border-glass);
 }
 
-.fb-preview-back {
+.fv-title {
+	font-family: var(--serif);
+	font-style: italic;
+	font-weight: 400;
+	font-size: 22px;
+	color: var(--text-primary);
+	flex-shrink: 0;
+}
+
+.fv-meta {
+	flex: 1;
+	min-width: 0;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: var(--space-1);
-	background: none;
-	border: none;
-	color: var(--accent);
+	gap: 2px;
+}
+
+.fv-path {
 	font-family: var(--sans);
 	font-size: var(--text-sm);
-	cursor: pointer;
+	font-weight: 500;
+	letter-spacing: var(--tracking-tight);
+	color: var(--text-primary);
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
-.fb-preview-back svg {
-	width: 16px;
-	height: 16px;
+.fv-sub {
+	font-family: var(--sans);
+	font-size: var(--text-2xs);
+	color: var(--text-muted);
+	letter-spacing: 0.03em;
 }
 
-.fb-download {
+.fv-actions {
 	display: flex;
 	align-items: center;
-	gap: var(--space-1);
-	color: var(--text-secondary);
-	font-family: var(--mono);
-	font-size: 12px;
-	text-decoration: none;
-	padding: var(--space-1) var(--space-2);
-	border-radius: var(--radius-sm);
+	gap: 6px;
+	flex-shrink: 0;
+}
+
+.fv-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	background: var(--bg-glass);
 	border: 1px solid var(--border-glass);
+	color: var(--text-muted);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	text-decoration: none;
 	transition:
 		color var(--ease),
-		border-color var(--ease);
+		transform var(--ease);
+	backdrop-filter: var(--blur-light);
+	-webkit-backdrop-filter: var(--blur-light);
 }
 
 @media (hover: hover) {
-	.fb-download:hover {
-		color: var(--accent);
-		border-color: var(--accent);
-		text-decoration: none;
+	.fv-btn:hover {
+		color: var(--text-primary);
 	}
 }
 
-.fb-download svg {
-	width: 14px;
-	height: 14px;
+.fv-btn:active {
+	transform: scale(0.96);
+}
+
+.fv-btn svg {
+	width: 18px;
+	height: 18px;
 }
 
 .fb-preview-content {

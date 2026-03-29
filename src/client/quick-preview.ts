@@ -3,11 +3,13 @@ import hljs from "highlight.js/lib/common";
 import {
 	qpPanel,
 	qpBackdrop,
-	qpTitle,
+	qpPath,
+	qpSub,
 	qpDownload,
 	qpClose,
 	qpContent
 } from "./dom.js";
+import { getTreeEntry } from "./file-browser.js";
 import { renderMarkdown } from "./markdown.js";
 
 const IMAGE_EXTENSIONS = new Set([
@@ -26,9 +28,14 @@ function getExtension(name: string): string {
 	return i >= 0 ? name.slice(i).toLowerCase() : "";
 }
 
-function basename(p: string): string {
-	const i = p.lastIndexOf("/");
-	return i >= 0 ? p.slice(i + 1) : p;
+function formatSize(bytes: number): string {
+	if (bytes < 1024) {
+		return bytes + " B";
+	}
+	if (bytes < 1024 * 1024) {
+		return (bytes / 1024).toFixed(1) + " KB";
+	}
+	return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
 export async function openQuickPreview(filePath: string): Promise<void> {
@@ -36,9 +43,11 @@ export async function openQuickPreview(filePath: string): Promise<void> {
 	const downloadUrl =
 		"/api/files/download?path=" + encodeURIComponent(filePath);
 	const ext = getExtension(filePath);
-	const name = basename(filePath);
+	const name = filePath.slice(filePath.lastIndexOf("/") + 1);
+	const entry = getTreeEntry(filePath);
 
-	qpTitle.textContent = name;
+	qpPath.textContent = filePath;
+	qpSub.textContent = entry ? formatSize(entry.size) : "";
 	qpDownload.href = downloadUrl;
 	qpContent.innerHTML = "";
 	qpPanel.hidden = false;

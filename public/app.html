@@ -413,20 +413,31 @@
 		<div id="quick-preview" class="file-browser" hidden>
 			<div class="fb-backdrop"></div>
 			<div class="fb-drawer">
-				<div class="fb-header">
-					<h2 id="qp-title">File</h2>
-					<a id="qp-download" class="fb-download" href="#" download>
-						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
-						Download
-					</a>
-					<button
-						type="button"
-						id="qp-close"
-						class="vd-header-btn"
-						aria-label="Close preview"
-					>
-						<i data-lucide="x" aria-hidden="true"></i>
-					</button>
+				<div class="fv-header">
+					<h2 class="fv-title">File Viewer</h2>
+					<div class="fv-meta">
+						<span id="qp-path" class="fv-path"></span>
+						<span id="qp-sub" class="fv-sub"></span>
+					</div>
+					<div class="fv-actions">
+						<a
+							id="qp-download"
+							class="fv-btn"
+							href="#"
+							download
+							aria-label="Download file"
+						>
+							<i data-lucide="download" aria-hidden="true"></i>
+						</a>
+						<button
+							type="button"
+							id="qp-close"
+							class="fv-btn"
+							aria-label="Close preview"
+						>
+							<i data-lucide="x" aria-hidden="true"></i>
+						</button>
+					</div>
 				</div>
 				<div id="qp-content" class="fb-preview-content"></div>
 			</div>
@@ -650,15 +661,31 @@
 				<div id="fb-breadcrumb" class="fb-breadcrumb"></div>
 				<div id="fb-list" class="fb-list"></div>
 				<div id="fb-preview" class="fb-preview" hidden>
-					<div class="fb-preview-header">
-						<button type="button" id="fb-preview-back" class="fb-preview-back">
-							<i data-lucide="chevron-left" aria-hidden="true"></i>
-							Back
-						</button>
-						<a id="fb-download" class="fb-download" href="#" download>
-							<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
-							Download
-						</a>
+					<div class="fv-header">
+						<h2 class="fv-title">File Viewer</h2>
+						<div class="fv-meta">
+							<span id="fb-preview-path" class="fv-path"></span>
+							<span id="fb-preview-sub" class="fv-sub"></span>
+						</div>
+						<div class="fv-actions">
+							<a
+								id="fb-download"
+								class="fv-btn"
+								href="#"
+								download
+								aria-label="Download file"
+							>
+								<i data-lucide="download" aria-hidden="true"></i>
+							</a>
+							<button
+								type="button"
+								id="fb-preview-back"
+								class="fv-btn"
+								aria-label="Close preview"
+							>
+								<i data-lucide="x" aria-hidden="true"></i>
+							</button>
+						</div>
 					</div>
 					<div id="fb-preview-content" class="fb-preview-content"></div>
 				</div>

@@ -1,6 +1,6 @@
 import {
 	createIcons,
-	ArrowRightToLine,
+	Download,
 	Bookmark,
 	ChevronDown,
 	ChevronLeft,
@@ -54,7 +54,7 @@ applyAccentColor(state.activeAccent);
 try {
 	createIcons({
 		icons: {
-			ArrowRightToLine,
+			Download,
 			Bookmark,
 			ChevronDown,
 			ChevronLeft,
