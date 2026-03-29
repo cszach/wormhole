@@ -33,6 +33,8 @@ Phone Browser ----> Wormhole Server ----> tmux ----> Claude Code
   breadcrumb navigation
 - **Power menu** — long-press the image or snippets button for quick access to
   file attachment, password vault, and file browser
+- **Clickable output** — URLs and file paths in terminal output are clickable,
+  with suffix matching for bare filenames
 - **Live terminal** — ANSI colors, auto-scroll, output search
 - **Multi-session** — switch between tmux sessions, create and delete from the
   app

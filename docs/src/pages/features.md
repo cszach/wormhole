@@ -15,6 +15,14 @@ Terminal output streams to your phone in real-time via WebSocket. ANSI
 colors are rendered, and the view auto-scrolls as new output arrives. Tap
 the scroll button to jump back to the bottom if you scroll up.
 
+## Clickable output
+
+URLs and file paths in terminal output are automatically detected and
+made clickable. URLs open in a new tab. File paths open a quick preview
+with syntax highlighting. Bare filenames like `server.ts` are resolved
+via suffix matching against the project file tree — if there's exactly
+one match, it links; if ambiguous, it doesn't.
+
 ## Claude Code detection
 
 Wormhole detects when Claude Code is running and switches to a tailored

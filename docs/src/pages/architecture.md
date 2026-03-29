@@ -32,7 +32,9 @@ Key modules:
 | Module               | Responsibility                                 |
 | -------------------- | ---------------------------------------------- |
 | `connection.ts`      | WebSocket lifecycle, message dispatch          |
-| `render.ts`          | ANSI-to-HTML terminal output                   |
+| `render.ts`          | ANSI-to-HTML terminal output, linkification    |
+| `linkify.ts`         | Detect URLs and file paths, make clickable     |
+| `quick-preview.ts`   | Standalone file preview from terminal links    |
 | `input.ts`           | Message sending, key buttons, file upload      |
 | `command-palette.ts` | Searchable command/skill/snippet palette       |
 | `vault.ts`           | Vault state, unlock/lock, credential actions   |
