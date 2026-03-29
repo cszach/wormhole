@@ -409,6 +409,29 @@
 
 		<div id="toast" class="toast" hidden></div>
 
+		<!-- Quick file preview (from terminal link clicks) -->
+		<div id="quick-preview" class="file-browser" hidden>
+			<div class="fb-backdrop"></div>
+			<div class="fb-drawer">
+				<div class="fb-header">
+					<h2 id="qp-title">File</h2>
+					<a id="qp-download" class="fb-download" href="#" download>
+						<i data-lucide="arrow-right-to-line" aria-hidden="true"></i>
+						Download
+					</a>
+					<button
+						type="button"
+						id="qp-close"
+						class="vd-header-btn"
+						aria-label="Close preview"
+					>
+						<i data-lucide="x" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="qp-content" class="fb-preview-content"></div>
+			</div>
+		</div>
+
 		<!-- Power menu -->
 		<div id="power-menu" class="modal-backdrop" hidden>
 			<div class="modal">

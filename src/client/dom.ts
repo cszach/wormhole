@@ -216,6 +216,14 @@ export const vdAddBtn = document.getElementById(
 export const vdLockBtn = document.getElementById(
 	"vd-lock"
 ) as HTMLButtonElement;
+export const qpPanel = document.getElementById("quick-preview") as HTMLElement;
+export const qpBackdrop = qpPanel.querySelector(".fb-backdrop") as HTMLElement;
+export const qpTitle = document.getElementById("qp-title") as HTMLElement;
+export const qpDownload = document.getElementById(
+	"qp-download"
+) as HTMLAnchorElement;
+export const qpClose = document.getElementById("qp-close") as HTMLButtonElement;
+export const qpContent = document.getElementById("qp-content") as HTMLElement;
 export const powerMenu = document.getElementById("power-menu") as HTMLElement;
 export const powerAttach = document.getElementById(
 	"power-attach"

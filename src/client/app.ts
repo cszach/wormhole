@@ -38,10 +38,13 @@ import { restoreColumnSettings, setupColumnHandlers } from "./columns.js";
 import { setupSessionHandlers } from "./sessions.js";
 import { setupSearchHandlers } from "./search.js";
 import { connect } from "./connection.js";
+import { relinkify } from "./render.js";
 import { initVault } from "./vault.js";
 import { setupPowerMenu } from "./power-menu.js";
-import { setupFileBrowser } from "./file-browser.js";
+import { setupFileBrowser, fetchTree } from "./file-browser.js";
 import { setupVaultDrawer } from "./vault-drawer.js";
+import { setupQuickPreview, openQuickPreview } from "./quick-preview.js";
+import { setPathClickHandler } from "./linkify.js";
 
 // Initialize shader + theme
 initTheme();
@@ -105,6 +108,8 @@ setupSearchHandlers();
 setupPowerMenu();
 setupFileBrowser();
 setupVaultDrawer();
+setupQuickPreview();
+setPathClickHandler(openQuickPreview);
 
 // Snippets button opens palette in snippets-only mode
 snippetsBtn.addEventListener("click", () => {
@@ -117,6 +122,11 @@ syncFooterPadding();
 
 // Connect WebSocket
 connect();
+
+// Fetch file tree for linkification
+fetchTree()
+	.then(() => relinkify())
+	.catch(() => {});
 
 // Speech recognition
 initSpeechRecognition();

@@ -25,7 +25,7 @@ let truncated = false;
 let currentDir = ".";
 
 const IGNORE_KEY = "wormhole-fb-ignore";
-const DEFAULT_IGNORE = ".git";
+const DEFAULT_IGNORE = ".git,node_modules";
 
 const FOLDER_SVG =
 	'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
@@ -81,7 +81,10 @@ function getIgnore(): string {
 
 // --- Tree fetching ---
 
-async function fetchTree(): Promise<void> {
+const pathSet = new Set<string>();
+let treeReady = false;
+
+export async function fetchTree(): Promise<void> {
 	const ignore = getIgnore();
 	const res = await fetch(
 		"/api/files/tree?ignore=" + encodeURIComponent(ignore)
@@ -89,6 +92,16 @@ async function fetchTree(): Promise<void> {
 	const data = await res.json();
 	tree = data.entries ?? [];
 	truncated = data.truncated ?? false;
+
+	pathSet.clear();
+	for (const entry of tree) {
+		pathSet.add(entry.path);
+	}
+	treeReady = true;
+}
+
+export function isTreeReady(): boolean {
+	return treeReady;
 }
 
 // --- Directory listing from cache ---
@@ -366,6 +379,60 @@ function renderMarkdown(text: string): string {
 		.replace(/^# (.+)$/gm, "<strong>$1</strong>")
 		.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
 		.replace(/`(.+?)`/g, "<code>$1</code>");
+}
+
+export function isKnownPath(filePath: string): boolean {
+	return pathSet.has(filePath);
+}
+
+export function resolveBySuffix(token: string): string | null {
+	// Exact match first
+	if (pathSet.has(token)) {
+		return token;
+	}
+
+	// Suffix match: find all paths ending with /token or equal to token
+	const suffix = "/" + token;
+	let match: string | null = null;
+
+	for (const p of pathSet) {
+		if (p === token || p.endsWith(suffix)) {
+			if (match !== null) {
+				// Multiple matches — ambiguous, don't link
+				return null;
+			}
+			match = p;
+		}
+	}
+
+	return match;
+}
+
+export function getTreeEntry(
+	filePath: string
+): { path: string; size: number } | null {
+	const entry = tree.find((e) => e.path === filePath);
+	return entry ? { path: entry.path, size: entry.size } : null;
+}
+
+export async function previewFile(filePath: string): Promise<void> {
+	const entry = getTreeEntry(filePath);
+
+	if (!entry) {
+		return;
+	}
+
+	fbPanel.hidden = false;
+	currentDir = parentDir(filePath);
+	fbSearch.value = "";
+	renderBreadcrumb();
+	renderEntries(listDir(currentDir), false);
+	openPreview({
+		name: basename(filePath),
+		type: "file",
+		size: entry.size,
+		path: entry.path
+	});
 }
 
 // --- Public API ---

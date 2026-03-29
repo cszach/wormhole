@@ -492,6 +492,24 @@ main > div {
 	white-space: pre;
 }
 
+.output-link {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-color: rgba(255, 255, 255, 0.2);
+	text-underline-offset: 2px;
+	cursor: pointer;
+}
+
+@media (hover: hover) {
+	.output-link:hover {
+		text-decoration-color: var(--accent);
+	}
+}
+
+.output-link:active {
+	text-decoration-color: var(--accent);
+}
+
 /* Wormholing loader */
 
 .wormholing {

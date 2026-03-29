@@ -5,6 +5,7 @@ import { isClaudeCode } from "@/text-processing.js";
 import { state } from "./state.js";
 import { output } from "./dom.js";
 import { syncKeyLayout, syncFooterPadding } from "./layout.js";
+import { linkifyOutput } from "./linkify.js";
 
 const ansi = new AnsiUp();
 
@@ -12,6 +13,10 @@ let rerunSearch: () => void = () => {};
 
 export function setRerunSearch(fn: () => void): void {
 	rerunSearch = fn;
+}
+
+export function relinkify(): void {
+	linkifyOutput();
 }
 
 export function renderOutput(content: string): void {
@@ -28,6 +33,7 @@ export function renderOutput(content: string): void {
 
 	output.innerHTML = lines.map((l) => `<div>${l || "&nbsp;"}</div>`).join("");
 
+	linkifyOutput();
 	rerunSearch();
 	syncFooterPadding();
 

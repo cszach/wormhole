@@ -446,17 +446,23 @@ app.get("/api/files/tree", (req, res) => {
 	let truncated = false;
 	const root = fs.realpathSync(FILE_ROOT);
 
-	function walk(dir: string, rel: string): void {
-		if (truncated) {
-			return;
+	// Breadth-first walk so root files always appear before deep subtrees
+	const queue: { dir: string; rel: string }[] = [{ dir: root, rel: "" }];
+
+	while (queue.length > 0) {
+		if (entries.length >= TREE_CAP) {
+			truncated = true;
+			break;
 		}
+
+		const { dir, rel } = queue.shift()!;
 
 		let names: string[];
 
 		try {
 			names = fs.readdirSync(dir);
 		} catch {
-			return;
+			continue;
 		}
 
 		for (const name of names) {
@@ -466,7 +472,7 @@ app.get("/api/files/tree", (req, res) => {
 
 			if (entries.length >= TREE_CAP) {
 				truncated = true;
-				return;
+				break;
 			}
 
 			const full = path.join(dir, name);
@@ -481,7 +487,7 @@ app.get("/api/files/tree", (req, res) => {
 			}
 
 			if (stat.isDirectory()) {
-				walk(full, entryRel);
+				queue.push({ dir: full, rel: entryRel });
 			} else if (stat.isFile()) {
 				entries.push({
 					path: entryRel,
@@ -491,8 +497,6 @@ app.get("/api/files/tree", (req, res) => {
 			}
 		}
 	}
-
-	walk(root, "");
 
 	entries.sort((a, b) => a.path.localeCompare(b.path));
 
