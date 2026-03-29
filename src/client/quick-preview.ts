@@ -9,7 +9,7 @@ import {
 	qpClose,
 	qpContent
 } from "./dom.js";
-import { getTreeEntry } from "./file-browser.js";
+import { getTreeEntry, getSubtext, getTabWidth } from "./file-browser.js";
 import { renderMarkdown } from "./markdown.js";
 
 const IMAGE_EXTENSIONS = new Set([
@@ -28,16 +28,6 @@ function getExtension(name: string): string {
 	return i >= 0 ? name.slice(i).toLowerCase() : "";
 }
 
-function formatSize(bytes: number): string {
-	if (bytes < 1024) {
-		return bytes + " B";
-	}
-	if (bytes < 1024 * 1024) {
-		return (bytes / 1024).toFixed(1) + " KB";
-	}
-	return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-}
-
 export async function openQuickPreview(filePath: string): Promise<void> {
 	const readUrl = "/api/files/read?path=" + encodeURIComponent(filePath);
 	const downloadUrl =
@@ -47,9 +37,10 @@ export async function openQuickPreview(filePath: string): Promise<void> {
 	const entry = getTreeEntry(filePath);
 
 	qpPath.textContent = filePath;
-	qpSub.textContent = entry ? formatSize(entry.size) : "";
+	qpSub.textContent = entry ? getSubtext(entry) : "";
 	qpDownload.href = downloadUrl;
 	qpContent.innerHTML = "";
+	qpContent.style.setProperty("--tab-width", String(getTabWidth()));
 	qpPanel.hidden = false;
 
 	if (IMAGE_EXTENSIONS.has(ext)) {

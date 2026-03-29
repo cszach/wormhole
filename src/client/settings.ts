@@ -7,7 +7,11 @@ import {
 	ttsToggle,
 	ttsModeSelect,
 	ttsRateInput,
-	ttsRateValue
+	ttsRateValue,
+	fvTabWidth,
+	fvSubtext,
+	vaultLockTimeout,
+	vaultClipTimeout
 } from "./dom.js";
 import { renderThemeList, renderColorList } from "./theme.js";
 import { populateVoices } from "./speech.js";
@@ -23,6 +27,12 @@ function openSettings(): void {
 	ttsRateInput.value = String(state.ttsRate);
 	ttsRateValue.textContent = state.ttsRate.toFixed(1) + "x";
 	ttsToggle.checked = state.ttsEnabled;
+	fvTabWidth.value = localStorage.getItem("wormhole-fv-tab-width") ?? "4";
+	fvSubtext.value = localStorage.getItem("wormhole-fv-subtext") ?? "size";
+	vaultLockTimeout.value =
+		localStorage.getItem("wormhole-vault-timeout") ?? "300000";
+	vaultClipTimeout.value =
+		localStorage.getItem("wormhole-vault-clip-timeout") ?? "30000";
 	renderSkillChips();
 	renderSnippetList();
 }
@@ -42,5 +52,21 @@ export function setupSettingsHandlers(): void {
 
 	settingsBackdrop.addEventListener("click", () => {
 		closeSettings();
+	});
+
+	fvTabWidth.addEventListener("change", () => {
+		localStorage.setItem("wormhole-fv-tab-width", fvTabWidth.value);
+	});
+
+	fvSubtext.addEventListener("change", () => {
+		localStorage.setItem("wormhole-fv-subtext", fvSubtext.value);
+	});
+
+	vaultLockTimeout.addEventListener("change", () => {
+		localStorage.setItem("wormhole-vault-timeout", vaultLockTimeout.value);
+	});
+
+	vaultClipTimeout.addEventListener("change", () => {
+		localStorage.setItem("wormhole-vault-clip-timeout", vaultClipTimeout.value);
 	});
 }

@@ -21,6 +21,7 @@ type TreeEntry = {
 	path: string;
 	type: "file" | "directory";
 	size: number;
+	modified: string;
 };
 
 let tree: TreeEntry[] = [];
@@ -29,6 +30,81 @@ let currentDir = ".";
 
 const IGNORE_KEY = "wormhole-fb-ignore";
 const DEFAULT_IGNORE = ".git,node_modules";
+const SUBTEXT_KEY = "wormhole-fv-subtext";
+const TAB_WIDTH_KEY = "wormhole-fv-tab-width";
+
+const EXT_TYPES: Record<string, string> = {
+	".ts": "TypeScript",
+	".tsx": "TypeScript (JSX)",
+	".js": "JavaScript",
+	".jsx": "JavaScript (JSX)",
+	".mjs": "JavaScript",
+	".json": "JSON",
+	".md": "Markdown",
+	".html": "HTML",
+	".css": "CSS",
+	".py": "Python",
+	".rs": "Rust",
+	".go": "Go",
+	".rb": "Ruby",
+	".java": "Java",
+	".c": "C",
+	".cpp": "C++",
+	".h": "C Header",
+	".sh": "Shell",
+	".yaml": "YAML",
+	".yml": "YAML",
+	".toml": "TOML",
+	".xml": "XML",
+	".svg": "SVG",
+	".png": "PNG Image",
+	".jpg": "JPEG Image",
+	".jpeg": "JPEG Image",
+	".gif": "GIF Image",
+	".webp": "WebP Image",
+	".mp4": "MP4 Video",
+	".webm": "WebM Video",
+	".mp3": "MP3 Audio",
+	".pdf": "PDF"
+};
+
+function fileType(filePath: string): string {
+	const ext = getExtension(filePath);
+	return EXT_TYPES[ext] ?? (ext.slice(1).toUpperCase() || "File");
+}
+
+function relativeTime(iso: string): string {
+	if (!iso) {return "";}
+	const diff = Date.now() - new Date(iso).getTime();
+	if (Number.isNaN(diff)) {return "";}
+	const mins = Math.floor(diff / 60000);
+	if (mins < 1) {return "just now";}
+	if (mins < 60) {return mins + "m ago";}
+	const hrs = Math.floor(mins / 60);
+	if (hrs < 24) {return hrs + "h ago";}
+	const days = Math.floor(hrs / 24);
+	if (days < 30) {return days + "d ago";}
+	const months = Math.floor(days / 30);
+	return months + "mo ago";
+}
+
+export function getSubtext(entry: {
+	path: string;
+	size: number;
+	modified: string;
+}): string {
+	const mode = localStorage.getItem(SUBTEXT_KEY) ?? "size";
+	if (mode === "type") {return fileType(entry.path);}
+	if (mode === "modified") {
+		const t = relativeTime(entry.modified);
+		return t ? "Last modified " + t : "";
+	}
+	return formatSize(entry.size);
+}
+
+export function getTabWidth(): number {
+	return parseInt(localStorage.getItem(TAB_WIDTH_KEY) ?? "4", 10);
+}
 
 const FOLDER_SVG =
 	'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
@@ -295,9 +371,14 @@ async function openPreview(entry: DirEntry): Promise<void> {
 	const ext = getExtension(entry.name);
 
 	fbPreviewPath.textContent = entry.path;
-	fbPreviewSub.textContent = formatSize(entry.size);
+	fbPreviewSub.textContent = getSubtext({
+		path: entry.path,
+		size: entry.size,
+		modified: tree.find((e) => e.path === entry.path)?.modified ?? ""
+	});
 	fbDownload.href = downloadUrl;
 	fbPreviewContent.innerHTML = "";
+	fbPreviewContent.style.setProperty("--tab-width", String(getTabWidth()));
 	fbPreview.hidden = false;
 
 	if (IMAGE_EXTENSIONS.has(ext)) {
@@ -405,9 +486,11 @@ export function resolveBySuffix(token: string): string | null {
 
 export function getTreeEntry(
 	filePath: string
-): { path: string; size: number } | null {
+): { path: string; size: number; modified: string } | null {
 	const entry = tree.find((e) => e.path === filePath);
-	return entry ? { path: entry.path, size: entry.size } : null;
+	return entry
+		? { path: entry.path, size: entry.size, modified: entry.modified }
+		: null;
 }
 
 export async function previewFile(filePath: string): Promise<void> {

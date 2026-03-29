@@ -273,6 +273,49 @@
 					</div>
 
 					<div class="settings-section">
+						<h3>File Viewer</h3>
+						<label class="settings-row">
+							<span class="settings-label">Tab width</span>
+							<select id="fv-tab-width" class="settings-select">
+								<option value="2">2</option>
+								<option value="4" selected>4</option>
+								<option value="8">8</option>
+							</select>
+						</label>
+						<label class="settings-row">
+							<span class="settings-label">Subtext</span>
+							<select id="fv-subtext" class="settings-select">
+								<option value="size" selected>File size</option>
+								<option value="type">File type</option>
+								<option value="modified">Last modified</option>
+							</select>
+						</label>
+					</div>
+
+					<div class="settings-section">
+						<h3>Password Vault</h3>
+						<label class="settings-row">
+							<span class="settings-label">Auto-lock</span>
+							<select id="vault-lock-timeout" class="settings-select">
+								<option value="60000">1 minute</option>
+								<option value="300000" selected>5 minutes</option>
+								<option value="600000">10 minutes</option>
+								<option value="1800000">30 minutes</option>
+								<option value="0">Never</option>
+							</select>
+						</label>
+						<label class="settings-row">
+							<span class="settings-label">Clipboard clear</span>
+							<select id="vault-clip-timeout" class="settings-select">
+								<option value="10000">10 seconds</option>
+								<option value="30000" selected>30 seconds</option>
+								<option value="60000">1 minute</option>
+								<option value="0">Never</option>
+							</select>
+						</label>
+					</div>
+
+					<div class="settings-section">
 						<h3>Skills</h3>
 						<div id="skills-chips" class="chips"></div>
 						<input

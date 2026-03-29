@@ -44,6 +44,18 @@ export const settingsClose = document.getElementById(
 export const settingsBackdrop = settingsPanel.querySelector(
 	".settings-backdrop"
 ) as HTMLElement;
+export const fvTabWidth = document.getElementById(
+	"fv-tab-width"
+) as HTMLSelectElement;
+export const fvSubtext = document.getElementById(
+	"fv-subtext"
+) as HTMLSelectElement;
+export const vaultLockTimeout = document.getElementById(
+	"vault-lock-timeout"
+) as HTMLSelectElement;
+export const vaultClipTimeout = document.getElementById(
+	"vault-clip-timeout"
+) as HTMLSelectElement;
 export const themeList = document.getElementById("theme-list") as HTMLElement;
 export const ccKeys = document.getElementById("cc-keys") as HTMLElement;
 export const termKeys = document.getElementById("term-keys") as HTMLElement;

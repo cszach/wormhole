@@ -440,6 +440,7 @@ app.get("/api/files/tree", (req, res) => {
 		path: string;
 		type: "file" | "directory";
 		size: number;
+		modified: string;
 	};
 
 	const entries: TreeEntry[] = [];
@@ -492,7 +493,8 @@ app.get("/api/files/tree", (req, res) => {
 				entries.push({
 					path: entryRel,
 					type: "file",
-					size: stat.size
+					size: stat.size,
+					modified: stat.mtime.toISOString()
 				});
 			}
 		}

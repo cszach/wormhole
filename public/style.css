@@ -2078,6 +2078,8 @@ main::-webkit-scrollbar-thumb:hover {
 	white-space: pre-wrap;
 	word-break: break-all;
 	color: var(--text-primary);
+	tab-size: var(--tab-width, 4);
+	-moz-tab-size: var(--tab-width, 4);
 }
 
 .fb-preview-content pre code.hljs {
