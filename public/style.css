@@ -1396,7 +1396,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .settings-header h2 {
 	font-family: var(--serif);
-	font-size: 22px;
+	font-size: var(--text-lg);
 	font-weight: 400;
 	font-style: italic;
 	color: var(--text-primary);
@@ -1991,7 +1991,7 @@ main::-webkit-scrollbar-thumb:hover {
 	font-family: var(--serif);
 	font-style: italic;
 	font-weight: 400;
-	font-size: 22px;
+	font-size: var(--text-lg);
 	color: var(--text-primary);
 	flex-shrink: 0;
 }
@@ -2596,7 +2596,7 @@ main::-webkit-scrollbar-thumb:hover {
 
 .cmd-header h2 {
 	font-family: var(--serif);
-	font-size: 22px;
+	font-size: var(--text-lg);
 	font-weight: 400;
 	font-style: italic;
 	color: var(--text-primary);
