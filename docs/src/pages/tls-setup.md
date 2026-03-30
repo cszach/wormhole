@@ -2,24 +2,18 @@
 layout: ../layouts/DocsLayout.astro
 title: TLS Setup
 prev: { text: "Configuration", href: "configuration" }
-next: { text: "Command Palette", href: "command-palette" }
+next: { text: "Sessions", href: "sessions" }
 ---
 
 # TLS Setup
 
-HTTPS is required for:
-
-- **Voice dictation** — the Web Speech API requires a secure context
-- **Password vault** — the vault refuses to unlock over plain HTTP
-- **Web Crypto API** — used for vault encryption
-
-`localhost` and `127.0.0.1` are treated as secure contexts by browsers, so
-TLS is only needed when connecting from another device.
+HTTPS is required for voice input, the password vault, and clipboard
+operations. `localhost` and `127.0.0.1` count as secure, so TLS is only
+needed when connecting from another device.
 
 ## Tailscale (recommended)
 
-If you use [Tailscale](https://tailscale.com), you can get a free TLS
-certificate for your machine:
+If you use [Tailscale](https://tailscale.com), get a free TLS certificate:
 
 ```sh
 sudo tailscale cert \
@@ -39,8 +33,6 @@ Then connect via `https://<hostname>.<tailnet>.ts.net:5173`.
 
 ## Self-signed certificate
 
-Generate a self-signed cert:
-
 ```sh
 openssl req -x509 -newkey rsa:2048 -nodes \
   -keyout key.pem -out cert.pem -days 365 \
@@ -54,16 +46,12 @@ TLS_CERT=./cert.pem
 TLS_KEY=./key.pem
 ```
 
-Your browser will show a security warning. Accept it once and the
-connection will work.
-
-> **Warning:** Self-signed certificates are fine for personal use on your
-> own network. Do not use them in production or on shared networks.
+Your browser will show a security warning — accept it once. Fine for
+personal use on your own network.
 
 ## Let's Encrypt
 
-If your machine has a public domain name, use
-[certbot](https://certbot.eff.org):
+For a machine with a public domain:
 
 ```sh
 sudo certbot certonly --standalone -d yourdomain.com
@@ -78,6 +66,6 @@ TLS_KEY=/etc/letsencrypt/live/yourdomain.com/privkey.pem
 
 ## Reverse proxy
 
-If you already run nginx or Caddy with TLS, you can skip Wormhole's
-built-in TLS and let the proxy terminate it. See
+If you already run nginx or Caddy with TLS, skip Wormhole's built-in TLS
+and let the proxy handle it. See
 [Configuration](../configuration/#running-behind-a-reverse-proxy).

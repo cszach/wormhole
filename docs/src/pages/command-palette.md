@@ -1,25 +1,22 @@
 ---
 layout: ../layouts/DocsLayout.astro
 title: Command Palette
-prev: { text: "TLS Setup", href: "tls-setup" }
+prev: { text: "Keyboard Controls", href: "keyboard" }
 next: { text: "Snippets", href: "snippets" }
 ---
 
 # Command Palette
 
-The command palette gives you quick access to Claude Code commands, custom
-skills, and saved snippets.
+Quick access to Claude Code commands, custom skills, and saved snippets.
 
-## Opening the palette
+## Opening
 
 Type `/` as the first character in the text input while in Claude Code
-mode. The palette opens automatically with all available commands.
+mode. The palette opens with all available commands.
 
 ## Sections
 
 ### Built-in commands
-
-These are standard Claude Code slash commands:
 
 | Command    | Description          |
 | ---------- | -------------------- |
@@ -35,15 +32,15 @@ These are standard Claude Code slash commands:
 
 ### Custom skills
 
-Skills you add in settings appear in the palette prefixed with `/`. When
-selected, they are inserted into the text input for you to send.
+Skills added in settings appear prefixed with `/`. Selecting one inserts
+it into the text input. You can also sync skills from Claude Code's
+skill files via the Sync button in settings.
 
 ### Snippets
 
-Saved text blocks appear in the palette. Selecting a snippet fills the
-text input with its content. See [Snippets](../snippets/).
+Saved text blocks appear under the Snippets section. Selecting one fills
+the text input. See [Snippets](../snippets/).
 
 ## Search
 
-Type in the search field to filter across all sections. The filter matches
-against command names and descriptions.
+Type to filter across all sections by name or description.

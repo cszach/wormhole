@@ -7,7 +7,7 @@ next: { text: "TLS Setup", href: "tls-setup" }
 
 # Configuration
 
-All configuration is via a `.env` file in the project root.
+All server configuration is via a `.env` file in the project root.
 
 ## Environment variables
 
@@ -29,10 +29,21 @@ TLS_CERT=/home/you/.local/share/tailscale/cert.pem
 TLS_KEY=/home/you/.local/share/tailscale/key.pem
 ```
 
+## In-app settings
+
+These settings live in your browser's local storage and are configured
+from the settings panel (gear icon):
+
+- **Text-to-speech** — toggle, mode, speed, voice
+- **Terminal** — auto/manual column width
+- **File Viewer** — tab width, subtext (file size, type, or last modified)
+- **Password Vault** — auto-lock timeout, clipboard clear timeout
+- **Skills** — custom skill commands
+- **Snippets** — saved text blocks
+
 ## Running behind a reverse proxy
 
-If you run Wormhole behind nginx or Caddy, make sure WebSocket upgrade
-headers are forwarded. Example nginx config:
+Forward WebSocket upgrade headers. Example nginx config:
 
 ```nginx
 location / {
@@ -44,8 +55,8 @@ location / {
 }
 ```
 
-With a reverse proxy handling TLS, you do not need to set `TLS_CERT` and
-`TLS_KEY` — Wormhole will run plain HTTP and the proxy terminates TLS.
+With a reverse proxy handling TLS, you do not need `TLS_CERT` and
+`TLS_KEY`.
 
 ## Auto-start with systemd
 

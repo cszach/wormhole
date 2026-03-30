@@ -1,7 +1,8 @@
 ---
 layout: ../layouts/DocsLayout.astro
 title: Troubleshooting
-prev: { text: "Architecture", href: "architecture" }
+prev: { text: "Themes & Customization", href: "themes" }
+next: { text: "How it works", href: "how-it-works" }
 ---
 
 # Troubleshooting
@@ -17,40 +18,35 @@ curl http://localhost:5173
 **Check your firewall:**
 
 ```sh
-# Allow port 5173 (Linux with ufw)
 sudo ufw allow 5173
 ```
 
-**Check you're on the same network.** Your phone and machine must be on
-the same LAN, or connected via Tailscale / VPN.
+**Check your network.** Your phone and machine must be on the same LAN,
+or connected via Tailscale / VPN.
 
 ## Port already in use
 
-If you see `EADDRINUSE`:
-
 ```sh
-# Find and kill the process using the port
 fuser -k 5173/tcp
 ```
 
 Then restart the server.
 
-## Voice dictation not working
+## Voice input not working
 
-The Web Speech API requires a secure context. Set up
-[TLS](../tls-setup/) or access Wormhole via `localhost`.
+Requires HTTPS. Set up [TLS](../tls-setup/) or access via `localhost`.
 
 ## Vault won't unlock
 
-The vault requires HTTPS, `localhost`, or `127.0.0.1`. If you see the
-HTTPS warning in the vault section, set up [TLS](../tls-setup/).
+Requires HTTPS, `localhost`, or `127.0.0.1`. Set up
+[TLS](../tls-setup/).
 
-If you forgot your master password, use "Reset vault" in settings. This
-permanently deletes all stored credentials.
+If you forgot your master password, tap "Reset vault" in the vault
+drawer. This permanently deletes all stored credentials.
 
 ## Clipboard paste not working
 
-**Linux:** Make sure `xclip` is installed:
+**Linux:** install `xclip`:
 
 ```sh
 sudo apt install xclip    # Debian/Ubuntu
@@ -60,13 +56,10 @@ sudo pacman -S xclip      # Arch
 
 **macOS:** `pbcopy` is included by default.
 
-**Timeout:** The clipboard auto-clears after a configurable timeout
-(default 30 seconds). If you take longer to paste, increase the timeout
-in settings or set it to "never."
+**Timeout:** the clipboard auto-clears after a configurable timeout
+(default 30s). Increase it in Settings > Password Vault if needed.
 
 ## tmux not found
-
-Wormhole requires tmux to be installed and in your PATH:
 
 ```sh
 sudo apt install tmux     # Debian/Ubuntu
@@ -76,12 +69,10 @@ brew install tmux         # macOS
 
 ## Terminal output looks garbled
 
-Try adjusting the column width in settings. If auto-columns gives
-unexpected results, switch to manual and set a value like 80.
+Adjust the column width in Settings > Terminal. Try switching to manual
+and setting 80 columns.
 
 ## Background notifications not appearing
 
-Background session polling only runs when an active session exists.
-Notifications appear after a background session's output stabilizes
-(stops changing for 2 seconds). Blank sessions do not trigger
-notifications.
+Notifications only fire after a background session's output stabilizes.
+Blank sessions do not trigger them.

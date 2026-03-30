@@ -8,8 +8,8 @@ next: { text: "Features", href: "features" }
 
 ## Prerequisites
 
-- **Node.js** 18 or later
-- **tmux** installed and available in your PATH
+- **Node.js** 20 or later
+- **tmux** installed and in your PATH
 - A machine on the same network as your phone
 
 ## Install
@@ -20,7 +20,11 @@ Run the install script:
 curl -sL https://raw.githubusercontent.com/cszach/wormhole/main/install.sh | sh
 ```
 
-Or clone manually:
+The installer checks dependencies, clones the repo, installs packages,
+and offers to start the server for you. Pass `--start` to skip the
+prompt and start automatically.
+
+Or install manually:
 
 ```sh
 git clone https://github.com/cszach/wormhole.git
@@ -31,29 +35,28 @@ npm install
 ## Start the server
 
 ```sh
-cd wormhole
 npm run dev
 ```
 
-This builds the client and starts the server on port 5173. Wormhole
-automatically creates a tmux session if none exists.
+Wormhole builds the client and starts the server on port 5173. A tmux
+session is created if none exists.
 
 ## Connect from your phone
 
-Open your browser and navigate to:
+Open your browser and go to:
 
 ```
 http://<your-machine-ip>:5173
 ```
 
-You should see the terminal output streaming live. Type a message and tap
-Send to send it to tmux.
+Terminal output streams live. Type a message and tap Send to push it
+to tmux.
 
 > **Tip:** Find your machine's IP with `hostname -I` on Linux or
 > `ipconfig getifaddr en0` on macOS.
 
 ## Next steps
 
-- [Set up TLS](../tls-setup/) for voice dictation and the password vault
+- [Set up TLS](../tls-setup/) for voice input and the password vault
 - [Explore features](../features/) to see what Wormhole can do
-- [Configure](../configuration/) the server with environment variables
+- [Configure](../configuration/) the server to your needs

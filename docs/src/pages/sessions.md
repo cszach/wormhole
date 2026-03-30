@@ -1,51 +1,37 @@
 ---
 layout: ../layouts/DocsLayout.astro
 title: Sessions
-prev: { text: "Snippets", href: "snippets" }
-next: { text: "Password Vault", href: "vault" }
+prev: { text: "TLS Setup", href: "tls-setup" }
+next: { text: "Keyboard Controls", href: "keyboard" }
 ---
 
 # Sessions
 
-Wormhole supports multiple tmux sessions that you can manage from
-your phone.
+Wormhole manages multiple tmux sessions from your phone.
 
 ## Session picker
 
-Tap the session name in the header to open the session picker. It shows:
+Tap the session name in the header to open the picker. It shows all
+active sessions, the current one highlighted, a latency readout, and
+green dots next to sessions with new activity.
 
-- All active tmux sessions
-- The current session (highlighted)
-- A latency readout
-- Background activity indicators (green dots)
+## Switching
 
-## Switching sessions
+Tap a session name to switch. Output updates immediately.
 
-Tap a session name in the picker to switch to it. The terminal output
-updates immediately to show the new session's content.
+## Creating
 
-## Creating sessions
+Type a name in the "New session" field and tap Create. Wormhole switches
+to the new session automatically.
 
-Type a name in the "New session" field and tap Create. The app
-automatically switches to the new session.
+Names must be 20 characters or fewer and cannot contain `.` or `:`.
 
-Session names must be:
+## Deleting
 
-- 20 characters or fewer
-- Cannot contain `.` or `:`
-- Cannot be empty
-
-## Deleting sessions
-
-Tap the **x** button next to a session. You cannot delete the last
-remaining session.
-
-If you delete the active session, Wormhole automatically switches to
-another one.
+Tap the **x** next to a session. You cannot delete the last remaining
+session. Deleting the active session switches to another one.
 
 ## Background notifications
 
-When a background session has new output that stabilizes (stops changing
-for 2 seconds), a notification appears in the session hint below the
-header, showing how many sessions have new activity. Green dots appear
-next to those sessions in the picker.
+When a background session has new output that stabilizes, a notification
+appears in the header hint showing how many sessions have activity.

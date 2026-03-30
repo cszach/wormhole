@@ -1,8 +1,8 @@
 ---
 layout: ../layouts/DocsLayout.astro
 title: Keyboard Controls
-prev: { text: "Speech & TTS", href: "speech" }
-next: { text: "Themes & Customization", href: "themes" }
+prev: { text: "Sessions", href: "sessions" }
+next: { text: "Command Palette", href: "command-palette" }
 ---
 
 # Keyboard Controls
@@ -12,23 +12,18 @@ detected.
 
 ## Claude Code layout
 
-Appears when Claude Code is running. Includes:
+| Key       | Action       |
+| --------- | ------------ |
+| Shift+Tab | Accept edits |
+| Ctrl+C    | Interrupt    |
+| Ctrl+O    | Bypass       |
+| Escape    | Cancel       |
+| Enter     | Confirm      |
 
-| Key       | Action        |
-| --------- | ------------- |
-| Shift+Tab | Accept edits  |
-| Ctrl+C    | Interrupt     |
-| Ctrl+O    | Bypass        |
-| Escape    | Cancel / back |
-| Enter     | Confirm       |
-
-The image button is available in this mode. Short tap opens the image
-picker; long-press opens the power menu (Attach files, Password Vault,
-File Browser).
+The image button appears in this mode. Short tap opens the image picker;
+long-press opens the power menu.
 
 ## Terminal layout
-
-Appears when Claude Code is not active. Includes:
 
 | Key        | Action            |
 | ---------- | ----------------- |
@@ -39,17 +34,16 @@ Appears when Claude Code is not active. Includes:
 | Tab        | Tab character     |
 | Arrow keys | Navigation        |
 
-The snippets button is available in this mode. Long-press it to open
-the power menu (Attach files, Password Vault, File Browser).
+The snippets button appears in this mode. Long-press it to open the
+power menu.
 
-## Modifier overlay
+## Sticky modifiers
 
-Tap Ctrl, Alt, or Shift to activate sticky modifiers. A combo overlay
+Tap Ctrl, Alt, or Shift to activate a sticky modifier. A combo overlay
 appears where you type the next character to send the combined keystroke
-(e.g., Ctrl + A). Multiple modifiers can be combined.
+(e.g., Ctrl+A). Multiple modifiers can be stacked. Tap a modifier again
+or press Escape to cancel.
 
-Tap a modifier again to deactivate it, or press Escape to cancel.
+## Extra rows
 
-## Expand rows
-
-Tap the ellipsis button (**...**) to show or hide extra key rows.
+Tap **...** to show or hide additional key rows.
