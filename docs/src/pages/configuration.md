@@ -49,26 +49,38 @@ With a reverse proxy handling TLS, you do not need to set `TLS_CERT` and
 
 ## Auto-start with systemd
 
-Create `/etc/systemd/system/wormhole.service`:
+A user-level systemd service lets Wormhole start automatically when you
+log in. Create `~/.config/systemd/user/wormhole.service`:
 
 ```ini
 [Unit]
-Description=Wormhole terminal server
+Description=Wormhole server
 After=network.target
 
 [Service]
 Type=simple
-User=youruser
-WorkingDirectory=/home/youruser/wormhole
-ExecStart=/usr/bin/npm run dev
+WorkingDirectory=%h/path/to/wormhole
+ExecStart=%h/.nvm/versions/node/vX.Y.Z/bin/node node_modules/.bin/tsx src/server.ts
 Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
+
+Update `WorkingDirectory` and `ExecStart` to match your setup. `%h`
+expands to your home directory. If you use nvm, point `ExecStart` to
+your nvm node binary (run `which node` to find it).
 
 Then enable and start:
 
 ```sh
-sudo systemctl enable --now wormhole
+systemctl --user enable --now wormhole
+```
+
+To keep the service running even when you are not logged in:
+
+```sh
+loginctl enable-linger $USER
 ```
