@@ -23,7 +23,7 @@ const resolvedNext = next ? { ...next, href: `${base}/${next.href}` } : undefine
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{title} - Wormhole Docs</title>
-		<link rel="icon" href="/favicon.png" />
+		<link rel="icon" href={`${base}/../favicon.png`} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
