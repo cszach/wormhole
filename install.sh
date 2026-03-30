@@ -2,9 +2,14 @@
 set -e
 
 DRY_RUN=0
-if [ "$1" = "--dry-run" ] || [ "$1" = "-n" ]; then
-	DRY_RUN=1
-fi
+START=0
+
+for arg in "$@"; do
+	case "$arg" in
+		--dry-run|-n) DRY_RUN=1 ;;
+		--start|-s) START=1 ;;
+	esac
+done
 
 # Colors
 BOLD='\033[1m'
@@ -12,6 +17,7 @@ DIM='\033[2m'
 CYAN='\033[36m'
 GREEN='\033[32m'
 RED='\033[31m'
+YELLOW='\033[33m'
 RESET='\033[0m'
 
 # Spinner frames
@@ -102,8 +108,49 @@ else
 	spinner "Installing packages" $!
 fi
 
-# Done
-printf "\n  ${GREEN}${BOLD}Done!${RESET} To get started:\n\n"
-printf "  ${CYAN}cd${RESET} wormhole\n"
-printf "  ${CYAN}npm run${RESET} dev\n\n"
-printf "  ${DIM}Then open the address on your phone.${RESET}\n\n"
+# Start server in tmux
+start_server() {
+	session="wormhole"
+	wormhole_dir="$(pwd)"
+
+	# Handle session name collision
+	if tmux has-session -t "$session" 2>/dev/null; then
+		i=2
+		while tmux has-session -t "${session}-${i}" 2>/dev/null; do
+			i=$((i + 1))
+		done
+		session="${session}-${i}"
+		printf "  ${YELLOW}!${RESET}  tmux session ${DIM}wormhole${RESET} already exists, using ${DIM}%s${RESET}\n" "$session"
+	fi
+
+	if [ $DRY_RUN -eq 1 ]; then
+		printf "  ${GREEN}✓${RESET}  Started server in tmux session ${DIM}%s${RESET}\n" "$session"
+	else
+		tmux new-session -d -s "$session" -c "$wormhole_dir" "npm run dev"
+		printf "  ${GREEN}✓${RESET}  Started server in tmux session ${DIM}%s${RESET}\n" "$session"
+	fi
+
+	printf "\n  ${GREEN}${BOLD}Done!${RESET} Server is running.\n\n"
+	printf "  ${DIM}Open the address on your phone to get started.${RESET}\n"
+	printf "  ${DIM}Attach to the session with:${RESET} ${CYAN}tmux attach -t %s${RESET}\n\n" "$session"
+}
+
+if [ $START -eq 1 ]; then
+	printf "\n"
+	start_server
+else
+	# Interactive prompt
+	printf "\n  Start the server now? ${DIM}[Y/n]${RESET} "
+	read -r answer
+	case "$answer" in
+		[Nn]*)
+			printf "\n  ${GREEN}${BOLD}Done!${RESET} To get started:\n\n"
+			printf "  ${CYAN}cd${RESET} wormhole\n"
+			printf "  ${CYAN}npm run${RESET} dev\n\n"
+			printf "  ${DIM}Then open the address on your phone.${RESET}\n\n"
+			;;
+		*)
+			start_server
+			;;
+	esac
+fi
