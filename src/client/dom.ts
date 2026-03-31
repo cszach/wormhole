@@ -1,5 +1,6 @@
 // Central DOM element references — imported by feature modules
 
+export const sessionTop = document.getElementById("session-top") as HTMLElement;
 export const wsDot = document.getElementById("ws-dot") as HTMLElement;
 export const sessionNameEl = document.getElementById(
 	"session-name"

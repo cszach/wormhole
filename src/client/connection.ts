@@ -2,6 +2,7 @@ import type { ServerMessage } from "@/types.js";
 
 import { state } from "./state.js";
 import {
+	sessionTop,
 	wsDot,
 	sessionNameEl,
 	output,
@@ -73,12 +74,14 @@ export function connect(): void {
 					}
 					state.ws.send(JSON.stringify(msg));
 				} else {
+					sessionTop.hidden = true;
 					noSessionEl.hidden = false;
 					wormholingEl.hidden = true;
 				}
 				return;
 			}
 
+			sessionTop.hidden = false;
 			noSessionEl.hidden = true;
 			state.activeWindowIndex = message.window;
 			state.activeWindowName = message.windowName;
