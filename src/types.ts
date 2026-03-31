@@ -17,7 +17,7 @@ export type VaultPayload = {
 export type ServerMessage =
 	| { type: "output"; content: string }
 	| { type: "stable" }
-	| { type: "session"; session: string }
+	| { type: "session"; session: string; window: number; windowName: string }
 	| { type: "pong"; ts: number }
 	| { type: "bg-stable"; session: string }
 	| { type: "bg-clear"; session: string }

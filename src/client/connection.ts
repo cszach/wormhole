@@ -54,7 +54,10 @@ export function connect(): void {
 		}
 
 		if (message.type === "session") {
+			state.activeWindowIndex = message.window;
+			state.activeWindowName = message.windowName;
 			sessionNameEl.textContent = message.session;
+			updateSessionHint();
 			output.innerHTML = "";
 			state.rawOutput = "";
 			wormholingEl.hidden = false;

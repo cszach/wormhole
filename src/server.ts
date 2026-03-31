@@ -18,8 +18,15 @@ import {
 	resizePane,
 	capturePane,
 	listSessions,
+	listWindows,
+	listSessionsWithWindows,
 	createSession,
 	killSession,
+	renameSession,
+	createWindow,
+	killWindow,
+	renameWindow,
+	selectWindow,
 	setBuffer,
 	pasteBuffer,
 	deleteBuffer
@@ -87,8 +94,8 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 });
 
 app.get("/api/sessions", async (_req, res) => {
-	const sessions = await listSessions();
-	res.json({ sessions });
+	const sessions = await listSessionsWithWindows();
+	res.json({ sessions, activeSession, activeWindowIndex });
 });
 
 app.post("/api/sessions", async (req, res) => {
@@ -143,12 +150,134 @@ app.delete("/api/sessions/:name", async (req, res) => {
 			activeSession = remaining[0];
 			lastCapture = "";
 			stableSent = false;
-			broadcast({ type: "session", session: activeSession });
+			await syncActiveWindow();
+			broadcastSession();
 		}
 
 		res.json({ ok: true });
 	} catch {
 		res.status(500).json({ error: "Failed to delete session" });
+	}
+});
+
+app.patch("/api/sessions/:name", async (req, res) => {
+	const { name } = req.params;
+	const { newName } = req.body;
+	const error = isValidSessionName(newName);
+
+	if (error) {
+		res.status(400).json({ error });
+		return;
+	}
+
+	const sessions = await listSessions();
+
+	if (!sessions.includes(name)) {
+		res.status(404).json({ error: "Session not found" });
+		return;
+	}
+
+	if (sessions.includes(newName)) {
+		res.status(409).json({ error: "Session name already taken" });
+		return;
+	}
+
+	try {
+		await renameSession(name, newName);
+
+		// Update background state key
+		const bg = bgState.get(name);
+		if (bg) {
+			bgState.delete(name);
+			bgState.set(newName, bg);
+		}
+
+		if (name === activeSession) {
+			activeSession = newName;
+			broadcastSession();
+		}
+
+		res.json({ ok: true });
+	} catch {
+		res.status(500).json({ error: "Failed to rename session" });
+	}
+});
+
+// --- Window endpoints ---
+
+app.post("/api/sessions/:session/windows", async (req, res) => {
+	const { session } = req.params;
+	const { name } = req.body ?? {};
+
+	const sessions = await listSessions();
+
+	if (!sessions.includes(session)) {
+		res.status(404).json({ error: "Session not found" });
+		return;
+	}
+
+	try {
+		await createWindow(session, name || undefined);
+		res.json({ ok: true });
+	} catch {
+		res.status(500).json({ error: "Failed to create window" });
+	}
+});
+
+app.delete("/api/sessions/:session/windows/:index", async (req, res) => {
+	const { session } = req.params;
+	const index = parseInt(req.params.index, 10);
+
+	const windows = await listWindows(session);
+
+	if (windows.length <= 1) {
+		res.status(400).json({ error: "Cannot delete the last window" });
+		return;
+	}
+
+	if (!windows.some((w) => w.index === index)) {
+		res.status(404).json({ error: "Window not found" });
+		return;
+	}
+
+	try {
+		await killWindow(session, index);
+
+		// If we deleted the active window, sync to the session's new active
+		if (session === activeSession && index === activeWindowIndex) {
+			await syncActiveWindow();
+			lastCapture = "";
+			stableSent = false;
+			broadcastSession();
+		}
+
+		res.json({ ok: true });
+	} catch {
+		res.status(500).json({ error: "Failed to delete window" });
+	}
+});
+
+app.patch("/api/sessions/:session/windows/:index", async (req, res) => {
+	const { session } = req.params;
+	const index = parseInt(req.params.index, 10);
+	const { newName } = req.body;
+
+	if (!newName || typeof newName !== "string" || newName.length > 30) {
+		res.status(400).json({ error: "Invalid window name" });
+		return;
+	}
+
+	try {
+		await renameWindow(session, index, newName);
+
+		if (session === activeSession && index === activeWindowIndex) {
+			activeWindowName = newName;
+			broadcastSession();
+		}
+
+		res.json({ ok: true });
+	} catch {
+		res.status(500).json({ error: "Failed to rename window" });
 	}
 });
 
@@ -577,7 +706,7 @@ async function handleVaultInject(value: string): Promise<boolean> {
 	try {
 		await setBuffer(value);
 		try {
-			await pasteBuffer(activeSession);
+			await pasteBuffer(activeTarget());
 		} finally {
 			await deleteBuffer();
 		}
@@ -609,10 +738,38 @@ async function handleVaultClipboard(
 }
 
 let activeSession = "";
+let activeWindowIndex = 0;
+let activeWindowName = "";
 let lastCapture = "";
 let lastChangeMs = Date.now();
 let stableSent = false;
 const bgState = new Map<string, SessionState>();
+
+function activeTarget(): string {
+	return `${activeSession}:${activeWindowIndex}`;
+}
+
+async function syncActiveWindow(): Promise<void> {
+	const windows = await listWindows(activeSession);
+	const active = windows.find((w) => w.active);
+
+	if (active) {
+		activeWindowIndex = active.index;
+		activeWindowName = active.name;
+	} else if (windows.length > 0) {
+		activeWindowIndex = windows[0].index;
+		activeWindowName = windows[0].name;
+	}
+}
+
+function broadcastSession(): void {
+	broadcast({
+		type: "session",
+		session: activeSession,
+		window: activeWindowIndex,
+		windowName: activeWindowName
+	});
+}
 
 const STABLE_THRESHOLD_MS = 2000;
 const POLL_INTERVAL_MS = 250;
@@ -636,13 +793,27 @@ async function pollTmux(): Promise<void> {
 
 			if (sessions.length > 0) {
 				activeSession = sessions[0];
-				broadcast({ type: "session", session: activeSession });
+				await syncActiveWindow();
+				broadcastSession();
 			} else {
 				return;
 			}
 		}
 
-		const content = await capturePane(activeSession);
+		let content: string;
+
+		try {
+			content = await capturePane(activeTarget());
+		} catch {
+			// Window may have been deleted externally; re-sync
+			try {
+				await syncActiveWindow();
+				broadcastSession();
+				content = await capturePane(activeTarget());
+			} catch {
+				return;
+			}
+		}
 
 		if (content !== lastCapture) {
 			lastCapture = content;
@@ -738,7 +909,14 @@ wss.on("connection", (ws) => {
 	});
 
 	// Send current session name and output on connect
-	ws.send(JSON.stringify({ type: "session", session: activeSession }));
+	ws.send(
+		JSON.stringify({
+			type: "session",
+			session: activeSession,
+			window: activeWindowIndex,
+			windowName: activeWindowName
+		})
+	);
 
 	if (lastCapture) {
 		ws.send(JSON.stringify({ type: "output", content: lastCapture }));
@@ -760,15 +938,15 @@ wss.on("connection", (ws) => {
 					.map((p: string) => ` [File: ${p}]`)
 					.join("");
 
-				await sendKeys(activeSession, message.text + files);
+				await sendKeys(activeTarget(), message.text + files);
 			}
 
 			if (message.type === "key" && message.key) {
-				await sendRawKey(activeSession, message.key);
+				await sendRawKey(activeTarget(), message.key);
 			}
 
 			if (message.type === "resize" && message.cols) {
-				await resizePane(activeSession, message.cols);
+				await resizePane(activeTarget(), message.cols);
 			}
 
 			if (message.type === "ping" && message.ts) {
@@ -812,8 +990,19 @@ wss.on("connection", (ws) => {
 
 				activeSession = message.session;
 				lastChangeMs = Date.now();
+
+				if (typeof message.window === "number") {
+					activeWindowIndex = message.window;
+					await selectWindow(activeSession, activeWindowIndex);
+					const windows = await listWindows(activeSession);
+					const win = windows.find((w) => w.index === activeWindowIndex);
+					activeWindowName = win?.name ?? "";
+				} else {
+					await syncActiveWindow();
+				}
+
 				broadcast({ type: "bg-clear", session: activeSession });
-				broadcast({ type: "session", session: activeSession });
+				broadcastSession();
 				pollTmux();
 			}
 		} catch {

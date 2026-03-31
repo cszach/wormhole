@@ -106,23 +106,43 @@
 			</button>
 		</div>
 
-		<!-- Session modal -->
-		<div id="session-modal" class="modal-backdrop" hidden>
-			<div class="modal">
-				<div class="modal-title-row">
-					<h2 class="modal-title">Sessions</h2>
-					<span id="modal-ping" class="modal-ping" hidden>
-						<i data-lucide="signal" aria-hidden="true"></i>
-						<span id="modal-ping-value"></span>
-					</span>
-				</div>
-				<div id="session-list" class="session-list"></div>
-				<div class="session-create">
+		<!-- Session drawer -->
+		<div id="session-drawer" class="file-browser" hidden>
+			<div class="fb-backdrop"></div>
+			<div class="fb-drawer">
+				<div class="fb-header">
+					<h2>Sessions</h2>
 					<input
 						type="text"
-						id="session-new-name"
-						class="settings-input"
-						placeholder="New session name…"
+						id="sd-search"
+						class="vd-search"
+						placeholder="Search…"
+						aria-label="Search sessions"
+					/>
+					<button
+						type="button"
+						id="sd-new-session"
+						class="vd-header-btn"
+						title="New session"
+						aria-label="New session"
+					>
+						<i data-lucide="plus" aria-hidden="true"></i>
+					</button>
+					<button
+						type="button"
+						id="sd-close"
+						class="vd-header-btn"
+						aria-label="Close sessions"
+					>
+						<i data-lucide="x" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="sd-create" class="sd-create" hidden>
+					<input
+						type="text"
+						id="sd-create-input"
+						class="vd-search"
+						placeholder="Session name…"
 						aria-label="New session name"
 						maxlength="20"
 						autocomplete="off"
@@ -130,15 +150,12 @@
 						autocapitalize="off"
 						spellcheck="false"
 					/>
-					<button
-						type="button"
-						id="session-create-btn"
-						class="session-create-btn"
-					>
+					<button type="button" id="sd-create-btn" class="sd-create-btn">
 						Create
 					</button>
 				</div>
-				<p id="session-error" class="session-error" hidden></p>
+				<p id="sd-error" class="sd-error" hidden></p>
+				<div id="sd-list" class="sd-list"></div>
 			</div>
 		</div>
 

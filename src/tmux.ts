@@ -183,3 +183,93 @@ export function killSession(name: string): Promise<void> {
 		});
 	});
 }
+
+export function renameSession(oldName: string, newName: string): Promise<void> {
+	return exec("tmux", ["rename-session", "-t", oldName, newName]);
+}
+
+// --- Window operations ---
+
+export type WindowInfo = {
+	index: number;
+	name: string;
+	active: boolean;
+};
+
+export function listWindows(session: string): Promise<WindowInfo[]> {
+	return new Promise((resolve) => {
+		execFile(
+			"tmux",
+			[
+				"list-windows",
+				"-t",
+				session,
+				"-F",
+				"#{window_index}:#{window_name}:#{window_active}"
+			],
+			(error, stdout) => {
+				if (error) {
+					resolve([]);
+				} else {
+					resolve(
+						stdout
+							.trim()
+							.split("\n")
+							.filter((line) => line.length > 0)
+							.map((line) => {
+								const parts = line.split(":");
+								return {
+									index: parseInt(parts[0], 10),
+									name: parts.slice(1, -1).join(":"),
+									active: parts[parts.length - 1] === "1"
+								};
+							})
+					);
+				}
+			}
+		);
+	});
+}
+
+export type SessionWithWindows = {
+	name: string;
+	windows: WindowInfo[];
+};
+
+export async function listSessionsWithWindows(): Promise<SessionWithWindows[]> {
+	const sessions = await listSessions();
+	const results: SessionWithWindows[] = [];
+
+	for (const name of sessions) {
+		const windows = await listWindows(name);
+		results.push({ name, windows });
+	}
+
+	return results;
+}
+
+export function createWindow(session: string, name?: string): Promise<void> {
+	const args = ["new-window", "-t", session];
+
+	if (name) {
+		args.push("-n", name);
+	}
+
+	return exec("tmux", args);
+}
+
+export function killWindow(session: string, index: number): Promise<void> {
+	return exec("tmux", ["kill-window", "-t", `${session}:${index}`]);
+}
+
+export function renameWindow(
+	session: string,
+	index: number,
+	newName: string
+): Promise<void> {
+	return exec("tmux", ["rename-window", "-t", `${session}:${index}`, newName]);
+}
+
+export function selectWindow(session: string, index: number): Promise<void> {
+	return exec("tmux", ["select-window", "-t", `${session}:${index}`]);
+}

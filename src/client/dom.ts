@@ -133,25 +133,24 @@ export const colsValue = document.getElementById("cols-value") as HTMLElement;
 export const sessionBtn = document.getElementById(
 	"session-btn"
 ) as HTMLButtonElement;
-export const sessionModal = document.getElementById(
-	"session-modal"
-) as HTMLElement;
-export const sessionList = document.getElementById(
-	"session-list"
-) as HTMLElement;
-export const sessionNewName = document.getElementById(
-	"session-new-name"
+export const sdPanel = document.getElementById("session-drawer") as HTMLElement;
+export const sdBackdrop = sdPanel.querySelector(".fb-backdrop") as HTMLElement;
+export const sdClose = document.getElementById("sd-close") as HTMLButtonElement;
+export const sdSearch = document.getElementById(
+	"sd-search"
 ) as HTMLInputElement;
-export const sessionCreateBtn = document.getElementById(
-	"session-create-btn"
+export const sdNewSession = document.getElementById(
+	"sd-new-session"
 ) as HTMLButtonElement;
-export const sessionError = document.getElementById(
-	"session-error"
-) as HTMLElement;
-export const modalPing = document.getElementById("modal-ping") as HTMLElement;
-export const modalPingValue = document.getElementById(
-	"modal-ping-value"
-) as HTMLElement;
+export const sdCreate = document.getElementById("sd-create") as HTMLElement;
+export const sdCreateInput = document.getElementById(
+	"sd-create-input"
+) as HTMLInputElement;
+export const sdCreateBtn = document.getElementById(
+	"sd-create-btn"
+) as HTMLButtonElement;
+export const sdError = document.getElementById("sd-error") as HTMLElement;
+export const sdList = document.getElementById("sd-list") as HTMLElement;
 export const searchBtn = document.getElementById(
 	"search-btn"
 ) as HTMLButtonElement;

@@ -9,5 +9,7 @@ export const state = {
 	ttsRate: parseFloat(localStorage.getItem("wormhole-tts-rate") ?? "1.1"),
 	activeThemeId: "",
 	activeAccent: localStorage.getItem("wormhole-accent") ?? "#c4b1f5",
-	prevInputLen: 0
+	prevInputLen: 0,
+	activeWindowIndex: 0,
+	activeWindowName: ""
 };

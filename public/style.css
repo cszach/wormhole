@@ -209,13 +209,232 @@ mark.search-active {
 	opacity: 1;
 }
 
-.session-ready-dot {
+/* Session drawer */
+
+.sd-list {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.sd-session + .sd-session {
+	border-top: 1px solid var(--border-glass);
+}
+
+.sd-swipe-wrapper {
+	position: relative;
+	overflow: hidden;
+}
+
+.sd-swipe-content {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: var(--space-3) var(--space-5);
+	background: var(--bg-void);
+	transition: transform 200ms ease;
+	cursor: pointer;
+	position: relative;
+	z-index: 1;
+}
+
+.sd-swipe-content:active {
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.sd-active-bar {
+	width: 3px;
+	height: 20px;
+	border-radius: 2px;
+	background: var(--accent);
+	flex-shrink: 0;
+}
+
+.sd-ready-dot {
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
 	background: var(--accent-warm);
 	flex-shrink: 0;
-	margin-right: 4px;
+}
+
+.sd-name {
+	flex: 1;
+	font-family: var(--sans);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	color: var(--text-primary);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 0;
+}
+
+.sd-name--muted {
+	color: var(--text-secondary);
+}
+
+.sd-window-count {
+	font-family: var(--sans);
+	font-size: var(--text-xs);
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.sd-chevron {
+	width: 16px;
+	height: 16px;
+	color: var(--text-muted);
+	transition: transform 200ms ease;
+	flex-shrink: 0;
+}
+
+.sd-chevron svg {
+	width: 16px;
+	height: 16px;
+}
+
+.sd-chevron.expanded {
+	transform: rotate(90deg);
+}
+
+/* Swipe actions */
+
+.sd-actions {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+}
+
+.sd-action-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	border: none;
+	font-family: var(--sans);
+	font-size: var(--text-xs);
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.sd-action-btn--rename {
+	background: var(--bg-glass-solid);
+	color: var(--text-primary);
+}
+
+.sd-action-btn--delete {
+	background: rgba(229, 72, 77, 0.12);
+	color: var(--danger);
+}
+
+.sd-action-btn:disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+/* Window rows */
+
+.sd-window-list {
+	border-top: 1px solid var(--border-glass);
+}
+
+.sd-window-row {
+	padding-left: var(--space-8);
+}
+
+.sd-window-index {
+	font-family: var(--mono);
+	font-size: var(--text-xs);
+	color: var(--text-muted);
+	width: 16px;
+	text-align: right;
+	flex-shrink: 0;
+}
+
+/* Inline rename */
+
+.sd-rename-input {
+	flex: 1;
+	min-width: 0;
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid var(--accent);
+	border-radius: var(--radius-sm);
+	padding: 2px 6px;
+	color: var(--text-primary);
+	font-family: var(--sans);
+	font-size: var(--text-sm);
+	outline: none;
+}
+
+/* New window button */
+
+.sd-new-window {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	padding: var(--space-3) var(--space-8);
+	color: var(--text-muted);
+	font-family: var(--sans);
+	font-size: var(--text-xs);
+	cursor: pointer;
+	background: none;
+	border: none;
+	width: 100%;
+	text-align: left;
+}
+
+.sd-new-window:active {
+	color: var(--accent);
+}
+
+/* Create session form */
+
+.sd-create {
+	display: flex;
+	gap: var(--space-2);
+	padding: var(--space-3) var(--space-5);
+	border-bottom: 1px solid var(--border-glass);
+}
+
+.sd-create[hidden] {
+	display: none;
+}
+
+.sd-create .vd-search {
+	flex: 1;
+}
+
+.sd-create-btn {
+	padding: var(--space-1) var(--space-3);
+	border-radius: var(--radius-md);
+	background: var(--accent);
+	border: none;
+	color: #000;
+	font-family: var(--sans);
+	font-size: var(--text-xs);
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.sd-create-btn:active {
+	opacity: 0.8;
+}
+
+/* Error */
+
+.sd-error {
+	padding: var(--space-2) var(--space-5);
+	font-family: var(--sans);
+	font-size: var(--text-xs);
+	color: var(--danger);
+}
+
+.sd-error[hidden] {
+	display: none;
 }
 
 .ws-dot {
@@ -310,156 +529,6 @@ mark.search-active {
 	font-weight: 400;
 	font-style: italic;
 	color: var(--text-primary);
-}
-
-.modal-ping {
-	display: flex;
-	align-items: center;
-	gap: 5px;
-	font-family: var(--mono);
-	font-size: var(--text-xs);
-	padding: 3px 8px;
-	border-radius: var(--radius-sm);
-	background: rgba(255, 255, 255, 0.04);
-}
-
-.modal-ping svg {
-	width: 12px;
-	height: 12px;
-}
-
-.modal-ping.ping-good {
-	color: #4ade80;
-}
-
-.modal-ping.ping-warn {
-	color: #facc15;
-}
-
-.modal-ping.ping-poor {
-	color: var(--danger);
-}
-
-.session-list {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	max-height: 240px;
-	overflow-y: auto;
-	margin-bottom: 16px;
-}
-
-.session-item {
-	display: flex;
-	align-items: center;
-	padding: 4px;
-	border-radius: var(--radius-md);
-	background: transparent;
-	border: 1px solid transparent;
-	transition:
-		background var(--ease),
-		border-color var(--ease);
-}
-
-@media (hover: hover) {
-	.session-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-}
-
-.session-item.active {
-	background: rgba(255, 255, 255, 0.08);
-	border-color: var(--accent);
-}
-
-.session-item-name {
-	flex: 1;
-	padding: 4px 8px;
-	background: none;
-	border: none;
-	color: var(--text-secondary);
-	font-family: var(--sans);
-	font-size: var(--text-sm);
-	text-align: left;
-	cursor: pointer;
-}
-
-.session-item.active .session-item-name {
-	color: var(--text-primary);
-}
-
-.session-delete {
-	width: 28px;
-	height: 28px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: none;
-	border: none;
-	border-radius: var(--radius-sm);
-	color: var(--text-muted);
-	font-size: 16px;
-	cursor: pointer;
-	opacity: 0.5;
-	transition:
-		opacity var(--ease),
-		color var(--ease);
-}
-
-@media (hover: hover) {
-	.session-delete:hover {
-		opacity: 1;
-		color: var(--danger);
-	}
-}
-
-.session-delete:disabled {
-	opacity: 0.15;
-	cursor: default;
-	color: var(--text-muted);
-}
-
-.session-create {
-	display: flex;
-	gap: 8px;
-}
-
-.session-create .settings-input {
-	flex: 1;
-}
-
-.session-create-btn {
-	padding: 6px 14px;
-	border-radius: var(--radius-md);
-	background: var(--accent);
-	border: none;
-	color: #000;
-	font-family: var(--sans);
-	font-size: 12px;
-	font-weight: 600;
-	cursor: pointer;
-	white-space: nowrap;
-}
-
-@media (hover: hover) {
-	.session-create-btn:hover {
-		opacity: 0.9;
-	}
-}
-
-.session-create-btn:active {
-	opacity: 0.8;
-}
-
-.session-error {
-	margin: 8px 0 0;
-	font-family: var(--sans);
-	font-size: var(--text-xs);
-	color: var(--danger);
-}
-
-.session-error[hidden] {
-	display: none;
 }
 
 /* Lucide icon sizing */
