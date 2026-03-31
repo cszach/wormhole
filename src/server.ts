@@ -27,6 +27,9 @@ import {
 	killWindow,
 	renameWindow,
 	selectWindow,
+	listPanes,
+	capturePanePreview,
+	selectPane,
 	setBuffer,
 	pasteBuffer,
 	deleteBuffer
@@ -279,6 +282,28 @@ app.patch("/api/sessions/:session/windows/:index", async (req, res) => {
 	} catch {
 		res.status(500).json({ error: "Failed to rename window" });
 	}
+});
+
+// --- Pane endpoints ---
+
+app.get("/api/sessions/:session/windows/:index/panes", async (req, res) => {
+	const { session } = req.params;
+	const windowIndex = parseInt(req.params.index, 10);
+	const layout = await listPanes(session, windowIndex);
+
+	// Fetch a 1-line preview for each pane
+	const panes = await Promise.all(
+		layout.panes.map(async (pane) => ({
+			...pane,
+			preview: await capturePanePreview(session, windowIndex, pane.index)
+		}))
+	);
+
+	res.json({
+		panes,
+		windowWidth: layout.windowWidth,
+		windowHeight: layout.windowHeight
+	});
 });
 
 app.get("/api/skills", (_req, res) => {
@@ -997,6 +1022,10 @@ wss.on("connection", (ws) => {
 					const windows = await listWindows(activeSession);
 					const win = windows.find((w) => w.index === activeWindowIndex);
 					activeWindowName = win?.name ?? "";
+
+					if (typeof message.pane === "number") {
+						await selectPane(activeSession, activeWindowIndex, message.pane);
+					}
 				} else {
 					await syncActiveWindow();
 				}

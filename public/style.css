@@ -437,6 +437,61 @@ mark.search-active {
 	display: none;
 }
 
+/* Pane picker */
+
+#pane-picker {
+	z-index: 300;
+}
+
+.pane-picker-modal {
+	max-width: 340px;
+}
+
+.pp-layout {
+	position: relative;
+	width: 100%;
+	background: var(--bg-void);
+	border-radius: var(--radius-sm);
+}
+
+.pp-pane {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 2px;
+	background: var(--bg-glass);
+	border: 1px solid var(--border-glass);
+	cursor: pointer;
+	overflow: hidden;
+	padding: var(--space-1);
+	transition:
+		border-color var(--ease),
+		background var(--ease);
+}
+
+.pp-pane--active {
+	border-color: var(--accent);
+}
+
+@media (hover: hover) {
+	.pp-pane:hover {
+		background: var(--bg-glass-hover);
+		border-color: var(--text-muted);
+	}
+}
+
+.pp-pane:active {
+	background: var(--bg-glass-solid);
+}
+
+.pp-pane-index {
+	font-family: var(--mono);
+	font-size: var(--text-xs);
+	color: var(--text-muted);
+}
+
 .ws-dot {
 	position: relative;
 	width: 7px;

@@ -13,13 +13,31 @@ import {
 	sdCreateInput,
 	sdCreateBtn,
 	sdError,
-	sdList
+	sdList,
+	ppModal,
+	ppTitle,
+	ppLayout
 } from "./dom.js";
 
 // --- Types ---
 
-type WindowInfo = { index: number; name: string; active: boolean };
+type WindowInfo = {
+	index: number;
+	name: string;
+	active: boolean;
+	panes: number;
+};
 type SessionInfo = { name: string; windows: WindowInfo[] };
+
+type PaneInfo = {
+	index: number;
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+	active: boolean;
+	preview: string;
+};
 
 // --- Drawer state ---
 
@@ -53,7 +71,10 @@ async function fetchSessions(): Promise<void> {
 	try {
 		const res = await fetch("/api/sessions");
 		const data = await res.json();
-		sessions = data.sessions ?? [];
+		sessions = (data.sessions ?? []).map((s: SessionInfo) => ({
+			...s,
+			windows: s.windows.map((w) => ({ ...w, panes: w.panes ?? 1 }))
+		}));
 		currentSession = data.activeSession ?? "";
 		currentWindowIndex = data.activeWindowIndex ?? 0;
 	} catch {
@@ -63,7 +84,11 @@ async function fetchSessions(): Promise<void> {
 
 // --- Navigation ---
 
-function switchTo(session: string, windowIndex?: number): void {
+function switchTo(
+	session: string,
+	windowIndex?: number,
+	paneIndex?: number
+): void {
 	if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
 		return;
 	}
@@ -75,6 +100,9 @@ function switchTo(session: string, windowIndex?: number): void {
 	if (typeof windowIndex === "number") {
 		msg.window = windowIndex;
 	}
+	if (typeof paneIndex === "number") {
+		msg.pane = paneIndex;
+	}
 	state.ws.send(JSON.stringify(msg));
 
 	closeDrawer();
@@ -85,58 +113,68 @@ function switchTo(session: string, windowIndex?: number): void {
 function attachSwipe(
 	wrapper: HTMLElement,
 	content: HTMLElement,
-	actionsWidth: number
+	actionsWidth: number,
+	onTap: () => void
 ): void {
 	let startX = 0;
 	let startY = 0;
 	let baseOffset = 0;
 	let offsetX = 0;
-	let swiping = false;
+	let swiped = false;
 	let locked = false;
 
-	content.style.touchAction = "pan-y";
+	content.addEventListener(
+		"touchstart",
+		(e) => {
+			const touch = e.touches[0];
+			startX = touch.clientX;
+			startY = touch.clientY;
+			baseOffset = wrapper.classList.contains("sd-swiped") ? -actionsWidth : 0;
+			offsetX = baseOffset;
+			swiped = false;
+			locked = false;
+			content.style.transition = "none";
+		},
+		{ passive: true }
+	);
 
-	content.addEventListener("pointerdown", (e) => {
-		startX = e.clientX;
-		startY = e.clientY;
-		baseOffset = wrapper.classList.contains("sd-swiped") ? -actionsWidth : 0;
-		offsetX = baseOffset;
-		swiping = false;
-		locked = false;
-		content.setPointerCapture(e.pointerId);
-		content.style.transition = "none";
-	});
+	content.addEventListener(
+		"touchmove",
+		(e) => {
+			const touch = e.touches[0];
+			const dx = touch.clientX - startX;
+			const dy = touch.clientY - startY;
 
-	content.addEventListener("pointermove", (e) => {
-		const dx = e.clientX - startX;
-		const dy = e.clientY - startY;
+			if (!locked) {
+				if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {return;}
 
-		if (!locked) {
-			if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
-				return;
-			}
+				if (Math.abs(dy) > Math.abs(dx)) {
+					locked = true;
+					return;
+				}
 
-			if (Math.abs(dy) > Math.abs(dx)) {
 				locked = true;
-				return;
+				swiped = true;
 			}
 
-			locked = true;
-			swiping = true;
-		}
+			if (!swiped) {return;}
 
-		if (!swiping) {
+			e.preventDefault();
+			offsetX = Math.max(-actionsWidth, Math.min(0, baseOffset + dx));
+			content.style.transform = `translateX(${offsetX}px)`;
+		},
+		{ passive: false }
+	);
+
+	content.addEventListener("touchend", () => {
+		if (!swiped) {
+			content.style.transition = "";
 			return;
 		}
 
-		offsetX = Math.max(-actionsWidth, Math.min(0, baseOffset + dx));
-		content.style.transform = `translateX(${offsetX}px)`;
-	});
-
-	const settle = () => {
 		content.style.transition = "";
 
-		if (swiping && offsetX < -actionsWidth / 3) {
+		if (offsetX < -actionsWidth / 3) {
 			content.style.transform = `translateX(${-actionsWidth}px)`;
 			wrapper.classList.add("sd-swiped");
 		} else {
@@ -144,12 +182,24 @@ function attachSwipe(
 			wrapper.classList.remove("sd-swiped");
 		}
 
-		swiping = false;
+		// swiped stays true so the ghost click gets suppressed
 		locked = false;
-	};
+	});
 
-	content.addEventListener("pointerup", settle);
-	content.addEventListener("pointercancel", settle);
+	// Suppress ghost click after swipe
+	content.addEventListener(
+		"click",
+		(e) => {
+			if (swiped) {
+				swiped = false;
+				e.stopImmediatePropagation();
+			}
+		},
+		true
+	);
+
+	// Tap — works for both touch and mouse
+	content.addEventListener("click", () => onTap());
 }
 
 function closeAllSwipes(): void {
@@ -161,6 +211,61 @@ function closeAllSwipes(): void {
 			content.style.transform = "";
 		}
 	}
+}
+
+// --- Pane picker ---
+
+async function openPanePicker(
+	session: string,
+	windowIndex: number
+): Promise<void> {
+	ppTitle.textContent = "Select pane";
+	ppLayout.innerHTML = '<div class="fb-empty">Loading\u2026</div>';
+	ppModal.hidden = false;
+
+	try {
+		const res = await fetch(
+			`/api/sessions/${encodeURIComponent(session)}/windows/${windowIndex}/panes`
+		);
+		const data: {
+			panes: PaneInfo[];
+			windowWidth: number;
+			windowHeight: number;
+		} = await res.json();
+
+		ppLayout.innerHTML = "";
+		ppLayout.style.aspectRatio = `${data.windowWidth} / ${data.windowHeight}`;
+
+		for (const pane of data.panes) {
+			const el = document.createElement("button");
+			el.type = "button";
+			el.className = "pp-pane" + (pane.active ? " pp-pane--active" : "");
+
+			el.style.left = `${(pane.left / data.windowWidth) * 100}%`;
+			el.style.top = `${(pane.top / data.windowHeight) * 100}%`;
+			el.style.width = `${(pane.width / data.windowWidth) * 100}%`;
+			el.style.height = `${(pane.height / data.windowHeight) * 100}%`;
+
+			const idx = document.createElement("span");
+			idx.className = "pp-pane-index";
+			idx.textContent = String(pane.index);
+
+			el.appendChild(idx);
+
+			el.addEventListener("click", () => {
+				ppModal.hidden = true;
+				switchTo(session, windowIndex, pane.index);
+			});
+
+			ppLayout.appendChild(el);
+		}
+	} catch {
+		ppLayout.innerHTML = '<div class="fb-empty">Failed to load panes</div>';
+	}
+}
+
+function closePanePicker(): void {
+	ppModal.hidden = true;
 }
 
 // --- Inline rename ---
@@ -425,10 +530,12 @@ function buildWindowList(
 		content.appendChild(idx);
 		content.appendChild(name);
 
-		content.addEventListener("click", () => {
-			closeAllSwipes();
-			switchTo(session.name, win.index);
-		});
+		if (win.panes > 1) {
+			const paneCount = document.createElement("span");
+			paneCount.className = "sd-window-count";
+			paneCount.textContent = `${win.panes} panes`;
+			content.appendChild(paneCount);
+		}
 
 		const actions = makeActions(
 			() => startRenameWindow(session.name, win.index, win.name, name),
@@ -438,7 +545,14 @@ function buildWindowList(
 
 		wrapper.appendChild(content);
 		wrapper.appendChild(actions);
-		attachSwipe(wrapper, content, ACTIONS_WIDTH);
+		attachSwipe(wrapper, content, ACTIONS_WIDTH, () => {
+			closeAllSwipes();
+			if (win.panes > 1) {
+				openPanePicker(session.name, win.index);
+			} else {
+				switchTo(session.name, win.index);
+			}
+		});
 		list.appendChild(wrapper);
 	}
 
@@ -515,16 +629,6 @@ function render(): void {
 			content.appendChild(chevron);
 		}
 
-		content.addEventListener("click", () => {
-			closeAllSwipes();
-			if (windowCount === 1) {
-				switchTo(session.name, session.windows[0].index);
-			} else {
-				expanded = isExpanded ? null : session.name;
-				render();
-			}
-		});
-
 		const actions = makeActions(
 			() => startRenameSession(session.name, label),
 			() => deleteSession(session.name),
@@ -533,7 +637,17 @@ function render(): void {
 
 		wrapper.appendChild(content);
 		wrapper.appendChild(actions);
-		attachSwipe(wrapper, content, ACTIONS_WIDTH);
+		attachSwipe(wrapper, content, ACTIONS_WIDTH, () => {
+			closeAllSwipes();
+			if (windowCount === 1 && session.windows[0].panes <= 1) {
+				switchTo(session.name, session.windows[0].index);
+			} else if (windowCount === 1 && session.windows[0].panes > 1) {
+				openPanePicker(session.name, session.windows[0].index);
+			} else {
+				expanded = isExpanded ? null : session.name;
+				render();
+			}
+		});
 		group.appendChild(wrapper);
 
 		if (isExpanded && windowCount > 1) {
@@ -618,6 +732,12 @@ export function setupSessionHandlers(): void {
 	});
 
 	sdSearch.addEventListener("input", () => render());
+
+	ppModal.addEventListener("click", (e) => {
+		if (e.target === ppModal) {
+			closePanePicker();
+		}
+	});
 
 	wormholingRefresh.addEventListener("click", (e) => {
 		e.preventDefault();

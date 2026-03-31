@@ -151,6 +151,9 @@ export const sdCreateBtn = document.getElementById(
 ) as HTMLButtonElement;
 export const sdError = document.getElementById("sd-error") as HTMLElement;
 export const sdList = document.getElementById("sd-list") as HTMLElement;
+export const ppModal = document.getElementById("pane-picker") as HTMLElement;
+export const ppTitle = document.getElementById("pp-title") as HTMLElement;
+export const ppLayout = document.getElementById("pp-layout") as HTMLElement;
 export const searchBtn = document.getElementById(
 	"search-btn"
 ) as HTMLButtonElement;

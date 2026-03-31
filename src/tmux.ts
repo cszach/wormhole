@@ -194,6 +194,7 @@ export type WindowInfo = {
 	index: number;
 	name: string;
 	active: boolean;
+	panes: number;
 };
 
 export function listWindows(session: string): Promise<WindowInfo[]> {
@@ -205,7 +206,7 @@ export function listWindows(session: string): Promise<WindowInfo[]> {
 				"-t",
 				session,
 				"-F",
-				"#{window_index}:#{window_name}:#{window_active}"
+				"#{window_index}:#{window_name}:#{window_panes}:#{window_active}"
 			],
 			(error, stdout) => {
 				if (error) {
@@ -218,10 +219,14 @@ export function listWindows(session: string): Promise<WindowInfo[]> {
 							.filter((line) => line.length > 0)
 							.map((line) => {
 								const parts = line.split(":");
+								const active = parts[parts.length - 1] === "1";
+								const panes = parseInt(parts[parts.length - 2], 10);
+								const name = parts.slice(1, -2).join(":");
 								return {
 									index: parseInt(parts[0], 10),
-									name: parts.slice(1, -1).join(":"),
-									active: parts[parts.length - 1] === "1"
+									name,
+									active,
+									panes
 								};
 							})
 					);
@@ -272,4 +277,103 @@ export function renameWindow(
 
 export function selectWindow(session: string, index: number): Promise<void> {
 	return exec("tmux", ["select-window", "-t", `${session}:${index}`]);
+}
+
+// --- Pane operations ---
+
+export type PaneInfo = {
+	index: number;
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+	active: boolean;
+};
+
+export type PaneLayout = {
+	panes: PaneInfo[];
+	windowWidth: number;
+	windowHeight: number;
+};
+
+export function listPanes(
+	session: string,
+	windowIndex: number
+): Promise<PaneLayout> {
+	const target = `${session}:${windowIndex}`;
+
+	return new Promise((resolve) => {
+		execFile(
+			"tmux",
+			[
+				"list-panes",
+				"-t",
+				target,
+				"-F",
+				"#{pane_index}:#{pane_left}:#{pane_top}:#{pane_width}:#{pane_height}:#{pane_active}:#{window_width}:#{window_height}"
+			],
+			(error, stdout) => {
+				if (error) {
+					resolve({ panes: [], windowWidth: 0, windowHeight: 0 });
+					return;
+				}
+
+				let windowWidth = 0;
+				let windowHeight = 0;
+				const panes: PaneInfo[] = [];
+
+				for (const line of stdout.trim().split("\n")) {
+					if (!line) {continue;}
+					const p = line.split(":");
+					windowWidth = parseInt(p[6], 10);
+					windowHeight = parseInt(p[7], 10);
+					panes.push({
+						index: parseInt(p[0], 10),
+						left: parseInt(p[1], 10),
+						top: parseInt(p[2], 10),
+						width: parseInt(p[3], 10),
+						height: parseInt(p[4], 10),
+						active: p[5] === "1"
+					});
+				}
+
+				resolve({ panes, windowWidth, windowHeight });
+			}
+		);
+	});
+}
+
+export function capturePanePreview(
+	session: string,
+	windowIndex: number,
+	paneIndex: number
+): Promise<string> {
+	const target = `${session}:${windowIndex}.${paneIndex}`;
+
+	return new Promise((resolve) => {
+		execFile(
+			"tmux",
+			["capture-pane", "-t", target, "-p", "-S", "-2"],
+			(error, stdout) => {
+				if (error) {
+					resolve("");
+				} else {
+					const lines = stdout.trimEnd().split("\n");
+					resolve(lines[lines.length - 1] ?? "");
+				}
+			}
+		);
+	});
+}
+
+export function selectPane(
+	session: string,
+	windowIndex: number,
+	paneIndex: number
+): Promise<void> {
+	return exec("tmux", [
+		"select-pane",
+		"-t",
+		`${session}:${windowIndex}.${paneIndex}`
+	]);
 }
