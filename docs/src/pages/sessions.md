@@ -31,6 +31,13 @@ the bottom of the list to create one.
 Swipe left on a window row to reveal Rename and Delete actions. You
 cannot delete the last window in a session.
 
+## Panes
+
+If a window has multiple panes (splits), tapping it opens a pane
+picker — a visual layout showing each pane as a rectangle matching
+its position in tmux. The active pane is highlighted. Tap a pane to
+switch to it.
+
 ## Creating sessions
 
 Tap the **+** button in the drawer header. Type a name and tap Create.

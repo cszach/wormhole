@@ -52,10 +52,10 @@ snippets. Opens when you type `/` in Claude Code mode. See
 
 ## Sessions & windows
 
-Manage tmux sessions and windows from a full-screen drawer. Sessions
-expand to show their windows. Create, rename, and delete sessions and
-windows with swipe actions. Background sessions show activity
-notifications. See [Sessions](../sessions/).
+Manage tmux sessions, windows, and panes from a full-screen drawer.
+Sessions expand to show their windows. Windows with multiple panes
+show a visual layout picker. Create, rename, and delete sessions and
+windows with swipe actions. See [Sessions](../sessions/).
 
 ## Password vault
 
