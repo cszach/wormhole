@@ -7,31 +7,43 @@ next: { text: "Keyboard Controls", href: "keyboard" }
 
 # Sessions
 
-Wormhole manages multiple tmux sessions from your phone.
+Wormhole manages tmux sessions and windows from your phone.
 
-## Session picker
+## Session drawer
 
-Tap the session name in the header to open the picker. It shows all
-active sessions, the current one highlighted, a latency readout, and
-green dots next to sessions with new activity.
+Tap the session name in the header to open the session drawer. It shows
+all sessions with their window counts, the active session highlighted,
+and green dots next to sessions with new activity. A search bar filters
+by session name or window name.
 
 ## Switching
 
-Tap a session name to switch. Output updates immediately.
+Tap a session with one window to switch directly. Tap a session with
+multiple windows to expand it and see its windows — then tap a window
+to switch to it. The header hint shows the active window name.
 
-## Creating
+## Windows
 
-Type a name in the "New session" field and tap Create. Wormhole switches
-to the new session automatically.
+Each session can have multiple tmux windows. Expand a session to see
+its windows listed with their index and name. Tap "+ New window" at
+the bottom of the list to create one.
 
+Swipe left on a window row to reveal Rename and Delete actions. You
+cannot delete the last window in a session.
+
+## Creating sessions
+
+Tap the **+** button in the drawer header. Type a name and tap Create.
 Names must be 20 characters or fewer and cannot contain `.` or `:`.
 
-## Deleting
+## Renaming and deleting
 
-Tap the **x** next to a session. You cannot delete the last remaining
-session. Deleting the active session switches to another one.
+Swipe left on a session or window row to reveal Rename and Delete.
+Rename opens an inline text input. You cannot delete the last
+remaining session.
 
 ## Background notifications
 
-When a background session has new output that stabilizes, a notification
-appears in the header hint showing how many sessions have activity.
+When a background session's active window has new output that
+stabilizes, a notification appears in the header hint showing how many
+sessions have activity.

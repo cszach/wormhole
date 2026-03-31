@@ -50,11 +50,12 @@ A searchable list of Claude Code commands, custom skills, and saved
 snippets. Opens when you type `/` in Claude Code mode. See
 [Command Palette](../command-palette/).
 
-## Multi-session
+## Sessions & windows
 
-Create, switch, and delete tmux sessions from the session picker.
-Background sessions show activity notifications. See
-[Sessions](../sessions/).
+Manage tmux sessions and windows from a full-screen drawer. Sessions
+expand to show their windows. Create, rename, and delete sessions and
+windows with swipe actions. Background sessions show activity
+notifications. See [Sessions](../sessions/).
 
 ## Password vault
 

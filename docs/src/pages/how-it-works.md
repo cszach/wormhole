@@ -47,14 +47,18 @@ An Express + WebSocket server that:
 
 ## tmux interaction
 
-| Operation      | Command                                 |
-| -------------- | --------------------------------------- |
-| Capture output | `tmux capture-pane -p -t <session>`     |
-| Send text      | `tmux send-keys -t <session> <text>`    |
-| Send key       | `tmux send-keys -t <session> <key>`     |
-| Resize         | `tmux resize-window -t <session> -x N`  |
-| List sessions  | `tmux list-sessions -F #{session_name}` |
-| Paste buffer   | `tmux set-buffer` + `paste-buffer`      |
+All commands target `session:windowIndex` to address the correct pane.
+
+| Operation      | Command                                   |
+| -------------- | ----------------------------------------- |
+| Capture output | `tmux capture-pane -p -t <target>`        |
+| Send text      | `tmux send-keys -t <target> <text>`       |
+| Send key       | `tmux send-keys -t <target> <key>`        |
+| Resize         | `tmux resize-window -t <target> -x N`     |
+| List sessions  | `tmux list-sessions -F #{session_name}`   |
+| List windows   | `tmux list-windows -t <session> -F ...`   |
+| Select window  | `tmux select-window -t <session>:<index>` |
+| Paste buffer   | `tmux set-buffer` + `paste-buffer`        |
 
 ## Polling
 
@@ -75,7 +79,7 @@ Messages are JSON with a `type` field.
 | `key`             | Key press                           |
 | `resize`          | Terminal column width               |
 | `ping`            | Latency measurement                 |
-| `switch`          | Switch session                      |
+| `switch`          | Switch session and/or window        |
 | `vault-inject`    | Paste credential into tmux          |
 | `vault-clipboard` | Copy credential to system clipboard |
 
@@ -85,7 +89,7 @@ Messages are JSON with a `type` field.
 | --------------------- | ------------------------------- |
 | `output`              | Terminal content update         |
 | `stable`              | Output stopped changing         |
-| `session`             | Active session name             |
+| `session`             | Active session and window       |
 | `pong`                | Latency response                |
 | `bg-stable`           | Background session has activity |
 | `bg-clear`            | Background notification cleared |
