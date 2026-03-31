@@ -13,6 +13,7 @@ export const wormholingEl = document.getElementById(
 export const wormholingHint = document.getElementById(
 	"wormholing-hint"
 ) as HTMLElement;
+export const noSessionEl = document.getElementById("no-session") as HTMLElement;
 export const toastEl = document.getElementById("toast") as HTMLElement;
 export const output = document.getElementById("output") as HTMLElement;
 export const textInput = document.getElementById(

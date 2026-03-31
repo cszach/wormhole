@@ -6,7 +6,8 @@ import {
 	sessionNameEl,
 	output,
 	wormholingEl,
-	wormholingHint
+	wormholingHint,
+	noSessionEl
 } from "./dom.js";
 import { renderOutput } from "./render.js";
 import {
@@ -45,6 +46,7 @@ export function connect(): void {
 			state.rawOutput = message.content;
 			renderOutput(message.content);
 			wormholingEl.hidden = true;
+			noSessionEl.hidden = true;
 			wormholingHint.classList.remove("visible");
 			clearTimeout(wormholingTimer);
 		}
@@ -54,6 +56,30 @@ export function connect(): void {
 		}
 
 		if (message.type === "session") {
+			if (!message.session) {
+				// Server has no active session — try restoring from localStorage
+				const saved = localStorage.getItem("wormhole-last-target");
+				if (saved && state.ws && state.ws.readyState === WebSocket.OPEN) {
+					const [session, windowStr, paneStr] = saved.split(":");
+					const msg: Record<string, unknown> = {
+						type: "switch",
+						session
+					};
+					if (windowStr) {
+						msg.window = parseInt(windowStr, 10);
+					}
+					if (paneStr) {
+						msg.pane = parseInt(paneStr, 10);
+					}
+					state.ws.send(JSON.stringify(msg));
+				} else {
+					noSessionEl.hidden = false;
+					wormholingEl.hidden = true;
+				}
+				return;
+			}
+
+			noSessionEl.hidden = true;
 			state.activeWindowIndex = message.window;
 			state.activeWindowName = message.windowName;
 			sessionNameEl.textContent = message.session;

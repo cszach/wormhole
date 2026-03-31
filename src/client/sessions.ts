@@ -105,6 +105,12 @@ function switchTo(
 	}
 	state.ws.send(JSON.stringify(msg));
 
+	// Save target for next load
+	const parts = [session];
+	if (typeof windowIndex === "number") {parts.push(String(windowIndex));}
+	if (typeof paneIndex === "number") {parts.push(String(paneIndex));}
+	localStorage.setItem("wormhole-last-target", parts.join(":"));
+
 	closeDrawer();
 }
 
@@ -146,7 +152,9 @@ function attachSwipe(
 			const dy = touch.clientY - startY;
 
 			if (!locked) {
-				if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {return;}
+				if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+					return;
+				}
 
 				if (Math.abs(dy) > Math.abs(dx)) {
 					locked = true;
@@ -157,7 +165,9 @@ function attachSwipe(
 				swiped = true;
 			}
 
-			if (!swiped) {return;}
+			if (!swiped) {
+				return;
+			}
 
 			e.preventDefault();
 			offsetX = Math.max(-actionsWidth, Math.min(0, baseOffset + dx));

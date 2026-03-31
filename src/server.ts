@@ -814,15 +814,7 @@ function broadcast(message: ServerMessage): void {
 async function pollTmux(): Promise<void> {
 	try {
 		if (!activeSession) {
-			const sessions = await listSessions();
-
-			if (sessions.length > 0) {
-				activeSession = sessions[0];
-				await syncActiveWindow();
-				broadcastSession();
-			} else {
-				return;
-			}
+			return;
 		}
 
 		let content: string;
