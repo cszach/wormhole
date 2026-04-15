@@ -32,6 +32,7 @@ const IGNORE_KEY = "wormhole-fb-ignore";
 const DEFAULT_IGNORE = ".git,node_modules";
 const SUBTEXT_KEY = "wormhole-fv-subtext";
 const TAB_WIDTH_KEY = "wormhole-fv-tab-width";
+const WRAP_KEY = "wormhole-fv-wrap";
 
 const EXT_TYPES: Record<string, string> = {
 	".ts": "TypeScript",
@@ -74,16 +75,28 @@ function fileType(filePath: string): string {
 }
 
 function relativeTime(iso: string): string {
-	if (!iso) {return "";}
+	if (!iso) {
+		return "";
+	}
 	const diff = Date.now() - new Date(iso).getTime();
-	if (Number.isNaN(diff)) {return "";}
+	if (Number.isNaN(diff)) {
+		return "";
+	}
 	const mins = Math.floor(diff / 60000);
-	if (mins < 1) {return "just now";}
-	if (mins < 60) {return mins + "m ago";}
+	if (mins < 1) {
+		return "just now";
+	}
+	if (mins < 60) {
+		return mins + "m ago";
+	}
 	const hrs = Math.floor(mins / 60);
-	if (hrs < 24) {return hrs + "h ago";}
+	if (hrs < 24) {
+		return hrs + "h ago";
+	}
 	const days = Math.floor(hrs / 24);
-	if (days < 30) {return days + "d ago";}
+	if (days < 30) {
+		return days + "d ago";
+	}
 	const months = Math.floor(days / 30);
 	return months + "mo ago";
 }
@@ -94,7 +107,9 @@ export function getSubtext(entry: {
 	modified: string;
 }): string {
 	const mode = localStorage.getItem(SUBTEXT_KEY) ?? "size";
-	if (mode === "type") {return fileType(entry.path);}
+	if (mode === "type") {
+		return fileType(entry.path);
+	}
 	if (mode === "modified") {
 		const t = relativeTime(entry.modified);
 		return t ? "Last modified " + t : "";
@@ -104,6 +119,10 @@ export function getSubtext(entry: {
 
 export function getTabWidth(): number {
 	return parseInt(localStorage.getItem(TAB_WIDTH_KEY) ?? "4", 10);
+}
+
+export function getWrap(): boolean {
+	return (localStorage.getItem(WRAP_KEY) ?? "true") === "true";
 }
 
 const FOLDER_SVG =
@@ -440,6 +459,9 @@ async function openPreview(entry: DirEntry): Promise<void> {
 			fbPreviewContent.appendChild(div);
 		} else {
 			const pre = document.createElement("pre");
+			if (!getWrap()) {
+				pre.classList.add("fv-nowrap");
+			}
 			const code = document.createElement("code");
 			code.textContent = text;
 			hljs.highlightElement(code);

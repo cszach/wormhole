@@ -2227,6 +2227,12 @@ main::-webkit-scrollbar-thumb:hover {
 	-moz-tab-size: var(--tab-width, 4);
 }
 
+.fb-preview-content pre.fv-nowrap {
+	white-space: pre;
+	word-break: normal;
+	overflow-x: auto;
+}
+
 .fb-preview-content pre code.hljs {
 	background: transparent;
 	padding: 0;

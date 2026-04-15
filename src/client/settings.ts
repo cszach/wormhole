@@ -10,6 +10,7 @@ import {
 	ttsRateValue,
 	fvTabWidth,
 	fvSubtext,
+	fvWrap,
 	vaultLockTimeout,
 	vaultClipTimeout
 } from "./dom.js";
@@ -29,6 +30,8 @@ function openSettings(): void {
 	ttsToggle.checked = state.ttsEnabled;
 	fvTabWidth.value = localStorage.getItem("wormhole-fv-tab-width") ?? "4";
 	fvSubtext.value = localStorage.getItem("wormhole-fv-subtext") ?? "size";
+	fvWrap.checked =
+		(localStorage.getItem("wormhole-fv-wrap") ?? "true") === "true";
 	vaultLockTimeout.value =
 		localStorage.getItem("wormhole-vault-timeout") ?? "300000";
 	vaultClipTimeout.value =
@@ -60,6 +63,10 @@ export function setupSettingsHandlers(): void {
 
 	fvSubtext.addEventListener("change", () => {
 		localStorage.setItem("wormhole-fv-subtext", fvSubtext.value);
+	});
+
+	fvWrap.addEventListener("change", () => {
+		localStorage.setItem("wormhole-fv-wrap", String(fvWrap.checked));
 	});
 
 	vaultLockTimeout.addEventListener("change", () => {

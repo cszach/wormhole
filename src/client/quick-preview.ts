@@ -9,7 +9,12 @@ import {
 	qpClose,
 	qpContent
 } from "./dom.js";
-import { getTreeEntry, getSubtext, getTabWidth } from "./file-browser.js";
+import {
+	getTreeEntry,
+	getSubtext,
+	getTabWidth,
+	getWrap
+} from "./file-browser.js";
 import { renderMarkdown } from "./markdown.js";
 
 const IMAGE_EXTENSIONS = new Set([
@@ -99,6 +104,9 @@ export async function openQuickPreview(filePath: string): Promise<void> {
 			qpContent.appendChild(div);
 		} else {
 			const pre = document.createElement("pre");
+			if (!getWrap()) {
+				pre.classList.add("fv-nowrap");
+			}
 			const code = document.createElement("code");
 			code.textContent = text;
 			hljs.highlightElement(code);

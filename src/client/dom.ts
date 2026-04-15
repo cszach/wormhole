@@ -52,6 +52,7 @@ export const fvTabWidth = document.getElementById(
 export const fvSubtext = document.getElementById(
 	"fv-subtext"
 ) as HTMLSelectElement;
+export const fvWrap = document.getElementById("fv-wrap") as HTMLInputElement;
 export const vaultLockTimeout = document.getElementById(
 	"vault-lock-timeout"
 ) as HTMLSelectElement;
