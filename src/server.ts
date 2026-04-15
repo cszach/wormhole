@@ -30,6 +30,7 @@ import {
 	listPanes,
 	capturePanePreview,
 	selectPane,
+	getPaneCwd,
 	setBuffer,
 	pasteBuffer,
 	deleteBuffer
@@ -495,7 +496,27 @@ function getMimeType(filePath: string): string {
 	return "text/plain";
 }
 
-function resolveFilePath(relativePath: string): string | null {
+async function getEffectiveRoot(): Promise<string> {
+	if (activeSession) {
+		const cwd = await getPaneCwd(activeSession, activeWindowIndex);
+		if (cwd) {
+			try {
+				const resolved = path.resolve(cwd);
+				if (fs.statSync(resolved).isDirectory()) {
+					return resolved;
+				}
+			} catch {
+				// Fall through to FILE_ROOT
+			}
+		}
+	}
+	return FILE_ROOT;
+}
+
+function resolveFilePath(
+	relativePath: string,
+	rootPath: string
+): string | null {
 	if (relativePath.includes("\0")) {
 		return null;
 	}
@@ -503,7 +524,7 @@ function resolveFilePath(relativePath: string): string | null {
 	let resolved: string;
 
 	try {
-		resolved = path.resolve(FILE_ROOT, relativePath);
+		resolved = path.resolve(rootPath, relativePath);
 	} catch {
 		return null;
 	}
@@ -520,7 +541,12 @@ function resolveFilePath(relativePath: string): string | null {
 		return null;
 	}
 
-	const root = fs.realpathSync(FILE_ROOT);
+	let root: string;
+	try {
+		root = fs.realpathSync(rootPath);
+	} catch {
+		return null;
+	}
 
 	if (real !== root && !real.startsWith(root + path.sep)) {
 		return null;
@@ -529,9 +555,10 @@ function resolveFilePath(relativePath: string): string | null {
 	return real;
 }
 
-app.get("/api/files/list", (req, res) => {
+app.get("/api/files/list", async (req, res) => {
 	const dir = String(req.query.dir ?? ".");
-	const resolved = resolveFilePath(dir);
+	const root = await getEffectiveRoot();
+	const resolved = resolveFilePath(dir, root);
 
 	if (!resolved) {
 		res.status(403).json({ error: "Access denied" });
@@ -581,7 +608,7 @@ app.get("/api/files/list", (req, res) => {
 
 const TREE_CAP = 10000;
 
-app.get("/api/files/tree", (req, res) => {
+app.get("/api/files/tree", async (req, res) => {
 	const ignoreParam = String(req.query.ignore ?? ".git");
 	const ignoreSet = new Set(
 		ignoreParam
@@ -599,7 +626,14 @@ app.get("/api/files/tree", (req, res) => {
 
 	const entries: TreeEntry[] = [];
 	let truncated = false;
-	const root = fs.realpathSync(FILE_ROOT);
+	const effectiveRoot = await getEffectiveRoot();
+	let root: string;
+	try {
+		root = fs.realpathSync(effectiveRoot);
+	} catch {
+		res.status(404).json({ error: "Root not found" });
+		return;
+	}
 
 	// Breadth-first walk so root files always appear before deep subtrees
 	const queue: { dir: string; rel: string }[] = [{ dir: root, rel: "" }];
@@ -659,9 +693,10 @@ app.get("/api/files/tree", (req, res) => {
 	res.json({ entries, truncated });
 });
 
-app.get("/api/files/read", (req, res) => {
+app.get("/api/files/read", async (req, res) => {
 	const filePath = String(req.query.path ?? "");
-	const resolved = resolveFilePath(filePath);
+	const root = await getEffectiveRoot();
+	const resolved = resolveFilePath(filePath, root);
 
 	if (!resolved) {
 		res.status(403).json({ error: "Access denied" });
@@ -689,9 +724,10 @@ app.get("/api/files/read", (req, res) => {
 	fs.createReadStream(resolved).pipe(res);
 });
 
-app.get("/api/files/download", (req, res) => {
+app.get("/api/files/download", async (req, res) => {
 	const filePath = String(req.query.path ?? "");
-	const resolved = resolveFilePath(filePath);
+	const root = await getEffectiveRoot();
+	const resolved = resolveFilePath(filePath, root);
 
 	if (!resolved) {
 		res.status(403).json({ error: "Access denied" });

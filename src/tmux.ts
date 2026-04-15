@@ -323,7 +323,9 @@ export function listPanes(
 				const panes: PaneInfo[] = [];
 
 				for (const line of stdout.trim().split("\n")) {
-					if (!line) {continue;}
+					if (!line) {
+						continue;
+					}
 					const p = line.split(":");
 					windowWidth = parseInt(p[6], 10);
 					windowHeight = parseInt(p[7], 10);
@@ -376,4 +378,29 @@ export function selectPane(
 		"-t",
 		`${session}:${windowIndex}.${paneIndex}`
 	]);
+}
+
+export function getPaneCwd(
+	session: string,
+	windowIndex: number
+): Promise<string> {
+	return new Promise((resolve) => {
+		execFile(
+			"tmux",
+			[
+				"display-message",
+				"-p",
+				"-t",
+				`${session}:${windowIndex}`,
+				"#{pane_current_path}"
+			],
+			(error, stdout) => {
+				if (error) {
+					resolve("");
+				} else {
+					resolve(stdout.trim());
+				}
+			}
+		);
+	});
 }
