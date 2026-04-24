@@ -10,6 +10,7 @@ import express from "express";
 import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 
+import { initPhoneAgent } from "./phone/index.js";
 import type { ServerMessage } from "./types.js";
 import { isValidSessionName } from "./validation.js";
 import {
@@ -64,7 +65,12 @@ const upload = multer({
 });
 
 const app = express();
-app.use(express.json());
+const captureRawBody = (req: express.Request, _res: unknown, buf: Buffer) => {
+	(req as express.Request & { rawBody?: Buffer }).rawBody = buf;
+};
+
+app.use(express.json({ verify: captureRawBody }));
+app.use(express.urlencoded({ extended: false, verify: captureRawBody }));
 
 const useTLS = TLS_CERT && TLS_KEY;
 
@@ -1069,6 +1075,8 @@ wss.on("connection", (ws) => {
 });
 
 const protocol = useTLS ? "https" : "http";
+
+await initPhoneAgent({ app });
 
 server.listen(PORT, "0.0.0.0", () => {
 	console.log(`Wormhole running on ${protocol}://0.0.0.0:${PORT}`);

@@ -6,6 +6,7 @@
 		"strict": true,
 		"esModuleInterop": true,
 		"noEmit": true,
+		"skipLibCheck": true,
 		"paths": {
 			"@/*": ["./src/*"]
 		}

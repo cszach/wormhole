@@ -6,6 +6,7 @@
 		"strict": true,
 		"lib": ["ES2020", "DOM", "DOM.Iterable"],
 		"noEmit": true,
+		"skipLibCheck": true,
 		"paths": {
 			"@/*": ["./src/*"]
 		}

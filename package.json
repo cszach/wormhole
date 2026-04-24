@@ -26,6 +26,7 @@
 		]
 	},
 	"dependencies": {
+		"@anthropic-ai/claude-agent-sdk": "^0.2.119",
 		"ansi_up": "^6.0.6",
 		"dotenv": "^17.3.1",
 		"express": "^5.2.1",
@@ -33,7 +34,10 @@
 		"lucide": "^1.6.0",
 		"marked": "^17.0.5",
 		"multer": "^2.1.1",
-		"ws": "^8.20.0"
+		"telnyx": "^6.41.1",
+		"twilio": "^6.0.0",
+		"ws": "^8.20.0",
+		"zod": "^4.3.6"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^7.1.0",
