@@ -32,6 +32,10 @@ When configured, data necessary for the requested action is sent to:
 
 Each third party operates under its own privacy policy.
 
+## Mobile information sharing
+
+Mobile phone numbers and SMS opt-in data collected by the Wormhole phone messaging module are **not** shared with third parties or affiliates for marketing or promotional purposes. The only third parties that receive mobile information are the messaging carrier (Twilio or Telnyx) for the sole purpose of delivering messages, as described above. No mobile data is sold, rented, or otherwise transferred for advertising.
+
 ## Retention and deletion
 
 All data is stored on the Operator's own filesystem and can be deleted by the Operator at any time. Wormhole provides no cloud-hosted data that the Operator cannot directly access.
