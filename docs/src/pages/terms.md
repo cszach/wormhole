@@ -17,6 +17,10 @@ Wormhole is a self-hosted tool for personal use. There is no Wormhole-operated s
 
 The phone messaging module is designed for, and hardcoded to, a single allowlisted phone number per installation. The Operator and the message recipient are the same person in this deployment.
 
+## SMS messaging terms
+
+By opting in to the Wormhole phone messaging module, the Operator agrees to receive SMS messages from a toll-free number registered to Duong Nguyen / Wormhole AI Assistant. Message types: conversational alerts, status updates, and questions from the Operator's own self-hosted AI assistant. Message frequency may vary, approximately 100 messages per month. Standard message and data rates may apply. Reply STOP to any message to opt out. Reply HELP for help, or contact hi@zachnguyen.com. Mobile phone numbers and SMS opt-in data are not shared or sold with third parties for marketing or promotional purposes. See the Privacy Policy for details.
+
 ## No commercial service, no warranty
 
 Wormhole is provided "as is" under the MIT License. It is not a commercial service. No warranty or uptime guarantee is offered to anyone.
